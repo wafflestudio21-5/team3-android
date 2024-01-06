@@ -24,7 +24,8 @@ class NetworkModule {
             .addInterceptor{chain ->
                 val newRequest=chain.request()
                     .newBuilder()
-                    .addHeader("accept","application/json")
+                    .addHeader("accept","*/*")
+                    .addHeader("Content-Type","application/json")
                     .build()
                 chain.proceed(newRequest)
             }.build()
@@ -35,7 +36,7 @@ class NetworkModule {
         okHttpClient: OkHttpClient,
         moshi: Moshi
     ): Retrofit {
-        return Retrofit.Builder().baseUrl("https://api.themoviedb.org/")
+        return Retrofit.Builder().baseUrl("http://everywaffle-server.duckdns.org")
             .client(okHttpClient)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
