@@ -7,8 +7,10 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,7 +24,9 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.Comment
 import androidx.compose.material.icons.filled.East
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.West
 import androidx.compose.material.icons.outlined.Cancel
@@ -36,10 +40,13 @@ import androidx.compose.material.icons.sharp.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -57,6 +64,7 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -76,6 +84,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import androidx.compose.material3.Card
+import androidx.navigation.NavGraph.Companion.findStartDestination
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity(){
@@ -116,6 +126,7 @@ fun MyAppNavHost(
         }
         composable("Home"){
             HomeScreen(
+                navController = navController,
                 onNavigateToBoard = {navController.navigate("Board")},
                 onNavigateToUser = {navController.navigate("User")}
             )
@@ -128,6 +139,14 @@ fun MyAppNavHost(
                 onNavigateToBoard = {navController.navigate("Board")},
                 onNavigateToHome = {navController.navigate("Home")}
             )
+        }
+        composable("Search"){
+            SearchScreen(
+                onNavigateBack={navController.popBackStack()}
+            )
+        }
+        composable("AllBoards"){
+            AllBoards(navController)
         }
     }
 }
@@ -441,8 +460,9 @@ fun SignupAlertDialog(
 }
 
 @Composable
-@Preview
+//@Preview
 fun HomeScreen(
+    navController:NavHostController,
     onNavigateToBoard : () -> Unit = {},
     onNavigateToUser : () -> Unit = {}
 ){
@@ -474,14 +494,14 @@ fun HomeScreen(
                             .border(width = 3.dp, color = Color.Black)
                     )
                 }
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(imageVector = Icons.Sharp.Search, contentDescription = "")
+                IconButton(onClick = { navController.navigate("Search")}) {
+                    Icon(imageVector = Icons.Sharp.Search, contentDescription = "Search")
                 }
                 IconButton(onClick = onNavigateToUser) {
                     Icon(imageVector = Icons.Sharp.ManageAccounts, contentDescription = "")
                 }
             }
-
+            BoardList(navController=navController)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -567,3 +587,204 @@ fun UserScreen(
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SearchScreen(
+    onNavigateBack:()->Unit,
+    onNavigateToHome : () -> Unit = {}
+){
+    var searchQuery by remember { mutableStateOf("") }
+    Surface (modifier = Modifier.fillMaxSize()){
+        Column{
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = onNavigateToHome) {
+                    Icon(imageVector = Icons.Sharp.ArrowBack, contentDescription = "")
+                }
+                Spacer(modifier = Modifier.weight(1f))
+            }
+            OutlinedTextField(
+                value = searchQuery ,
+                onValueChange = { newText ->
+                    searchQuery = newText
+            },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+            label = {Text("검색어를 입력하세요. ")},
+                singleLine = true,
+                trailingIcon = {
+                    IconButton(onClick ={/*TODO*/}){
+                        Icon(imageVector = Icons.Default.Search, contentDescription = "Search")
+                    }
+                },
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Search
+                ),
+                keyboardActions = KeyboardActions(
+                    onSearch = {/*TODO*/}
+                )
+            )
+            //TODO:검색 결과 표시
+        }
+    }
+}
+@Composable
+fun BoardList(navController: NavHostController) {
+
+    val boardNames = listOf("자유게시판", "비밀게시판", "졸업생게시판", "새내기게시판", "시사·이슈", "장터게시판", "정보게시판")
+
+    Column(modifier = Modifier.padding(bottom = 100.dp)) {
+
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "즐겨찾는 게시판",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "더 보기 >",
+                fontSize = 10.sp,
+                modifier = Modifier
+                    .clickable {
+                        navController.navigate("AllBoards")
+                    }
+            )
+        }
+
+        Divider(modifier = Modifier.padding(vertical = 4.dp))
+
+        boardNames.forEach { name ->
+            Text(
+                text = name,
+                fontSize = 14.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        // TODO: 게시판으로 넘어가는 로직
+                    }
+                    .padding(vertical = 8.dp),
+                color = Color.Black
+            )
+            //Divider()
+        }
+
+        Divider(modifier = Modifier.padding(vertical = 20.dp))
+
+        Text(
+            text = "실시간 인기 글",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
+        for(i in 0 until 2){
+            PopularPost()
+        }
+
+        //Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+
+@Composable
+fun PopularPost() {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        //elevation = 4.dp,
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .background(Color.White)
+                .clickable {
+                    // TODO: 상세 게시글로 넘어가는 로직
+                }
+                .padding(16.dp)
+        ) {
+            Text("게시글 제목", fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text("게시글 내용 미리보기...", color = Color.Gray)
+            Spacer(modifier = Modifier.height(4.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("01/02 01:22", fontSize = 12.sp, color = Color.Gray)
+                Row {
+                    Icon(imageVector = Icons.Default.Favorite, contentDescription = "Likes", tint = Color.Red)
+                    Text("공감", modifier = Modifier.padding(start = 4.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(imageVector = Icons.Default.Comment, contentDescription = "Comments", tint = Color.Gray)
+                    Text("댓글", modifier = Modifier.padding(start = 4.dp))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun AllBoards(navController: NavHostController) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+            .padding(top=100.dp)
+    ) {
+        val boardList = listOf("내가 쓴 글", "댓글 단 글", "스크랩", "HOT 게시판", "BEST 게시판")
+        val boardNames = listOf("자유게시판", "비밀게시판", "졸업생게시판", "새내기게시판", "시사·이슈", "장터게시판", "정보게시판")
+
+        boardList.forEach { boardName ->
+            Text(
+                text = boardName,
+                fontSize = 18.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        // TODO: 각 게시물로 이동하는 로직
+                    }
+                    .padding(vertical = 8.dp),
+                fontWeight = FontWeight.Medium,
+                color = Color.Black
+            )
+            Divider()
+        }
+
+        Text(
+            text = "즐겨찾는 게시판",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(vertical = 16.dp)
+        )
+
+        boardNames.forEach { name ->
+            Text(
+                text = name,
+                fontSize = 14.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        // TODO: 각 게시판으로 이동하는 로직
+                    }
+                    .padding(vertical = 8.dp),
+                color = Color.Black
+            )
+            Divider()
+        }
+    }
+}
+
