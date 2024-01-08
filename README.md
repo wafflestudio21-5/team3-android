@@ -52,6 +52,7 @@ https://github.com/plgafhd/team3-android/assets/141345525/a3f4ffb2-7d70-4db6-bca
 
 
 ![image](https://github.com/wafflestudio21-5/team3-android/assets/110971028/112bb72f-aa84-4e37-8b2b-87a3996060a0)
+
 각 게시판으로 넘어가는 버튼을 클릭했을 때의 기능은 구현중입니다. 
 
 <검색 화면>
