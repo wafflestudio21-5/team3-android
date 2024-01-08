@@ -43,3 +43,24 @@ https://github.com/plgafhd/team3-android/assets/141345525/a3f4ffb2-7d70-4db6-bca
   화면 구성은 마친 상태이며, 아이디 및 비밀번호를 입력할 수 있습니다.
   
   버튼을 클릭했을 때의 기능은 구현 중입니다.
+
+
+
+1/8
+
+<홈 화면>
+![image](https://github.com/wafflestudio21-5/team3-android/assets/110971028/112bb72f-aa84-4e37-8b2b-87a3996060a0)
+각 게시판으로 넘어가는 버튼을 클릭했을 때의 기능은 구현중입니다. 
+
+<검색 화면>
+![image](https://github.com/wafflestudio21-5/team3-android/assets/110971028/940a03f7-688c-4af4-b57e-24e39cd16e00)
+
+검색어를 입력하고 나오는 기능을 추가해야 합니다.
+검색화면에서도 상단바와 하단바를 유지할지에 대해 논의가 필요할 것 같습니다. 
+
+<전체 게시판 화면>
+홈화면의 '즐겨찾는 게시판 > 더 보기' 를 눌렀을 때 표시되는 화면입니다. 
+![image](https://github.com/wafflestudio21-5/team3-android/assets/110971028/2e885d08-b239-4412-ad06-7437d8442f93)
+
+각 버튼을 눌렀을 때 화면이 전환되는 기능을 구현해야 합니다. 
+아이콘 등 디자인적 논의와 수정이 필요할 것 같습니다. 
