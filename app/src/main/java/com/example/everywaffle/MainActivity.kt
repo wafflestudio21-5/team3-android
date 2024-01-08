@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.paddingFromBaseline
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -127,26 +128,28 @@ fun MyAppNavHost(
         composable("Home"){
             HomeScreen(
                 navController = navController,
-                onNavigateToBoard = {navController.navigate("Board")},
+                onNavigateToBoard = {navController.navigate("AllBoards")},
                 onNavigateToUser = {navController.navigate("User")}
             )
         }
-        composable("Board"){
-            BoardScreen()
-        }
         composable("User"){
             UserScreen(
-                onNavigateToBoard = {navController.navigate("Board")},
+                onNavigateToBoard = {navController.navigate("AllBoards")},
                 onNavigateToHome = {navController.navigate("Home")}
             )
         }
         composable("Search"){
             SearchScreen(
-                onNavigateBack={navController.popBackStack()}
+                onNavigateBack={navController.popBackStack()},
+                onNavigateToHome = {navController.navigate("Home")}
             )
         }
         composable("AllBoards"){
-            AllBoards(navController)
+            AllBoards(
+                navController = navController,
+                onNavigateToHome = {navController.navigate("Home")},
+                onNavigateToUser = {navController.navigate("User")}
+            )
         }
     }
 }
@@ -472,19 +475,17 @@ fun HomeScreen(
         modifier = Modifier
             .background(color = Color.White)
             .fillMaxSize()
+            .padding(15.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(15.dp)
         ) {
-            Row(
-                modifier = Modifier
-                    .weight(.1f)
-            ){
+            Row() {
                 Row(
                     modifier = Modifier.weight(.1f)
-                ){
+                ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_launcher_foreground),
                         contentDescription = "",
@@ -494,18 +495,26 @@ fun HomeScreen(
                             .border(width = 3.dp, color = Color.Black)
                     )
                 }
-                IconButton(onClick = { navController.navigate("Search")}) {
+                IconButton(onClick = { navController.navigate("Search") }) {
                     Icon(imageVector = Icons.Sharp.Search, contentDescription = "Search")
                 }
                 IconButton(onClick = onNavigateToUser) {
                     Icon(imageVector = Icons.Sharp.ManageAccounts, contentDescription = "")
                 }
             }
-            BoardList(navController=navController)
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(580.dp)
+            ){
+                item {
+                    BoardList(navController = navController)
+                }
+            }
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
-            ){
+            ) {
                 IconButtonWithText(
                     imageVector = Icons.Sharp.Home,
                     text = "홈"
@@ -542,20 +551,6 @@ fun IconButtonWithText(
             text = text
         )
     }
-}
-
-@Composable
-fun BoardScreen(
-    onNavigateToBoard : () -> Unit = {},
-    onNavigateToUser : () -> Unit = {}
-) {
-    //val mainViewModel = hiltViewModel<MainViewModel>()
-
-    Surface(
-        modifier = Modifier
-            .background(color = Color.White)
-            .fillMaxSize()
-    ) {}
 }
 
 @Composable
@@ -738,52 +733,85 @@ fun PopularPost() {
 }
 
 @Composable
-fun AllBoards(navController: NavHostController) {
+fun AllBoards(
+    navController: NavHostController,
+    onNavigateToHome : () -> Unit = {},
+    onNavigateToUser : () -> Unit = {}
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .padding(top=100.dp)
+            .padding(top = 100.dp)
+            .padding(15.dp)
     ) {
         val boardList = listOf("내가 쓴 글", "댓글 단 글", "스크랩", "HOT 게시판", "BEST 게시판")
         val boardNames = listOf("자유게시판", "비밀게시판", "졸업생게시판", "새내기게시판", "시사·이슈", "장터게시판", "정보게시판")
 
-        boardList.forEach { boardName ->
-            Text(
-                text = boardName,
-                fontSize = 18.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        // TODO: 각 게시물로 이동하는 로직
-                    }
-                    .padding(vertical = 8.dp),
-                fontWeight = FontWeight.Medium,
-                color = Color.Black
-            )
-            Divider()
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(540.dp)
+        ){
+            item {
+                boardList.forEach { boardName ->
+                    Text(
+                        text = boardName,
+                        fontSize = 18.sp,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                // TODO: 각 게시물로 이동하는 로직
+                            }
+                            .padding(vertical = 8.dp),
+                        fontWeight = FontWeight.Medium,
+                        color = Color.Black
+                    )
+                    Divider()
+                }
+
+                Text(
+                    text = "즐겨찾는 게시판",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(vertical = 16.dp)
+                )
+
+                boardNames.forEach { name ->
+                    Text(
+                        text = name,
+                        fontSize = 14.sp,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                // TODO: 각 게시판으로 이동하는 로직
+                            }
+                            .padding(vertical = 8.dp),
+                        color = Color.Black
+                    )
+                    Divider()
+                }
+            }
         }
 
-        Text(
-            text = "즐겨찾는 게시판",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(vertical = 16.dp)
-        )
-
-        boardNames.forEach { name ->
-            Text(
-                text = name,
-                fontSize = 14.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        // TODO: 각 게시판으로 이동하는 로직
-                    }
-                    .padding(vertical = 8.dp),
-                color = Color.Black
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            IconButtonWithText(
+                imageVector = Icons.Sharp.Home,
+                text = "홈",
+                onclick = onNavigateToHome
             )
-            Divider()
+            IconButtonWithText(
+                imageVector = Icons.Sharp.Dashboard,
+                text = "게시판"
+            )
+            IconButtonWithText(
+                imageVector = Icons.Sharp.ManageAccounts,
+                text = "마이페이지",
+                onclick = onNavigateToUser
+            )
         }
     }
 }
