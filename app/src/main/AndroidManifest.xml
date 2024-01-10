@@ -16,6 +16,10 @@
         android:theme="@style/Theme.Design.NoActionBar"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+        <meta-data
+            android:name="com.kakao.sdk.Appkey"
+            android:value="TODO">
+        </meta-data>
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -25,6 +29,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data android:host="oauth"
+                    android:scheme="kakaofe6dad63a3191e6ceead975b205d3386"/>
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>

@@ -102,4 +102,6 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.5")
     implementation("androidx.fragment:fragment-ktx:1.6.2")
     implementation("androidx.activity:activity-ktx:1.8.1")
+
+    implementation("com.kakao.sdk:v2-user:2.12.1")
 }
