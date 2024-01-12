@@ -86,6 +86,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.navigation.NavGraph.Companion.findStartDestination
 
 @AndroidEntryPoint
@@ -535,7 +536,6 @@ fun HomeScreen(
 }
 
 @Composable
-@Preview
 fun IconButtonWithText(
     imageVector: ImageVector = Icons.Sharp.DeviceUnknown,
     text:String = "",
@@ -553,35 +553,119 @@ fun IconButtonWithText(
     }
 }
 
-@Composable
 @Preview
+@Composable
 fun UserScreen(
-    onNavigateToBoard : () -> Unit = {},
-    onNavigateToHome : () -> Unit = {}
+    onNavigateToBoard: () -> Unit = {},
+    onNavigateToHome: () -> Unit = {}
 ) {
-    //val mainViewModel = hiltViewModel<MainViewModel>()
-
     Surface(
         modifier = Modifier
             .background(color = Color.White)
             .fillMaxSize()
     ) {
-        Column {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = onNavigateToHome) {
-                    Icon(imageVector = Icons.Sharp.ArrowBack, contentDescription = "")
-                }
-                Text(
-                    text = "내 정보",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
+        Column(modifier = Modifier.padding(16.dp)) {
+            Header(onNavigateToHome)
+            UserOptionsSection("계정", accountOptions)
+            UserOptionsSection("커뮤니티", communityOptions)
+            UserOptionsSection("앱 설정", appSettingsOptions)
+            UserOptionsSection("이용 안내", usageOptions)
+            UserOptionsSection("기타", otherOptions)
+        }
+    }
+}
+
+@Composable
+fun Header(onNavigateToHome: () -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        IconButton(onClick = onNavigateToHome) {
+            Icon(imageVector = Icons.Sharp.ArrowBack, contentDescription = "")
+        }
+        Text(
+            text = "내 정보",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+@Composable
+fun UserOptionsSection(title: String, options: List<Pair<String, String>>) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 16.dp)
+            .background(Color.White)
+            .border(1.dp, Color.Gray, RoundedCornerShape(4.dp))
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = title,
+                color = Color.Black,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 4.dp, top = 4.dp, start = 4.dp)
+            )
+            options.forEach { (_, buttonText) ->
+                OptionButton(buttonText = buttonText)
             }
         }
     }
 }
+
+@Composable
+fun OptionButton(buttonText: String) {
+    Text(
+        text = buttonText,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { /* TODO: 화면 이동 로직 */ }
+            .padding(vertical = 8.dp, horizontal = 16.dp),
+        color = Color.Black,
+        fontSize = 12.sp,
+        fontWeight = FontWeight.Medium
+    )
+}
+
+val accountOptions = listOf(
+    "아이디" to "아이디",
+    "실명 프로필 사진 변경" to "실명 프로필 사진 변경",
+    "학교 인증" to "학교 인증",
+    "학과 설정" to "학과 설정",
+    "학적 처리 내역" to "학적 처리 내역",
+    "비밀번호 변경" to "비밀번호 변경",
+    "이메일 변경" to "이메일 변경"
+)
+
+val communityOptions = listOf(
+    "닉네임 설정" to "닉네임 설정",
+    "게시판 프로필 사진 변경" to "게시판 프로필 사진 변경",
+    "이용 제한 내역" to "이용 제한 내역",
+    "쪽지 설정" to "쪽지 설정",
+    "커뮤니티 이용규칙" to "커뮤니티 이용규칙"
+)
+
+val appSettingsOptions = listOf(
+    "다크 모드" to "다크 모드",
+    "알림 설정" to "알림 설정",
+    "암호 잠금" to "암호 잠금",
+    "캐시 삭제" to "캐시 삭제"
+)
+
+val usageOptions = listOf(
+    "앱 버전" to "앱 버전",
+    "문의하기" to "문의하기",
+    "공지사항" to "공지사항",
+    "서비스 이용약관" to "서비스 이용약관",
+    "개인정보 처리방침" to "개인정보 처리방침",
+    "청소년 보호정책" to "청소년 보호정책",
+    "오픈소스 라이선스" to "오픈소스 라이선스"
+)
+
+val otherOptions = listOf(
+    "정보 동의 설정" to "정보 동의 설정",
+    "회원 탈퇴" to "회원탈퇴",
+    "로그아웃" to "로그아웃"
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
