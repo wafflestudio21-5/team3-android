@@ -36,9 +36,11 @@ import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.sharp.ArrowBack
 import androidx.compose.material.icons.sharp.Dashboard
 import androidx.compose.material.icons.sharp.DeviceUnknown
+import androidx.compose.material.icons.sharp.ErrorOutline
 import androidx.compose.material.icons.sharp.Home
 import androidx.compose.material.icons.sharp.ManageAccounts
 import androidx.compose.material.icons.sharp.Search
+import androidx.compose.material.icons.sharp.SmsFailed
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -88,8 +90,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.RememberObserver
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.core.text.isDigitsOnly
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
@@ -125,12 +131,14 @@ fun MyAppNavHost(
         composable("Init"){
             InitScreen(
                 onNavigateToSignup = { navController.navigate("Signup") },
-                onNavigateToHome = {navController.navigate("Home")}
+                onNavigateToHome = {navController.navigate("Home")},
+                onNavigateToDetail = {navController.navigate("Detail")}
             )
         }
         composable("Signup"){
             SignupScreen(
-                onNavigateToInit = {navController.navigate("Init")}
+                onNavigateToInit = {navController.navigate("Init")},
+                onNavigateToDetail = {navController.navigate("Detail")}
             )
         }
         composable("Home"){
@@ -159,6 +167,11 @@ fun MyAppNavHost(
                 onNavigateToUser = {navController.navigate("User")}
             )
         }
+        composable("Detail"){
+            DetailScreen(
+                onNavigateToInit = {navController.navigate("Init")}
+            )
+        }
     }
 }
 
@@ -167,13 +180,15 @@ fun MyAppNavHost(
 @Composable
 fun InitScreen(
     onNavigateToSignup: () -> Unit ={},
-    onNavigateToHome: () -> Unit ={}
+    onNavigateToHome: () -> Unit ={},
+    onNavigateToDetail: () -> Unit ={}
 ){
     val mainViewModel = hiltViewModel<MainViewModel>()
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
     var signinid by remember { mutableStateOf("") }
     var signinpw by remember { mutableStateOf("") }
+    var signinfail by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     Surface(
@@ -262,9 +277,14 @@ fun InitScreen(
                     focusManager.clearFocus()
                     keyboardController?.hide()
                     CoroutineScope(Dispatchers.Main).launch {
-                        mainViewModel.signin(signinid, signinpw)
+                        val result = mainViewModel.signin(signinid, signinpw)
+                        if(result==null){
+                            signinfail=true
+                        }
+                        else{
+                            onNavigateToHome()
+                        }
                     }
-                    onNavigateToHome()
                 },
                 colors = ButtonDefaults.buttonColors(Color(0xDFF00000)),
                 shape = RoundedCornerShape(10.dp),
@@ -284,7 +304,10 @@ fun InitScreen(
                 onClick = {
                     focusManager.clearFocus()
                     keyboardController?.hide()
-                    kakaoLogin(context = context)
+                    kakaoLogin(
+                        context = context,
+                        onNavigateToDetail = onNavigateToDetail
+                    )
                 },
                 colors = ButtonDefaults.buttonColors(Color(0xFFFFEB3B)),
                 shape = RectangleShape,
@@ -317,11 +340,24 @@ fun InitScreen(
                     )
                 }
             }
+
+            if(signinfail){
+                MakeAlertDialog(
+                    onConfirmation = {signinfail=false},
+                    icon = Icons.Sharp.SmsFailed,
+                    title = "로그인 실패",
+                    content = "잘못된 아이디 또는 비밀번호입니다.",
+                    confirmtext = "다시 입력하기"
+                )
+            }
         }
     }
 }
 
-fun kakaoLogin(context: Context){
+fun kakaoLogin(
+    context: Context,
+    onNavigateToDetail: () -> Unit
+){
     // 카카오계정으로 로그인 공통 callback 구성
     // 카카오톡으로 로그인 할 수 없어 카카오계정으로 로그인할 경우 사용됨
     val callback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
@@ -334,6 +370,7 @@ fun kakaoLogin(context: Context){
                         "token: ${token.accessToken} \n\n " +
                         "me: ${user}")
             }
+            onNavigateToDetail()
         }
     }
 
@@ -361,14 +398,194 @@ fun kakaoLogin(context: Context){
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@Preview
+@Composable
+fun DetailScreen(
+    onNavigateToInit: () -> Unit = {}
+){
+    //val mainViewModel = hiltViewModel<MainViewModel>()
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+    var realname by remember { mutableStateOf("") }
+    var nickname by remember { mutableStateOf("") }
+    var department by remember { mutableStateOf("") }
+    var studentId by remember { mutableStateOf("") }
+    Surface(
+        modifier = Modifier
+            .background(color = Color.White)
+            .fillMaxSize()
+    ){
+        Column(
+            modifier = Modifier.padding(15.dp)
+        ){
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 10.dp),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Text(
+                    text = "사용자 정보 입력",
+                    color = Color.Black,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            TextField(
+                value = realname,
+                onValueChange = {realname = it},
+                placeholder = { Text(text = "이름", fontSize = 15.sp) },
+                modifier = Modifier
+                    .padding(horizontal = 15.dp, vertical = 3.dp)
+                    .fillMaxWidth()
+                    .height(50.dp),
+                shape = RoundedCornerShape(15.dp),
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+                keyboardActions = KeyboardActions(
+                    onNext = {
+                        focusManager.moveFocus(FocusDirection.Next)
+                    }
+                ),
+                colors = TextFieldDefaults.textFieldColors(
+                    containerColor = Color(0x10000000),
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
+                    placeholderColor = Color.Gray
+                )
+            )
+
+            TextField(
+                value = nickname,
+                onValueChange = {nickname = it},
+                placeholder = { Text(text = "닉네임", fontSize = 15.sp) },
+                modifier = Modifier
+                    .padding(horizontal = 15.dp, vertical = 3.dp)
+                    .fillMaxWidth()
+                    .height(50.dp),
+                shape = RoundedCornerShape(15.dp),
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+                keyboardActions = KeyboardActions(
+                    onNext = {
+                        focusManager.moveFocus(FocusDirection.Next)
+                    }
+                ),
+                colors = TextFieldDefaults.textFieldColors(
+                    containerColor = Color(0x10000000),
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
+                    placeholderColor = Color.Gray
+                )
+            )
+
+            TextField(
+                value = department,
+                onValueChange = {department = it},
+                placeholder = { Text(text = "학과", fontSize = 15.sp) },
+                modifier = Modifier
+                    .padding(horizontal = 15.dp, vertical = 3.dp)
+                    .fillMaxWidth()
+                    .height(50.dp),
+                shape = RoundedCornerShape(15.dp),
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+                keyboardActions = KeyboardActions(
+                    onNext = {
+                        focusManager.moveFocus(FocusDirection.Next)
+                    }
+                ),
+                colors = TextFieldDefaults.textFieldColors(
+                    containerColor = Color(0x10000000),
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
+                    placeholderColor = Color.Gray
+                )
+            )
+
+            TextField(
+                value = studentId,
+                onValueChange = {
+                    if(it.isNumber()) studentId = it},
+                placeholder = { Text(text = "학번", fontSize = 15.sp) },
+                modifier = Modifier
+                    .padding(horizontal = 15.dp, vertical = 3.dp)
+                    .fillMaxWidth()
+                    .height(50.dp),
+                shape = RoundedCornerShape(15.dp),
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Done,
+                    keyboardType = KeyboardType.Number
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        keyboardController?.hide()
+                        focusManager.clearFocus()
+                    }
+                ),
+                colors = TextFieldDefaults.textFieldColors(
+                    containerColor = Color(0x10000000),
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
+                    placeholderColor = Color.Gray
+                )
+            )
+
+            Button(
+                onClick = {
+                    focusManager.clearFocus()
+                    keyboardController?.hide()
+                    /*
+                    CoroutineScope(Dispatchers.Main).launch {
+                        mainViewModel.signup(signupid, signuppw, signupemail)
+                    }
+                    signupdone=false // TODO: 체크 필요
+                    */
+                    onNavigateToInit()
+                },
+                colors = ButtonDefaults.buttonColors(Color(0xDFF00000)),
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier
+                    .padding(horizontal = 15.dp, vertical = 3.dp)
+                    .fillMaxWidth()
+                    .height(50.dp)
+            ){
+                Text(
+                    text = "정보 입력 완료",
+                    color = Color.White,
+                    fontSize = 15.sp
+                )
+            }
+
+            /*
+            if(signupdone==true){
+                MakeAlertDialog(
+                    onConfirmation = onNavigateToInit,
+                    icon = Icons.Outlined.Check,
+                    title = "회원가입 성공",
+                    content = "회원가입이 정상적으로 완료되었습니다.",
+                    confirmtext = "확인"
+                )
+            }
+            */
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun SignupScreen(
-    onNavigateToInit : () -> Unit = {}
+    onNavigateToInit : () -> Unit = {},
+    onNavigateToDetail : () -> Unit = {}
 ) {
     val mainViewModel = hiltViewModel<MainViewModel>()
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
     var signupdone by remember { mutableStateOf(false) }
+    var signupfail by remember { mutableStateOf(false) }
     var signupid by remember { mutableStateOf("") }
     var signuppw by remember { mutableStateOf("") }
     var signupemail by remember { mutableStateOf("") }
@@ -479,9 +696,14 @@ fun SignupScreen(
                     focusManager.clearFocus()
                     keyboardController?.hide()
                     CoroutineScope(Dispatchers.Main).launch {
-                        mainViewModel.signup(signupid, signuppw, signupemail)
+                        val result = mainViewModel.signup(signupid, signuppw, signupemail)
+                        if (result==null){
+                            signupfail=true
+                        }
+                        else{
+                            signupdone=true
+                        }
                     }
-                    signupdone=true // TODO: 체크 필요
                 },
                 colors = ButtonDefaults.buttonColors(Color(0xDFF00000)),
                 shape = RoundedCornerShape(10.dp),
@@ -498,24 +720,48 @@ fun SignupScreen(
             }
 
             if(signupdone==true){
-                SignupAlertDialog(onConfirmation = onNavigateToInit)
+                MakeAlertDialog(
+                    onConfirmation = {
+                        onNavigateToDetail()
+                        signupdone=false},
+                    icon = Icons.Outlined.Check,
+                    title = "회원가입 성공",
+                    content = "회원가입이 정상적으로 완료되었습니다.",
+                    confirmtext = "사용자 정보 입력"
+                )
+            }
+
+            if(signupfail==true){
+                MakeAlertDialog(
+                    onConfirmation = {
+                        signupfail=false},
+                    icon = Icons.Sharp.ErrorOutline,
+                    title = "회원가입 실패",
+                    content = "이미 사용되고 있는 아이디입니다.",
+                    confirmtext = "다시하기"
+                )
             }
         }
     }
 }
+
 @Composable
-fun SignupAlertDialog(
+fun MakeAlertDialog(
     onConfirmation: () -> Unit,
-) {
+    icon:ImageVector,
+    title:String,
+    content:String,
+    confirmtext:String = "확인"
+){
     AlertDialog(
         icon = {
-            Icon(imageVector = Icons.Outlined.Check, contentDescription = "Example Icon")
+            Icon(imageVector = icon, contentDescription = "Icon")
         },
         title = {
-            Text(text = "회원가입 성공")
+            Text(text = title)
         },
         text = {
-            Text(text = "회원가입이 정상적으로 완료되었습니다.")
+            Text(text = content)
         },
         onDismissRequest = {},
         confirmButton = {
@@ -524,7 +770,7 @@ fun SignupAlertDialog(
                     onConfirmation()
                 }
             ) {
-                Text("확인")
+                Text(confirmtext)
             }
         }
     )
@@ -631,13 +877,15 @@ fun UserScreen(
             .background(color = Color.White)
             .fillMaxSize()
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Header(onNavigateToHome)
-            UserOptionsSection("계정", accountOptions)
-            UserOptionsSection("커뮤니티", communityOptions)
-            UserOptionsSection("앱 설정", appSettingsOptions)
-            UserOptionsSection("이용 안내", usageOptions)
-            UserOptionsSection("기타", otherOptions)
+        LazyColumn(modifier = Modifier.padding(16.dp)) {
+            item {
+                Header(onNavigateToHome)
+                UserOptionsSection("계정", accountOptions)
+                UserOptionsSection("커뮤니티", communityOptions)
+                UserOptionsSection("앱 설정", appSettingsOptions)
+                UserOptionsSection("이용 안내", usageOptions)
+                UserOptionsSection("기타", otherOptions)
+            }
         }
     }
 }
@@ -967,3 +1215,10 @@ fun AllBoards(
     }
 }
 
+fun String.isNumber(): Boolean {
+    val v = toIntOrNull()
+    return when(v) {
+        null -> false
+        else -> true
+    }
+}

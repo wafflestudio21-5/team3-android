@@ -30,3 +30,11 @@ data class SigninResponse(
     @Json(name = "email") val email:String,
     @Json(name = "token") val token:String
 )
+
+@JsonClass(generateAdapter = true)
+data class UserDetail(
+    @Json(name = "realName") val realName:String,
+    @Json(name = "nickname") val nickname:String,
+    @Json(name = "department") val department:String,
+    @Json(name = "studentId") val studentId:Int
+)
