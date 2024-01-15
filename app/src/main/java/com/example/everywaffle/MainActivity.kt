@@ -96,6 +96,9 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.core.text.isDigitsOnly
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
@@ -398,9 +401,10 @@ fun kakaoLogin(
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
-@Preview
+//@Preview
 @Composable
 fun DetailScreen(
+    mainViewModel: MainViewModel = hiltViewModel(),
     onNavigateToInit: () -> Unit = {}
 ){
     //val mainViewModel = hiltViewModel<MainViewModel>()
@@ -544,6 +548,9 @@ fun DetailScreen(
                     }
                     signupdone=false // TODO: 체크 필요
                     */
+                    CoroutineScope(Dispatchers.IO).launch{
+                        mainViewModel.updateUserInfo(realname,nickname,department,studentId)
+                    }
                     onNavigateToInit()
                 },
                 colors = ButtonDefaults.buttonColors(Color(0xDFF00000)),
@@ -589,6 +596,11 @@ fun SignupScreen(
     var signupid by remember { mutableStateOf("") }
     var signuppw by remember { mutableStateOf("") }
     var signupemail by remember { mutableStateOf("") }
+
+    var realname by remember{ mutableStateOf("") }
+    var nickname by remember { mutableStateOf("") }
+    var department by remember { mutableStateOf("") }
+    var studentId by remember { mutableStateOf("") }
 
     Surface(
         modifier = Modifier
@@ -697,11 +709,13 @@ fun SignupScreen(
                     keyboardController?.hide()
                     CoroutineScope(Dispatchers.Main).launch {
                         val result = mainViewModel.signup(signupid, signuppw, signupemail)
-                        if (result==null){
-                            signupfail=true
+                        if (result!=null){
+                            mainViewModel.updateUserInfo(realname,nickname,department,studentId)
+                            signupdone=true
+                            onNavigateToDetail()
                         }
                         else{
-                            signupdone=true
+                            signupfail=true
                         }
                     }
                 },
@@ -866,12 +880,16 @@ fun IconButtonWithText(
     }
 }
 
+
+
 @Preview
 @Composable
 fun UserScreen(
+    mainViewModel: MainViewModel = hiltViewModel(),
     onNavigateToBoard: () -> Unit = {},
     onNavigateToHome: () -> Unit = {}
 ) {
+    val userInfo = UserInfo("","","","")
     Surface(
         modifier = Modifier
             .background(color = Color.White)
@@ -880,6 +898,12 @@ fun UserScreen(
         LazyColumn(modifier = Modifier.padding(16.dp)) {
             item {
                 Header(onNavigateToHome)
+                UserInfoSection(
+                    realname = userInfo.name,
+                    nickname = userInfo.nickname,
+                    department = userInfo.department,
+                    studentId = userInfo.studentId
+                )
                 UserOptionsSection("계정", accountOptions)
                 UserOptionsSection("커뮤니티", communityOptions)
                 UserOptionsSection("앱 설정", appSettingsOptions)
@@ -890,6 +914,47 @@ fun UserScreen(
     }
 }
 
+@Composable
+fun UserInfoSection(
+    realname:String,
+    nickname: String,
+    department: String,
+    studentId : String
+){
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 16.dp)
+            .background(Color.White)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "사용자 정보",
+                fontWeight = FontWeight.Bold,
+                color = Color.Black,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            UserInfoItem(label = "이름", realname)
+            UserInfoItem(label = "닉네임", nickname)
+            UserInfoItem(label = "학과", department)
+            UserInfoItem(label = "학번", studentId)
+
+        }
+    }
+}
+
+@Composable
+fun UserInfoItem(label : String, value : String){
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(text = label, color = Color.Black)
+        Text(text = value, color = Color.Gray)
+    }
+}
 @Composable
 fun Header(onNavigateToHome: () -> Unit) {
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -1006,11 +1071,11 @@ fun SearchScreen(
                 value = searchQuery ,
                 onValueChange = { newText ->
                     searchQuery = newText
-            },
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-            label = {Text("검색어를 입력하세요. ")},
+                label = {Text("검색어를 입력하세요. ")},
                 singleLine = true,
                 trailingIcon = {
                     IconButton(onClick ={/*TODO*/}){
@@ -1028,14 +1093,12 @@ fun SearchScreen(
         }
     }
 }
+
 @Composable
 fun BoardList(navController: NavHostController) {
-
     val boardNames = listOf("자유게시판", "비밀게시판", "졸업생게시판", "새내기게시판", "시사·이슈", "장터게시판", "정보게시판")
 
     Column(modifier = Modifier.padding(bottom = 100.dp)) {
-
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -1057,9 +1120,7 @@ fun BoardList(navController: NavHostController) {
                     }
             )
         }
-
         Divider(modifier = Modifier.padding(vertical = 4.dp))
-
         boardNames.forEach { name ->
             Text(
                 text = name,
@@ -1067,31 +1128,72 @@ fun BoardList(navController: NavHostController) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        // TODO: 게시판으로 넘어가는 로직
+                        when (name) {
+                            "자유게시판" -> navController.navigate("FreeBoardContent")
+                            "비밀게시판" -> navController.navigate("SecretBoardContent")
+                            "졸업생게시판" -> navController.navigate("GraduateBoardContent")
+                            "새내기게시판" -> navController.navigate("NewbieBoardContent")
+                            "시사·이슈" -> navController.navigate("IssueBoardContent")
+                            "장터게시판" -> navController.navigate("MarketBoardContent")
+                            "정보게시판" -> navController.navigate("InformationBoardContent")
+                            else -> {
+                                // 아무 동작도 하지 않음
+                            }
+                        }
                     }
                     .padding(vertical = 8.dp),
                 color = Color.Black
             )
-            //Divider()
         }
-
         Divider(modifier = Modifier.padding(vertical = 20.dp))
-
         Text(
             text = "실시간 인기 글",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 16.dp)
         )
-
-        for(i in 0 until 2){
+        for (i in 0 until 2) {
             PopularPost()
         }
-
-        //Spacer(modifier = Modifier.height(16.dp))
     }
 }
+/*
+@Composable
+fun FreeBoardContent() {
+    Text(
+        text = "자유게시판",
+        fontSize = 20.sp,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        color = Color.Black
+    )
+}
 
+@Composable
+fun SecretBoardContent() {
+    Text(
+        text = "비밀게시판",
+        fontSize = 20.sp,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        color = Color.Black
+    )
+}
+
+@Composable
+fun GraduateBoardContent() {
+    Text(
+        text = "졸업생게시판",
+        fontSize = 20.sp,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        color = Color.Black
+    )
+}
+*/
 @Composable
 fun PopularPost() {
     Card(
