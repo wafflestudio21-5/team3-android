@@ -100,10 +100,16 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import com.kakao.sdk.auth.AuthApiClient
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
+import com.kakao.sdk.common.model.KakaoSdkError
 import com.kakao.sdk.user.UserApiClient
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity(){
@@ -178,6 +184,51 @@ fun MyAppNavHost(
     }
 }
 
+suspend fun UserApiClient.Companion.loginWithKakao(context: Context): OAuthToken {
+    return if (instance.isKakaoTalkLoginAvailable(context)) {
+        try {
+            loginWithKakaoTalk(context)
+        } catch (e: ClientError) {
+            if (e.reason == ClientErrorCause.Cancelled) {
+                throw e
+            } else {
+                loginWithKakaoAccount(context)
+            }
+        } catch (e: Throwable) {
+            loginWithKakaoAccount(context)
+        }
+    } else {
+        loginWithKakaoAccount(context)
+    }
+}
+
+suspend fun UserApiClient.Companion.loginWithKakaoTalk(context: Context): OAuthToken {
+    return suspendCoroutine { continuation ->
+        instance.loginWithKakaoTalk(context) { token, error ->
+            if (error != null) {
+                continuation.resumeWithException(error)
+            } else if (token != null) {
+                continuation.resume(token)
+            } else {
+                continuation.resumeWithException(RuntimeException("Failed to obtain Kakao access token. The reason is unclear."))
+            }
+        }
+    }
+}
+
+suspend fun UserApiClient.Companion.loginWithKakaoAccount(context: Context): OAuthToken {
+    return suspendCoroutine { continuation ->
+        instance.loginWithKakaoAccount(context) { token:OAuthToken?, error:Throwable? ->
+            if (error != null) {
+                continuation.resumeWithException(error)
+            } else if (token != null) {
+                continuation.resume(token)
+            } else {
+                continuation.resumeWithException(RuntimeException("Failed to obtain Kakao access token. The reason is unclear."))
+            }
+        }
+    }
+}
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 //@Preview
 @Composable
@@ -280,17 +331,18 @@ fun InitScreen(
                     focusManager.clearFocus()
                     keyboardController?.hide()
                     CoroutineScope(Dispatchers.Main).launch {
-                        val result = mainViewModel.signin(signinid, signinpw)
-                        if(result==null){
-                            signinfail=true
-                        }
-                        else{
-                            onNavigateToHome()
+                        try {
+                            val oAuthToken = UserApiClient.loginWithKakao(context)
+                            Log.i("KakaoLogin", "Login successful: $oAuthToken")
+                            onNavigateToDetail()  // 성공시 Detail 화면으로 이동
+                        } catch (error: Throwable) {
+                            Log.e("KakaoLogin", "Login failed", error)
+                            //TODO: 로그인 실패시 처리 로직
                         }
                     }
                 },
-                colors = ButtonDefaults.buttonColors(Color(0xDFF00000)),
-                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(Color(0xFFFFEB3B)),
+                shape = RectangleShape,
                 modifier = Modifier
                     .padding(horizontal = 15.dp, vertical = 3.dp)
                     .fillMaxWidth()
@@ -307,7 +359,7 @@ fun InitScreen(
                 onClick = {
                     focusManager.clearFocus()
                     keyboardController?.hide()
-                    kakaoLogin(
+                    loginWithKaKao(
                         context = context,
                         onNavigateToDetail = onNavigateToDetail
                     )
@@ -354,49 +406,6 @@ fun InitScreen(
                 )
             }
         }
-    }
-}
-
-fun kakaoLogin(
-    context: Context,
-    onNavigateToDetail: () -> Unit
-){
-    // 카카오계정으로 로그인 공통 callback 구성
-    // 카카오톡으로 로그인 할 수 없어 카카오계정으로 로그인할 경우 사용됨
-    val callback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
-        if (error != null) {
-            Log.d("aaaa", "카카오계정으로 로그인 실패", error)
-        } else if (token != null) {
-            Log.d("aaaa", "카카오계정으로 로그인 성공 ${token.accessToken}")
-            UserApiClient.instance.me { user, error ->
-                Log.d("aaaa", "카카오계정으로 로그인 성공 \n\n " +
-                        "token: ${token.accessToken} \n\n " +
-                        "me: ${user}")
-            }
-            onNavigateToDetail()
-        }
-    }
-
-    // 카카오톡이 설치되어 있으면 카카오톡으로 로그인, 아니면 카카오계정으로 로그인
-    if (UserApiClient.instance.isKakaoTalkLoginAvailable(context)) {
-        UserApiClient.instance.loginWithKakaoTalk(context) { token, error ->
-            if (error != null) {
-                Log.d("aaaa", "카카오톡으로 로그인 실패", error)
-
-                // 사용자가 카카오톡 설치 후 디바이스 권한 요청 화면에서 로그인을 취소한 경우,
-                // 의도적인 로그인 취소로 보고 카카오계정으로 로그인 시도 없이 로그인 취소로 처리 (예: 뒤로 가기)
-                if (error is ClientError && error.reason == ClientErrorCause.Cancelled) {
-                    return@loginWithKakaoTalk
-                }
-
-                // 카카오톡에 연결된 카카오계정이 없는 경우, 카카오계정으로 로그인 시도
-                UserApiClient.instance.loginWithKakaoAccount(context, callback = callback)
-            } else if (token != null) {
-                Log.d("aaaa", "카카오톡으로 로그인 성공 ${token.accessToken}")
-            }
-        }
-    } else {
-        UserApiClient.instance.loginWithKakaoAccount(context, callback = callback)
     }
 }
 
