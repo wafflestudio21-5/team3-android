@@ -12,6 +12,7 @@ data class SignupRequest(
 
 @JsonClass(generateAdapter = true)
 data class SignupResponse(
+    @Json(name = "userId") val userId:Int,
     @Json(name = "userName") val userName:String,
     @Json(name = "email") val email:String,
     @Json(name = "token") val token:String
@@ -33,6 +34,15 @@ data class SigninResponse(
 
 @JsonClass(generateAdapter = true)
 data class UserDetail(
+    @Json(name = "realName") val realName:String,
+    @Json(name = "nickname") val nickname:String,
+    @Json(name = "department") val department:String,
+    @Json(name = "studentId") val studentId:Int
+)
+
+@JsonClass(generateAdapter = true)
+data class GetUserDetail(
+    @Json(name = "userId") val userId:Int,
     @Json(name = "realName") val realName:String,
     @Json(name = "nickname") val nickname:String,
     @Json(name = "department") val department:String,

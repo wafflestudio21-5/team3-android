@@ -14,13 +14,11 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val api: RestAPI
 ):ViewModel(){
-
-    private val _userInfo = MutableLiveData<UserInfo>()
-    val userInfo: LiveData<UserInfo> = _userInfo
     suspend fun signup(id:String, pw:String, email:String):SignupResponse?{
         var signupresponse:SignupResponse?
         try {
             signupresponse= api.signup(SignupRequest(id,pw,email))
+            MyApplication.prefs.setString("userid",signupresponse.userId.toString())
         }
         catch (e:retrofit2.HttpException){
             signupresponse= null
@@ -32,23 +30,58 @@ class MainViewModel @Inject constructor(
         var signinresponse:SigninResponse?
         try {
             signinresponse = api.signin(SigninRequest(id, pw))
-            Log.d("aaaa", "success")
+            MyApplication.prefs.setString("userid",signinresponse.userId.toString())
+            MyApplication.prefs.setString("token",signinresponse.token)
+            MyApplication.prefs.setString("id",id)
+            MyApplication.prefs.setString("password",pw)
         }
         catch (e:retrofit2.HttpException){
             signinresponse = null
-            Log.d("aaaa", "fail")
         }
         return signinresponse
     }
 
-    fun updateUserInfo(name: String, nickname: String, department: String, studentId: String){
-        _userInfo.value = UserInfo(name, nickname, department, studentId)
+    suspend fun updateUserInfo(realname: String, nickname: String, department: String, studentId: Int):UserDetail?{
+        var updateUserInforesponse:UserDetail?
+        try {
+            updateUserInforesponse = api.updateUserInfo(userid = MyApplication.prefs.getString("userId").toInt(), userdetail = UserDetail(realname,nickname,department,studentId))
+            MyApplication.prefs.setString("realname",realname)
+            MyApplication.prefs.setString("nickname",nickname)
+            MyApplication.prefs.setString("department",department)
+            MyApplication.prefs.setString("studentid",studentId.toString())
+
+        }
+        catch (e:retrofit2.HttpException){
+            updateUserInforesponse=null
+        }
+        return updateUserInforesponse
+    }
+
+    suspend fun getUserInfo(userId:Int = MyApplication.prefs.getString("userId").toInt()):GetUserDetail? {
+        var getUserInforesponse: GetUserDetail?
+        try {
+            getUserInforesponse = api.getUserInfo(userid = userId)
+            MyApplication.prefs.setString("realname", getUserInforesponse.realName)
+            MyApplication.prefs.setString("nickname", getUserInforesponse.nickname)
+            MyApplication.prefs.setString("department", getUserInforesponse.department)
+            MyApplication.prefs.setString("studentid", getUserInforesponse.studentId.toString())
+        } catch (e: retrofit2.HttpException) {
+            getUserInforesponse = null
+        }
+        return getUserInforesponse
+    }
+
+    suspend fun changepassword(newpw:String):Int?{
+        try{
+            Log.d("aaaa",MyApplication.prefs.getString("userId"))
+            Log.d("aaaa",MyApplication.prefs.getString("password"))
+            Log.d("aaaa",newpw)
+            api.changepassword(userid = MyApplication.prefs.getString("userId").toInt(), newpw=newpw)
+            MyApplication.prefs.setString("password",newpw)
+            return 1
+        }
+        catch (e:retrofit2.HttpException){
+            return null
+        }
     }
 }
-
-data class UserInfo(
-    val name: String,
-    val nickname: String,
-    val department: String,
-    val studentId: String
-)
