@@ -67,7 +67,7 @@ fun UserScreen(
     ) {
         LazyColumn(modifier = Modifier.padding(16.dp)) {
             item {
-                val onclicklist = listOf(
+                val onclicklist = listOf( // Mainactivity의 option 변수 참조, 순서에 해당하는 함수 생성
                     {navController.navigate("ChangePassword")},
                     {
                         navController.navigate("Init")
@@ -164,7 +164,7 @@ fun UserOptionsSection(title: String, options: List<Pair<String, Any>>, onclickl
                 modifier = Modifier.padding(bottom = 4.dp, top = 4.dp, start = 4.dp)
             )
             options.forEach { (buttonText, command) ->
-                when (command){
+                when (command){  // 여기서 option의 형태에 따라 다른 화면 구성
                     is String -> {
                         OptionRow(Text1 = buttonText, Text2 = command)
                     }

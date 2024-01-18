@@ -287,13 +287,17 @@ fun IconButtonWithText(
     }
 }
 
+// option에서 두번째 요소가 String이면 String 2개 배치 (실제 앱에서 아이디가 이 경우에 속함)
+// option에서 두번째 요소가 Int이면 그 숫자에 해당하는 함수 호출
+// 함수 목록은 UserScreen.kt의 UserScreen 함수에서 onclicklist에 있고, 이를 UserOptionsSection 함수에서 감지 및 실행
+
 val accountOptions = listOf(
     "아이디" to "",
     "실명 프로필 사진 변경" to "실명 프로필 사진 변경",
     "학교 인증" to "학교 인증",
     "학과 설정" to "학과 설정",
     "학적 처리 내역" to "학적 처리 내역",
-    "비밀번호 변경" to 0,
+    "비밀번호 변경" to 0, //
     "이메일 변경" to "이메일 변경"
 )
 
@@ -328,7 +332,7 @@ val otherOptions = listOf(
     "로그아웃" to 1
 )
 /*
-@Composable
+@Composable전
 fun FreeBoardContent() {
     Text(
         text = "자유게시판",

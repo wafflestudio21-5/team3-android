@@ -16,3 +16,5 @@ class MyApplication : Application(){
         KakaoSdk.init(this,"fe6dad63a3191e6ceead975b205d3386")
     }
 }
+
+// pref의 사용 용도 : 처음 실행시 로그인 안해도 홈 화면으로 가도록 하는 경우, viewmodel의 사용 줄이기

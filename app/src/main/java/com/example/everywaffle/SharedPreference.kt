@@ -3,7 +3,7 @@ package com.example.everywaffle
 import android.content.Context
 import android.content.SharedPreferences
 
-class SharedPreference(context: Context) {
+class SharedPreference(context: Context) { // key는 가급적 all 소문자로
     private val prefs:SharedPreferences = context.getSharedPreferences("pref",Context.MODE_PRIVATE)
 
     fun getString(key:String,defvalue:String = "-1"):String{
@@ -14,7 +14,7 @@ class SharedPreference(context: Context) {
         prefs.edit().putString(key,str).apply()
     }
 
-    fun reset(){
+    fun reset(){ // 로그아웃
         prefs.edit().remove("userid").apply()
         prefs.edit().remove("token").apply()
         prefs.edit().remove("id").apply()

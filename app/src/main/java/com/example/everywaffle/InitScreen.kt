@@ -63,6 +63,7 @@ fun InitScreen(
     var signinpw by remember { mutableStateOf("") }
     var signinfail by remember { mutableStateOf(false) }
 
+    // 토큰에 로그인 정보가 있는 경우, 앱 시작시 홈 화면으로 바로 이동
     LaunchedEffect(Unit){
         if(MyApplication.prefs.getString("token")!="-1"){
             onNavigateToHome()
@@ -150,18 +151,19 @@ fun InitScreen(
                 )
             )
 
+            // 일반 로그인
             Button(
                 onClick = {
                     focusManager.clearFocus()
                     keyboardController?.hide()
                     CoroutineScope(Dispatchers.Main).launch {
                         val result = mainViewModel.signin(signinid,signinpw)
-                        if(result==null){
+                        if(result==null){ // 로그인 실패
                             signinfail=true
                         }
                         else{
                             val result2 = mainViewModel.getUserInfo()
-                            if(result2==null){
+                            if(result2==null){ // 입력된 사용자 정보가 없는 경우
                                 onNavigateToDetail()
                             }
                             else {
@@ -184,6 +186,7 @@ fun InitScreen(
                 )
             }
 
+            // 카카오 로그인
             Button(
                 onClick = {
                     focusManager.clearFocus()
@@ -222,7 +225,7 @@ fun InitScreen(
                 }
             }
 
-            if(signinfail){
+            if(signinfail){ // 로그인 실패시 뜨는 alert
                 MakeAlertDialog(
                     onConfirmation = {signinfail=false},
                     icon = Icons.Sharp.SmsFailed,
