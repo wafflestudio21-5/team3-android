@@ -100,6 +100,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.kakao.sdk.auth.AuthApiClient
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
@@ -148,9 +150,17 @@ fun MyAppNavHost(
         composable("Signup"){
             SignupScreen(
                 onNavigateToInit = {navController.navigate("Init")},
-                onNavigateToDetail = {navController.navigate("Detail")}
+                onNavigateToDetail = {navController.navigate("Detail")},
+                onNavigateToHome = {navController.navigate("Home")}
             )
         }
+        /*composable("KakaoSignup/{idToken}",arguments= listOf(navArgument("idToken"){type= NavType.StringType})){
+            KakaoSignupScreen(
+                onNavigateToInit = {navController.navigate("Init")},
+                onNavigateToDetail = {navController.navigate("Detail")},
+                onNavigateToHome = {navController.navigate("Home")}
+            )
+        }*/
         composable("Home"){
             HomeScreen(
                 navController = navController,
@@ -195,7 +205,7 @@ fun MyAppNavHost(
         }
     }
 }
-
+/*
 suspend fun UserApiClient.Companion.loginWithKakao(context: Context): OAuthToken {
     return if (instance.isKakaoTalkLoginAvailable(context)) {
         try {
@@ -237,6 +247,8 @@ suspend fun UserApiClient.Companion.loginWithKakaoAccount(context: Context): OAu
         continuation.invokeOnCancellation {}
     }
 }
+ */
+
 
 @Composable
 fun MakeAlertDialog(

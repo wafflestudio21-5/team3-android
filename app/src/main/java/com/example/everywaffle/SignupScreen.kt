@@ -1,5 +1,6 @@
 package com.example.everywaffle
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -34,6 +35,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
@@ -49,7 +51,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun SignupScreen(
     onNavigateToInit : () -> Unit = {},
-    onNavigateToDetail : () -> Unit = {}
+    onNavigateToDetail : () -> Unit = {},
+    onNavigateToHome : () -> Unit = {}
 ) {
     val mainViewModel = hiltViewModel<MainViewModel>()
     val focusManager = LocalFocusManager.current
@@ -59,6 +62,8 @@ fun SignupScreen(
     var signupid by remember { mutableStateOf("") }
     var signuppw by remember { mutableStateOf("") }
     var signupemail by remember { mutableStateOf("") }
+    val kakaologin = Kakaologin()
+    val context = LocalContext.current
 
     //var realname by remember{ mutableStateOf("") }
     //var nickname by remember { mutableStateOf("") }
@@ -195,6 +200,43 @@ fun SignupScreen(
                     fontSize = 15.sp
                 )
             }
+
+            /*
+            Button(
+                onClick = {
+                    focusManager.clearFocus()
+                    keyboardController?.hide()
+                    CoroutineScope(Dispatchers.Main).launch {
+                        try {
+                            val oAuthToken = kakaologin.loginWithKakao(context)
+                            if (oAuthToken != null) {
+                                //kakaologin.getKakaoOAuthToken(oAuthToken.accessToken)
+                                //kakaologin.loginWithTokenVerification(true)
+                                onNavigateToDetail()
+                            } else {
+                                // Handle the error case
+                                Log.e("SignupScreen", "Kakao login failed: token is null")
+                            }
+                        } catch (e: Throwable) {
+                            // Log the exception
+                            Log.e("SignupScreen", "Kakao login failed", e)
+                        }
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(Color(0xFFFFEB3B)),
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier
+                    .padding(horizontal = 15.dp, vertical = 3.dp)
+                    .fillMaxWidth()
+                    .height(50.dp)
+            ) {
+                Text(
+                    text = "카카오계정으로 회원가입",
+                    color = Color.Black,
+                    fontSize = 15.sp
+                )
+            }
+            */
 
             if(signupdone==true){
                 MakeAlertDialog(

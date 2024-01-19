@@ -41,10 +41,11 @@ class MainViewModel @Inject constructor(
         return signinresponse
     }
 
+
     suspend fun updateUserInfo(realname: String, nickname: String, department: String, studentId: Int):UserDetail?{
         var updateUserInforesponse:UserDetail?
         try {
-            updateUserInforesponse = api.updateUserInfo(userid = MyApplication.prefs.getString("userId").toInt(), userdetail = UserDetail(realname,nickname,department,studentId))
+            updateUserInforesponse = api.updateUserInfo(userid = MyApplication.prefs.getString("userid").toInt(), userdetail = UserDetail(realname,nickname,department,studentId))
             MyApplication.prefs.setString("realname",realname)
             MyApplication.prefs.setString("nickname",nickname)
             MyApplication.prefs.setString("department",department)
@@ -57,7 +58,7 @@ class MainViewModel @Inject constructor(
         return updateUserInforesponse
     }
 
-    suspend fun getUserInfo(userId:Int = MyApplication.prefs.getString("userId").toInt()):GetUserDetail? {
+    suspend fun getUserInfo(userId:Int = MyApplication.prefs.getString("userid").toInt()):GetUserDetail? {
         var getUserInforesponse: GetUserDetail?
         try {
             getUserInforesponse = api.getUserInfo(userid = userId)
@@ -73,10 +74,10 @@ class MainViewModel @Inject constructor(
 
     suspend fun changepassword(newpw:String):Int?{
         try{
-            Log.d("aaaa",MyApplication.prefs.getString("userId"))
+            Log.d("aaaa",MyApplication.prefs.getString("userid"))
             Log.d("aaaa",MyApplication.prefs.getString("password"))
             Log.d("aaaa",newpw)
-            api.changepassword(userid = MyApplication.prefs.getString("userId").toInt(), newpw=newpw)
+            api.changepassword(userid = MyApplication.prefs.getString("userid").toInt(), newpw=newpw)
             MyApplication.prefs.setString("password",newpw)
             return 1
         }

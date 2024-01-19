@@ -24,4 +24,6 @@ class SharedPreference(context: Context) { // key는 가급적 all 소문자로
         prefs.edit().remove("department").apply()
         prefs.edit().remove("studentid").apply()
     }
+
+
 }

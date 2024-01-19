@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">everywaffle</string>
+    <string name="kakao_app_key">23c2bc9d05330c6beff7a81d9796286b</string>
 </resources>
