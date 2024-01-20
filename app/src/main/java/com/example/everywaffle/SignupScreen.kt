@@ -62,7 +62,7 @@ fun SignupScreen(
     var signupid by remember { mutableStateOf("") }
     var signuppw by remember { mutableStateOf("") }
     var signupemail by remember { mutableStateOf("") }
-    val kakaologin = Kakaologin()
+    //val kakaologin = Kakaologin()
     val context = LocalContext.current
 
     //var realname by remember{ mutableStateOf("") }

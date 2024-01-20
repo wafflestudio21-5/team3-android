@@ -1,8 +1,13 @@
 package com.example.everywaffle
 
+//import Kakaologin
+import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
+import android.widget.Button
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -48,29 +53,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.kakao.sdk.auth.AuthApiClient
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.common.model.KakaoSdkError
+import com.kakao.sdk.common.util.Utility
 import com.kakao.sdk.user.UserApiClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-fun savetoken(context: Context, token: String) {
-    val sharedPref = context.getSharedPreferences("MyApp", Context.MODE_PRIVATE)
-    with (sharedPref.edit()) {
-        putString("Token", token)
-        apply()
-    }
-}
 
-fun checkloginstatus(context: Context): Boolean {
-    val sharedPref = context.getSharedPreferences("MyApp", Context.MODE_PRIVATE)
-    return sharedPref.getString("Token", null) != null
-}
+@SuppressLint("SuspiciousIndentation")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 //@Preview
 @Composable
@@ -82,28 +80,27 @@ fun InitScreen(
     onNavigateToDetail: () -> Unit ={}
 ) {
     val mainViewModel = hiltViewModel<MainViewModel>()
+    val viewModel:MainViewModel= hiltViewModel()
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
     var signinid by remember { mutableStateOf("") }
     var signinpw by remember { mutableStateOf("") }
     var signinfail by remember { mutableStateOf(false) }
 
-    val kakaologin = Kakaologin()
-    val context = LocalContext.current
 
+    val context = LocalContext.current
     var isLoggingIn by remember { mutableStateOf(false) }
-    var loginSuccess by remember { mutableStateOf(false) }
-    var loginError by remember { mutableStateOf<String?>(null) }
+    var loginError by remember { mutableStateOf("") }
 
 
     // 토큰에 로그인 정보가 있는 경우, 앱 시작시 홈 화면으로 바로 이동
-    /*
+
     LaunchedEffect(Unit){
         if(MyApplication.prefs.getString("token")!="-1"){
             onNavigateToHome()
         }
     }
-     */
+
     Surface(
         modifier = Modifier
             .background(color = Color.White)
@@ -191,23 +188,15 @@ fun InitScreen(
                     focusManager.clearFocus()
                     keyboardController?.hide()
                     CoroutineScope(Dispatchers.Main).launch {
-                        if (UserApiClient.instance.isKakaoTalkLoginAvailable(context)) {
-                            UserApiClient.instance.loginWithKakaoTalk(context) { token, error ->
-                                if (error != null) {
-                                    Log.e("InitScreen", "카카오톡으로 로그인 실패", error)
-                                } else if (token != null) {
-                                    Log.i("InitScreen", "카카오톡으로 로그인 성공 ${token.accessToken}")
-                                    onNavigateToHome()
-                                }
-                            }
+                        val result = mainViewModel.signin(signinid, signinpw)
+                        if (result == null) { // 로그인 실패
+                            signinfail = true
                         } else {
-                            UserApiClient.instance.loginWithKakaoAccount(context) { token, error ->
-                                if (error != null) {
-                                    Log.e("InitScreen", "카카오계정으로 로그인 실패", error)
-                                } else if (token != null) {
-                                    Log.i("InitScreen", "카카오계정으로 로그인 성공 ${token.accessToken}")
-                                    onNavigateToHome()
-                                }
+                            val result2 = mainViewModel.getUserInfo()
+                            if (result2 == null) { // 입력된 사용자 정보가 없는 경우
+                                onNavigateToDetail()
+                            } else {
+                                onNavigateToHome()
                             }
                         }
                     }
@@ -227,7 +216,32 @@ fun InitScreen(
             }
 
             // 카카오 로그인
-
+            Button(
+                onClick = {
+                    viewModel.loginWithKakao(context,
+                        onSuccess = {
+                            onNavigateToHome()
+                        },
+                        onError = { errorMessage ->
+                            Log.e("LOGIN", errorMessage)
+                        }
+                    )
+                },
+                colors = ButtonDefaults.buttonColors(Color(0xFFFFEB3B)),
+                shape = RectangleShape,
+                modifier = Modifier
+                    .padding(horizontal = 15.dp, vertical = 3.dp)
+                    .fillMaxWidth()
+                    .height(50.dp)
+            )
+            {
+                Text(
+                    text = "카카오계정으로 로그인",
+                    color = Color.Black,
+                    fontSize = 15.sp
+                )
+            }
+/*
             val context = LocalContext.current
             Button(
                 onClick = {
@@ -235,7 +249,7 @@ fun InitScreen(
                     loginError = ""
                     CoroutineScope(Dispatchers.Main).launch {
                         try {
-                            val oAuthToken = kakaologin.getKakaoOAuthToken(context)
+                            val oAuthToken = KakaologinActivity.loginWithKakao(context)
                             if (oAuthToken != null) {
                                 onNavigateToHome()
                             } else {
@@ -255,32 +269,35 @@ fun InitScreen(
                     .padding(horizontal = 15.dp, vertical = 3.dp)
                     .fillMaxWidth()
                     .height(50.dp)
-            )
-            {
-                Text(
-                    text = "카카오계정으로 로그인",
-                    color = Color.Black,
-                    fontSize = 15.sp
                 )
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Button(
-                    onClick = onNavigateToSignup,
-                    colors = ButtonDefaults.buttonColors(Color.Transparent)
-                ) {
+                {
                     Text(
-                        text = "회원가입",
+                        text = "카카오계정으로 로그인",
                         color = Color.Black,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold
+                        fontSize = 15.sp
                     )
                 }
-            }
+ */
+
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(
+                        onClick = onNavigateToSignup,
+                        colors = ButtonDefaults.buttonColors(Color.Transparent)
+                    ) {
+                        Text(
+                            text = "회원가입",
+                            color = Color.Black,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+
 
             if (signinfail) { // 로그인 실패시 뜨는 alert
                 MakeAlertDialog(

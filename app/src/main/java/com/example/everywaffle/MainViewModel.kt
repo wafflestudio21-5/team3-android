@@ -1,10 +1,12 @@
 package com.example.everywaffle
 
+import android.content.Context
 import android.util.Log
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.kakao.sdk.user.UserApiClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -83,6 +85,26 @@ class MainViewModel @Inject constructor(
         }
         catch (e:retrofit2.HttpException){
             return null
+        }
+    }
+
+    fun loginWithKakao(context: Context, onSuccess: () -> Unit, onError: (String) -> Unit) {
+        if (UserApiClient.instance.isKakaoTalkLoginAvailable(context)) {
+            UserApiClient.instance.loginWithKakaoTalk(context) { token, error ->
+                if (error != null) {
+                    onError(error.toString())
+                } else if (token != null) {
+                    onSuccess()
+                }
+            }
+        } else {
+            UserApiClient.instance.loginWithKakaoAccount(context) { token, error ->
+                if (error != null) {
+                    onError(error.toString())
+                } else if (token != null) {
+                    onSuccess()
+                }
+            }
         }
     }
 }

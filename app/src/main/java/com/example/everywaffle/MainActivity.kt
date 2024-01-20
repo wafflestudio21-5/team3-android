@@ -1,8 +1,11 @@
 package com.example.everywaffle
 
+import android.app.Application
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -104,9 +107,11 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.kakao.sdk.auth.AuthApiClient
 import com.kakao.sdk.auth.model.OAuthToken
+import com.kakao.sdk.common.KakaoSdk
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.common.model.KakaoSdkError
+import com.kakao.sdk.common.util.Utility
 import com.kakao.sdk.user.UserApiClient
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.cancellation.CancellationException
@@ -118,6 +123,10 @@ import kotlin.coroutines.suspendCoroutine
 class MainActivity : ComponentActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
+        val keyHash = Utility.getKeyHash(this)
+        Log.d("Hash",keyHash)
         setContent{
             MaterialTheme {
                 val navController = rememberNavController()
@@ -126,8 +135,11 @@ class MainActivity : ComponentActivity(){
                 )
             }
         }
+
     }
 }
+
+
 
 @Composable
 fun MyAppNavHost(
@@ -135,6 +147,7 @@ fun MyAppNavHost(
     navController: NavHostController = rememberNavController(),
     startDestination:String = "Init"
 ){
+
     NavHost(
         modifier = modifier,
         navController = navController,
@@ -205,6 +218,9 @@ fun MyAppNavHost(
         }
     }
 }
+
+
+
 /*
 suspend fun UserApiClient.Companion.loginWithKakao(context: Context): OAuthToken {
     return if (instance.isKakaoTalkLoginAvailable(context)) {
@@ -418,7 +434,7 @@ fun PopularPost() {
         }
     }
 }
-
+/*
 fun String.isNumber(): Boolean {
     val v = toIntOrNull()
     return when(v) {
@@ -426,3 +442,5 @@ fun String.isNumber(): Boolean {
         else -> true
     }
 }
+*/
+fun String.isNumber():Boolean = toIntOrNull()!=null

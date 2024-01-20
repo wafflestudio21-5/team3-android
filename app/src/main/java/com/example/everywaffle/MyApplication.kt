@@ -13,7 +13,7 @@ class MyApplication : Application(){
     override fun onCreate() {
         prefs= SharedPreference(applicationContext)
         super.onCreate()
-        KakaoSdk.init(this,"fe6dad63a3191e6ceead975b205d3386")
+        KakaoSdk.init(this, "23c2bc9d05330c6beff7a81d9796286b")
     }
 }
 
