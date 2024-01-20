@@ -1,11 +1,14 @@
 package com.example.everywaffle
 
 import android.util.Log
+import androidx.compose.runtime.remember
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 
@@ -14,6 +17,10 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val api: RestAPI
 ):ViewModel(){
+    companion object{
+        var _postchanged: MutableStateFlow<Boolean> = MutableStateFlow(false)
+        var postchanged = _postchanged.asStateFlow()
+    }
     suspend fun signup(id:String, pw:String, email:String):SignupResponse?{
         var signupresponse:SignupResponse?
         try {
@@ -32,6 +39,7 @@ class MainViewModel @Inject constructor(
             signinresponse = api.signin(SigninRequest(id, pw))
             MyApplication.prefs.setString("userid",signinresponse.userId.toString())
             MyApplication.prefs.setString("token",signinresponse.token)
+            MyApplication.prefs.setString("mail",signinresponse.email)
             MyApplication.prefs.setString("id",id)
             MyApplication.prefs.setString("password",pw)
         }
@@ -84,5 +92,74 @@ class MainViewModel @Inject constructor(
         catch (e:retrofit2.HttpException){
             return null
         }
+    }
+
+    suspend fun changemail(newmail:String):Int?{
+        try{
+            api.changemail(userid = MyApplication.prefs.getString("userid").toInt(), newmail = newmail)
+            MyApplication.prefs.setString("mail",newmail)
+            return 1
+        }
+        catch (e:retrofit2.HttpException){
+            return null
+        }
+    }
+
+    suspend fun getpostcategory(boardid:String, page:Int, size:Int=10):List<PostDetail>?{
+        var getPostCategory:List<PostDetail>?
+        try{
+            getPostCategory = api.getpostcategory(boardid = boardid, page = page, size = size)
+        }
+        catch (e: retrofit2.HttpException){
+            Log.d("aaaa",e.toString())
+            getPostCategory=null
+        }
+        return getPostCategory
+    }
+
+    suspend fun getpost(postid:Int):PostDetail?{
+        var getPost:PostDetail?
+        try {
+            getPost = api.getpost(postid = postid)
+        }
+        catch (e: retrofit2.HttpException){
+            getPost=null
+        }
+        return getPost
+    }
+
+    suspend fun getcomments(postid:Int):List<ParentComment>?{
+        var getComments:List<ParentComment>?
+        try{
+            getComments = api.getcomments(postid)
+        }
+        catch (e: retrofit2.HttpException){
+            getComments = null
+        }
+        return getComments
+    }
+
+    suspend fun postlike(postid:Int):Int? {
+        try {
+            api.postlike(
+                postid = postid,
+                userid = UserId(userId = MyApplication.prefs.getString("userid").toInt())
+            )
+            return 1
+        }
+        catch (e: retrofit2.HttpException){
+            return null
+        }
+    }
+
+    suspend fun postcomment(comment: PostComment):ChildComment?{
+        var postComment:ChildComment?
+        try{
+            postComment = api.postcomment(comment = comment)
+        }
+        catch (e: retrofit2.HttpException){
+            postComment = null
+        }
+        return postComment
     }
 }
