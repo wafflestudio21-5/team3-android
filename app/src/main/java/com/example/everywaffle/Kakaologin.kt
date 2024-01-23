@@ -21,9 +21,8 @@ class KakaologinActivity : AppCompatActivity() {
         //setContentView(R.layout.activity_kakaologin) // XML 레이아웃을 사용하는 경우
 
 
-        val btnKakao: Button = findViewById(R.id.btnKakao) // 버튼 ID로 교체
+        val btnKakao: Button = findViewById(R.id.btnKakao)
         btnKakao.setOnClickListener {
-            // 카카오계정으로 로그인
             loginWithKakao()
         }
 
@@ -59,9 +58,8 @@ class KakaologinActivity : AppCompatActivity() {
     }
 
     fun navigateToHomeScreen() {
-        // 로그인 성공 시 HomeScreen으로 이동하기 위한 인텐트
         val intent = Intent(this, MainActivity::class.java)
-        intent.putExtra("navigateTo", "Home") // 홈 화면으로 이동하라는 정보를 인텐트에 추가
+        intent.putExtra("navigateTo", "Home")
         startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
         finish()
     }

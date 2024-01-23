@@ -219,53 +219,6 @@ fun MyAppNavHost(
     }
 }
 
-
-
-/*
-suspend fun UserApiClient.Companion.loginWithKakao(context: Context): OAuthToken {
-    return if (instance.isKakaoTalkLoginAvailable(context)) {
-        try {
-            loginWithKakaoTalk(context)
-        } catch (e: ClientError) {
-            if (e.reason == ClientErrorCause.Cancelled) {
-                throw e
-            } else {
-                loginWithKakaoAccount(context)
-            }
-        } catch (e: Throwable) {
-            loginWithKakaoAccount(context)
-        }
-    } else {
-        loginWithKakaoAccount(context)
-    }
-}
-
-suspend fun UserApiClient.Companion.loginWithKakaoTalk(context: Context): OAuthToken {
-    return suspendCancellableCoroutine { continuation ->
-        instance.loginWithKakaoTalk(context) { token, error ->
-            when {
-                error != null -> continuation.cancel(error)
-                token != null -> continuation.resume(token)
-                else -> continuation.cancel(RuntimeException("Fail to access kakao"))
-            }
-        }
-    }
-}
-suspend fun UserApiClient.Companion.loginWithKakaoAccount(context: Context): OAuthToken {
-    return suspendCancellableCoroutine { continuation ->
-        instance.loginWithKakaoAccount(context) { token, error ->
-            when {
-                error != null -> continuation.cancel(CancellationException("Kakao login failed", error))
-                token != null -> continuation.resume(token)
-                else -> continuation.cancel(RuntimeException("Fail to access Kakao."))
-            }
-        }
-        continuation.invokeOnCancellation {}
-    }
-}
- */
-
-
 @Composable
 fun MakeAlertDialog(
     onConfirmation: () -> Unit,

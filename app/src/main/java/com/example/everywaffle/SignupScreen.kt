@@ -201,43 +201,6 @@ fun SignupScreen(
                 )
             }
 
-            /*
-            Button(
-                onClick = {
-                    focusManager.clearFocus()
-                    keyboardController?.hide()
-                    CoroutineScope(Dispatchers.Main).launch {
-                        try {
-                            val oAuthToken = kakaologin.loginWithKakao(context)
-                            if (oAuthToken != null) {
-                                //kakaologin.getKakaoOAuthToken(oAuthToken.accessToken)
-                                //kakaologin.loginWithTokenVerification(true)
-                                onNavigateToDetail()
-                            } else {
-                                // Handle the error case
-                                Log.e("SignupScreen", "Kakao login failed: token is null")
-                            }
-                        } catch (e: Throwable) {
-                            // Log the exception
-                            Log.e("SignupScreen", "Kakao login failed", e)
-                        }
-                    }
-                },
-                colors = ButtonDefaults.buttonColors(Color(0xFFFFEB3B)),
-                shape = RoundedCornerShape(10.dp),
-                modifier = Modifier
-                    .padding(horizontal = 15.dp, vertical = 3.dp)
-                    .fillMaxWidth()
-                    .height(50.dp)
-            ) {
-                Text(
-                    text = "카카오계정으로 회원가입",
-                    color = Color.Black,
-                    fontSize = 15.sp
-                )
-            }
-            */
-
             if(signupdone==true){
                 MakeAlertDialog(
                     onConfirmation = {

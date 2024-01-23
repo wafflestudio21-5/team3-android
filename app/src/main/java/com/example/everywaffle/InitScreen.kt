@@ -241,45 +241,6 @@ fun InitScreen(
                     fontSize = 15.sp
                 )
             }
-/*
-            val context = LocalContext.current
-            Button(
-                onClick = {
-                    isLoggingIn = true
-                    loginError = ""
-                    CoroutineScope(Dispatchers.Main).launch {
-                        try {
-                            val oAuthToken = KakaologinActivity.loginWithKakao(context)
-                            if (oAuthToken != null) {
-                                onNavigateToHome()
-                            } else {
-                                loginError = "Login failed: Unknown error"
-                            }
-                        } catch (e: Throwable) {
-                            loginError = "Login failed: ${e.localizedMessage}"
-                        } finally {
-                            isLoggingIn = false
-                        }
-                    }
-                },
-
-                colors = ButtonDefaults.buttonColors(Color(0xFFFFEB3B)),
-                shape = RectangleShape,
-                modifier = Modifier
-                    .padding(horizontal = 15.dp, vertical = 3.dp)
-                    .fillMaxWidth()
-                    .height(50.dp)
-                )
-                {
-                    Text(
-                        text = "카카오계정으로 로그인",
-                        color = Color.Black,
-                        fontSize = 15.sp
-                    )
-                }
- */
-
-
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center,
