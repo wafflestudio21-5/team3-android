@@ -97,12 +97,13 @@ fun InitScreen(
 
 
     // 토큰에 로그인 정보가 있는 경우, 앱 시작시 홈 화면으로 바로 이동
-    LaunchedEffect(Unit) {
-        if (MyApplication.prefs.getString("token") != "-1") {
+    /*
+    LaunchedEffect(Unit){
+        if(MyApplication.prefs.getString("token")!="-1"){
             onNavigateToHome()
         }
     }
-
+     */
     Surface(
         modifier = Modifier
             .background(color = Color.White)
@@ -190,17 +191,23 @@ fun InitScreen(
                     focusManager.clearFocus()
                     keyboardController?.hide()
                     CoroutineScope(Dispatchers.Main).launch {
-                        val result = mainViewModel.signin(signinid,signinpw)
-                        if(result==null){ // 로그인 실패
-                            signinfail=true
-                        }
-                        else{
-                            val result2 = mainViewModel.getUserInfo()
-                            if(result2==null){ // 입력된 사용자 정보가 없는 경우
-                                onNavigateToDetail()
+                        if (UserApiClient.instance.isKakaoTalkLoginAvailable(context)) {
+                            UserApiClient.instance.loginWithKakaoTalk(context) { token, error ->
+                                if (error != null) {
+                                    Log.e("InitScreen", "카카오톡으로 로그인 실패", error)
+                                } else if (token != null) {
+                                    Log.i("InitScreen", "카카오톡으로 로그인 성공 ${token.accessToken}")
+                                    onNavigateToHome()
+                                }
                             }
-                            else {
-                                onNavigateToHome()
+                        } else {
+                            UserApiClient.instance.loginWithKakaoAccount(context) { token, error ->
+                                if (error != null) {
+                                    Log.e("InitScreen", "카카오계정으로 로그인 실패", error)
+                                } else if (token != null) {
+                                    Log.i("InitScreen", "카카오계정으로 로그인 성공 ${token.accessToken}")
+                                    onNavigateToHome()
+                                }
                             }
                         }
                     }
