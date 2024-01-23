@@ -1,138 +1,66 @@
+
 package com.example.everywaffle
 
-import android.content.Context
+import android.annotation.SuppressLint
+import android.content.Intent
+import android.os.Bundle
 import android.util.Log
-import com.kakao.sdk.auth.AuthApiClient
+import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
 import com.kakao.sdk.auth.model.OAuthToken
+import com.kakao.sdk.common.KakaoSdk
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
-import com.kakao.sdk.common.model.KakaoSdkError
 import com.kakao.sdk.user.UserApiClient
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.coroutines.cancellation.CancellationException
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
-class Kakaologin {
+class KakaologinActivity : AppCompatActivity() {
 
-    suspend fun loginWithKakao(context: Context): OAuthToken {
-        return if (UserApiClient.instance.isKakaoTalkLoginAvailable(context)) {
-            try {
-                loginWithKakaoTalk(context)
-            } catch (e: ClientError) {
-                if (e.reason == ClientErrorCause.Cancelled) {
-                    throw e
-                } else {
-                    loginWithKakaoAccount(context)
-                }
-            } catch (e: Throwable) {
-                loginWithKakaoAccount(context)
+    @SuppressLint("MissingInflatedId")
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        //setContentView(R.layout.activity_kakaologin) // XML 레이아웃을 사용하는 경우
+
+
+        val btnKakao: Button = findViewById(R.id.btnKakao)
+        btnKakao.setOnClickListener {
+            loginWithKakao()
+        }
+
+    }
+
+    fun loginWithKakao() {
+        // 카카오톡 로그인 가능 여부 확인
+        if (UserApiClient.instance.isKakaoTalkLoginAvailable(this)) {
+            // 카카오톡으로 로그인
+            UserApiClient.instance.loginWithKakaoTalk(this) { token, error ->
+                handleLoginResult(token, error)
             }
         } else {
-            loginWithKakaoAccount(context)
-        }
-    }
-
-    private suspend fun loginWithKakaoTalk(context: Context): OAuthToken {
-        return suspendCancellableCoroutine { continuation ->
-            UserApiClient.instance.loginWithKakaoTalk(context) { token, error ->
-                when {
-                    error != null -> continuation.cancel(error)
-                    token != null -> continuation.resume(token)
-                    else -> continuation.cancel(RuntimeException("Fail to access kakao"))
-                }
+            // 카카오계정으로 로그인
+            UserApiClient.instance.loginWithKakaoAccount(this) { token, error ->
+                handleLoginResult(token, error)
             }
         }
     }
 
-    private suspend fun loginWithKakaoAccount(context: Context): OAuthToken {
-        return suspendCancellableCoroutine { continuation ->
-            UserApiClient.instance.loginWithKakaoAccount(context) { token, error ->
-                when {
-                    error != null -> continuation.cancel(
-                        CancellationException(
-                            "Kakao login failed",
-                            error
-                        )
-                    )
-
-                    token != null -> continuation.resume(token)
-                    else -> continuation.cancel(RuntimeException("Fail to access Kakao."))
-                }
+    fun handleLoginResult(token: OAuthToken?, error: Throwable?) {
+        if (error != null) {
+            if (error is ClientError && error.reason == ClientErrorCause.Cancelled) {
+                Log.i("LOGIN", "카카오톡 로그인이 취소되었습니다.")
+                return
+            } else {
+                Log.e("LOGIN", "카카오계정으로 로그인 실패", error)
             }
-            continuation.invokeOnCancellation {}
+        } else if (token != null) {
+            Log.i("LOGIN", "카카오계정으로 로그인 성공 ${token.accessToken}")
+            navigateToHomeScreen()
         }
     }
 
-    suspend fun getKakaoOAuthToken(context: Context): OAuthToken? {
-        return runCatching {
-            loginWithKakao(context)
-        }.onSuccess { oAuthToken ->
-            Log.i("getKakaoOAuthToken", oAuthToken.toString())
-            return oAuthToken
-        }.onFailure { error ->
-            when (error) {
-                is ClientError -> {
-                    if (error.reason == ClientErrorCause.Cancelled) {
-                        Log.i("getKakaoOAuthToken", "사용자가 명시적으로 취소")
-                    } else {
-                        Log.e("getKakaoOAuthToken", "인증 에러 발생", error)
-                    }
-                }
-
-                else -> Log.e("getKakaoOAuthToken", "인증 에러 발생", error)
-            }
-            return null
-        }.getOrNull()
-    }
-
-    suspend fun checkUserData(context: Context) {
-        suspendCancellableCoroutine { continuation ->
-            UserApiClient.instance.me { user, error ->
-                if (error != null) {
-                    continuation.resumeWithException(error)
-                    Log.e("checkUserData", "사용자 정보 요청 실패", error)
-                } else if (user != null) {
-                    continuation.resume(Unit)
-                    Log.e("checkUserData", "사용자 정보 요청 성공 : $user")
-                    user.kakaoAccount?.profile?.nickname?.let { nickname ->
-                        Log.d("checkUserData", "닉네임: $nickname")
-                    }
-                    Log.d("checkUserData", "회원번호: ${user.id}")
-                }
-            }
-        }
-    }
-
-    suspend fun loginWithTokenVerification(context: Context) {
-        if (AuthApiClient.instance.hasToken()) {
-            try {
-                val tokenInfo = suspendCancellableCoroutine { continuation ->
-                    UserApiClient.instance.accessTokenInfo { tokenInfo, error ->
-                        if (error != null) {
-                            continuation.resumeWithException(error)
-                        } else {
-                            continuation.resume(tokenInfo)
-                        }
-                    }
-                }
-                if (tokenInfo != null) {
-                    Log.i(
-                        "토큰 인포 체크", "토큰 정보 보기 성공" +
-                                "\n토큰인포: $tokenInfo" +
-                                "\n회원번호: ${tokenInfo.id}" +
-                                "\n만료시간: ${tokenInfo.expiresIn} 초"
-                    )
-                }
-            } catch (error: Throwable) {
-                if (error is KakaoSdkError && error.isInvalidTokenError()) {
-                    Log.e("토큰 인포 체크", "토큰 유효하지 않음: 로그인 필요", error)
-                } else {
-                    Log.e("토큰 인포 체크", "기타 에러 발생", error)
-                }
-            }
-        } else {
-            Log.i("토큰 인포 체크", "토큰 없음: 로그인 필요")
-        }
+    fun navigateToHomeScreen() {
+        val intent = Intent(this, MainActivity::class.java)
+        intent.putExtra("navigateTo", "Home")
+        startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
+        finish()
     }
 }

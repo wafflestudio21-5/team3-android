@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.everywaffle"
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -31,6 +32,15 @@
         </activity>
 
         <activity
+            android:name=".KakaologinActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
             android:exported="true">
             <intent-filter>
@@ -39,7 +49,7 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data android:host="oauth"
-                    android:scheme="kakaofe6dad63a3191e6ceead975b205d3386"/>
+                    android:scheme="kakao23c2bc9d05330c6beff7a81d9796286b"/>
             </intent-filter>
         </activity>
 

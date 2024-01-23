@@ -1,45 +1,118 @@
 package com.example.everywaffle
 
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.paddingFromBaseline
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Comment
+import androidx.compose.material.icons.filled.East
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.West
+import androidx.compose.material.icons.outlined.Cancel
+import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.sharp.ArrowBack
+import androidx.compose.material.icons.sharp.Dashboard
 import androidx.compose.material.icons.sharp.DeviceUnknown
+import androidx.compose.material.icons.sharp.ErrorOutline
+import androidx.compose.material.icons.sharp.Home
+import androidx.compose.material.icons.sharp.ManageAccounts
+import androidx.compose.material.icons.sharp.Search
+import androidx.compose.material.icons.sharp.SmsFailed
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.modifier.modifierLocalConsumer
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.RememberObserver
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.core.text.isDigitsOnly
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.kakao.sdk.auth.AuthApiClient
+import com.kakao.sdk.auth.model.OAuthToken
+import com.kakao.sdk.common.model.ClientError
+import com.kakao.sdk.common.model.ClientErrorCause
+import com.kakao.sdk.common.model.KakaoSdkError
+import com.kakao.sdk.user.UserApiClient
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.cancellation.CancellationException
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity(){
@@ -120,39 +193,14 @@ fun MyAppNavHost(
                 onNavigateToInit = {navController.navigate("Init")}
             )
         }
+        composable("Detail"){
+            DetailScreen(
+                onNavigateToInit = {navController.navigate("Init")}
+            )
+        }
         composable("ChangePassword"){
             PasswordChangeScreen(
                 onNavigateToUser = {navController.navigate("User")}
-            )
-        }
-        composable("ChangeEmail"){
-            EmailChangeScreen(
-                onNavigateToUser = {navController.navigate("User")}
-            )
-        }
-        composable(
-            route="Board/{board_id}",
-            arguments = listOf(
-                navArgument("board_id"){
-                    type= NavType.StringType
-                }
-            )
-        ){backstackEntry ->
-            BoardScreen(
-                boardid = backstackEntry.arguments?.getString("board_id"),
-                navController = navController
-            )
-        }
-        composable(
-            route="Post/{post_id}",
-            arguments = listOf(
-                navArgument("post_id"){
-                    type= NavType.IntType
-                }
-            )
-        ){backstackEntry ->
-            PostScreen(
-                postid = backstackEntry.arguments?.getInt("post_id"),
             )
         }
     }
@@ -262,7 +310,7 @@ val accountOptions = listOf(
     "학과 설정" to "학과 설정",
     "학적 처리 내역" to "학적 처리 내역",
     "비밀번호 변경" to 0, //
-    "이메일 변경" to 2
+    "이메일 변경" to "이메일 변경"
 )
 
 val communityOptions = listOf(
@@ -295,17 +343,8 @@ val otherOptions = listOf(
     "회원 탈퇴" to "회원탈퇴",
     "로그아웃" to 1
 )
-
-val boardnames = mapOf(
-    "자유게시판" to "FREE_BOARD",
-    "비밀게시판" to "SECRET_BOARD",
-    "졸업생게시판" to "GRADUATE_BOARD",
-    "새내기게시판" to "FRESHMAN_BOARD",
-    "정보게시판" to "INFO_BOARD"
-)
-
 /*
-@Composable
+@Composable전
 fun FreeBoardContent() {
     Text(
         text = "자유게시판",
@@ -387,5 +426,3 @@ fun String.isNumber(): Boolean {
         else -> true
     }
 }
-
-val postdetailtemp = PostDetail(postId=1, userId=35, title="waffle", content="waffle", category="FREE_BOARD", createdAt="2024-01-18T19:13:04.000+00:00", likes=1,0,0)

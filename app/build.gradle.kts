@@ -5,7 +5,10 @@ plugins {
     id("dagger.hilt.android.plugin")
 }
 
+
 android {
+
+
     namespace = "com.example.everywaffle"
     compileSdk = 34
 
@@ -56,7 +59,6 @@ android {
         }
     }
 }
-
 dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("androidx.activity:activity-compose:1.8.1")
@@ -104,7 +106,10 @@ dependencies {
     implementation("androidx.fragment:fragment-ktx:1.6.2")
     implementation("androidx.activity:activity-ktx:1.8.1")
 
-    implementation("com.kakao.sdk:v2-user:2.12.1")
+    //implementation("com.kakao.sdk:v2-user:2.12.1")
+
+        implementation ("com.kakao.sdk:v2-user:2.11.0") // 카카오 로그인
+
     /*
     implementation ("com.kakao.sdk:v2-all:2.19.0") // 전체 모듈 설치, 2.11.0 버전부터 지원
     implementation ("com.kakao.sdk:v2-user:2.19.0") // 카카오 로그인
