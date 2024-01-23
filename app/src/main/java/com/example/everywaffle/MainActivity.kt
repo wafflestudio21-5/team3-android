@@ -129,8 +129,6 @@ class MainActivity : ComponentActivity(){
     }
 }
 
-// 임시
-
 @Composable
 fun MyAppNavHost(
     modifier: Modifier = Modifier,
