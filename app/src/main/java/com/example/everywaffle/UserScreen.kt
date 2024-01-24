@@ -72,7 +72,8 @@ fun UserScreen(
                     {
                         navController.navigate("Init")
                         MyApplication.prefs.reset()
-                    }
+                    },
+                    {navController.navigate("ChangeEmail")}
                 )
 
                 Header(onNavigateToHome)
@@ -349,7 +350,7 @@ fun PasswordChangeScreen(
                 )
             }
 
-            if (changedone == true) {
+            if (changedone) {
                 MakeAlertDialog(
                     onConfirmation = {
                         onNavigateToUser()
@@ -358,6 +359,130 @@ fun PasswordChangeScreen(
                     icon = Icons.Outlined.Check,
                     title = "비밀번호 성공",
                     content = "비밀번호가 변경되었습니다.",
+                    confirmtext = "확인"
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@Composable
+fun EmailChangeScreen(
+    onNavigateToUser : () -> Unit
+){
+    val mainViewModel = hiltViewModel<MainViewModel>()
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+    var newemail by remember { mutableStateOf("") }
+    var changedone by remember { mutableStateOf(false) }
+
+    Surface(
+        modifier = Modifier
+            .background(color = Color.White)
+            .fillMaxSize()
+            .padding(15.dp)
+    ) {
+        Column {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "비밀번호 변경",
+                    color = Color.Black,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
+                IconButton(
+                    onClick = onNavigateToUser
+                ) {
+                    Icon(imageVector = Icons.Outlined.Cancel, contentDescription = "")
+                }
+            }
+
+            TextField(
+                value = MyApplication.prefs.getString("mail"),
+                onValueChange = {},
+                placeholder = {},
+                modifier = Modifier
+                    .padding(horizontal = 15.dp, vertical = 3.dp)
+                    .fillMaxWidth()
+                    .height(50.dp),
+                shape = RoundedCornerShape(15.dp),
+                colors = TextFieldDefaults.textFieldColors(
+                    containerColor = Color(0x10000000),
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
+                    placeholderColor = Color.Gray
+                )
+            )
+
+            TextField(
+                value = newemail,
+                onValueChange = { newemail = it },
+                placeholder = { Text(text = "새 메일", fontSize = 15.sp) },
+                modifier = Modifier
+                    .padding(horizontal = 15.dp, vertical = 3.dp)
+                    .fillMaxWidth()
+                    .height(50.dp),
+                shape = RoundedCornerShape(15.dp),
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Done,
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        keyboardController?.hide()
+                        focusManager.clearFocus()
+                    }
+                ),
+                colors = TextFieldDefaults.textFieldColors(
+                    containerColor = Color(0x10000000),
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
+                    placeholderColor = Color.Gray
+                )
+            )
+
+            Button(
+                onClick = {
+                    focusManager.clearFocus()
+                    keyboardController?.hide()
+                    CoroutineScope(Dispatchers.Main).launch {
+                        val result = mainViewModel.changemail(newmail = newemail)
+                        if (result != null) {
+                            changedone = true
+                        }
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(Color(0xF0FF0000)),
+                shape = RectangleShape,
+                modifier = Modifier
+                    .padding(horizontal = 15.dp, vertical = 3.dp)
+                    .fillMaxWidth()
+                    .height(50.dp)
+            ) {
+                Text(
+                    text = "메일 변경",
+                    color = Color.White,
+                    fontSize = 15.sp
+                )
+            }
+
+            if (changedone) {
+                MakeAlertDialog(
+                    onConfirmation = {
+                        onNavigateToUser()
+                        changedone = false
+                    },
+                    icon = Icons.Outlined.Check,
+                    title = "메일 변경 성공",
+                    content = "메일이 변경되었습니다.",
                     confirmtext = "확인"
                 )
             }
