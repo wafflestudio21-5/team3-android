@@ -18,8 +18,8 @@ class MainViewModel @Inject constructor(
     private val api: RestAPI
 ):ViewModel(){
     companion object{
-        var _postchanged: MutableStateFlow<Boolean> = MutableStateFlow(false)
-        var postchanged = _postchanged.asStateFlow()
+        val _postchanged: MutableStateFlow<Boolean> = MutableStateFlow(false)
+        val postchanged = _postchanged.asStateFlow()
     }
     suspend fun signup(id:String, pw:String, email:String):SignupResponse?{
         var signupresponse:SignupResponse?
@@ -161,5 +161,39 @@ class MainViewModel @Inject constructor(
             postComment = null
         }
         return postComment
+    }
+
+    suspend fun postscrap(postid:Int):PostScrapResponse? {
+        var postScrap:PostScrapResponse?
+        try{
+            postScrap = api.postscrap(postid = postid,
+                userid = UserId(userId = MyApplication.prefs.getString("userid").toInt()))
+        }
+        catch (e: retrofit2.HttpException){
+            postScrap = null
+        }
+        return postScrap
+    }
+
+    suspend fun getrecent(category:String):PostDetail? {
+        var getRecent:PostDetail?
+        try{
+            getRecent = api.getrecent(category = category)
+        }
+        catch (e: retrofit2.HttpException){
+            getRecent = null
+        }
+        return getRecent
+    }
+
+    suspend fun gettrending():List<PostDetail>? {
+        var gettrending:List<PostDetail>?
+        try {
+            gettrending = api.gettrending()
+        }
+        catch (e: retrofit2.HttpException){
+            gettrending = null
+        }
+        return gettrending
     }
 }

@@ -1,5 +1,6 @@
 package com.example.everywaffle
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -35,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -49,8 +51,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @Composable
 //@Preview
@@ -59,7 +64,22 @@ fun HomeScreen(
     onNavigateToBoard : () -> Unit = {},
     onNavigateToUser : () -> Unit = {}
 ){
-    //val mainViewModel = hiltViewModel<MainViewModel>()
+    val mainViewModel = hiltViewModel<MainViewModel>()
+    val recentpost= remember{mutableStateMapOf<String,String>()}
+    val trendpost= remember{mutableStateListOf<PostDetail>()}
+
+    LaunchedEffect(Unit){
+        CoroutineScope(Dispatchers.Main).launch {
+            trendpost.clear()
+            trendpost.addAll(mainViewModel.gettrending()!!)
+        }
+        boardnames.forEach{ kor,eng ->
+            CoroutineScope(Dispatchers.Main).launch {
+                val result = mainViewModel.getrecent(eng)
+                if(result!=null) recentpost[kor] = result.title
+            }
+        }
+    }
 
     Surface(
         modifier = Modifier
@@ -98,7 +118,7 @@ fun HomeScreen(
                     .height(580.dp)
             ){
                 item {
-                    BoardList(navController = navController)
+                    BoardList(navController = navController, recent = recentpost, trend = trendpost)
                 }
             }
             Row(
@@ -125,9 +145,8 @@ fun HomeScreen(
 }
 
 @Composable
-fun BoardList(navController: NavHostController) {
+fun BoardList(navController: NavHostController, recent:Map<String,String>, trend:List<PostDetail>) {
     val boardNames = listOf("자유게시판", "비밀게시판", "졸업생게시판", "새내기게시판", "시사·이슈", "장터게시판", "정보게시판")
-
     Column(modifier = Modifier.padding(bottom = 100.dp)) {
         Row(
             modifier = Modifier
@@ -152,9 +171,7 @@ fun BoardList(navController: NavHostController) {
         }
         Divider(modifier = Modifier.padding(vertical = 4.dp))
         boardNames.forEach { name ->
-            Text(
-                text = name,
-                fontSize = 14.sp,
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
@@ -167,18 +184,30 @@ fun BoardList(navController: NavHostController) {
                         }
                     }
                     .padding(vertical = 8.dp),
-                color = Color.Black
-            )
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = name,
+                    fontSize = 14.sp,
+                    color = Color.Black
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(
+                    text = recent.getOrDefault(name, ""),
+                    fontSize = 12.sp,
+                    color = Color.Gray
+                )
+            }
         }
-        Divider(modifier = Modifier.padding(vertical = 20.dp))
+        Divider(modifier = Modifier.padding(top = 4.dp, bottom = 20.dp))
         Text(
             text = "실시간 인기 글",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 16.dp)
         )
-        for (i in 0 until 2) {
-            PopularPost()
+        trend.forEach {
+            PopularPost(navController, it)
         }
     }
 }

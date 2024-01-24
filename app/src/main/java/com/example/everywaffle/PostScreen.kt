@@ -27,6 +27,8 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.sharp.AccountBox
 import androidx.compose.material.icons.sharp.ArrowBack
+import androidx.compose.material.icons.sharp.ChatBubbleOutline
+import androidx.compose.material.icons.sharp.Comment
 import androidx.compose.material.icons.sharp.FavoriteBorder
 import androidx.compose.material.icons.sharp.MoreVert
 import androidx.compose.material.icons.sharp.Search
@@ -81,21 +83,15 @@ fun PostScreen(postid:Int?){
     val mainViewModel = hiltViewModel<MainViewModel>()
     var post by remember { mutableStateOf(PostDetail(1,0,"","","","",0, 0,0)) }
     val comments = remember { mutableStateListOf<ParentComment>() }
-    val parentcommentid by remember { mutableStateOf(0) }
-    val postchangedkey = MainViewModel.postchanged.collectAsState()
+    var parentcommentid by remember { mutableStateOf(0) }
+    val postchangedkey by MainViewModel.postchanged.collectAsState()
+    val keyboardController = LocalSoftwareKeyboardController.current
 
-    LaunchedEffect(Unit){
+    LaunchedEffect(Unit, postchangedkey){
+        Log.d("aaaa","abc")
         post = mainViewModel.getpost(postid!!)!!
         comments.clear()
         comments.addAll(mainViewModel.getcomments(post.postId)!!)
-    }
-
-    LaunchedEffect(postchangedkey){
-        post = mainViewModel.getpost(postid!!)!!
-        comments.clear()
-        val k = mainViewModel.getcomments(post.postId)!!
-        comments.addAll(k)
-        Log.d("aaaa",k.toString())
     }
 
     Surface(
@@ -142,7 +138,6 @@ fun PostScreen(postid:Int?){
                                     CoroutineScope(Dispatchers.Main).launch {
                                         val result = mainViewModel.postlike(postid = postid!!)
                                         if (result == null) {
-                                            Log.d("aaaa", "abc")
                                             // TODO:
                                         } else {
                                             post = post.copy(likes = post.likes + 1)
@@ -177,7 +172,16 @@ fun PostScreen(postid:Int?){
                                 .padding(top = 7.dp, start = 5.dp)
                                 .clip(shape = RoundedCornerShape(8.dp))
                                 .background(Color(0xBEE6E6E6))
-                                .clickable {},
+                                .clickable {
+                                    CoroutineScope(Dispatchers.Main).launch {
+                                        val result = mainViewModel.postscrap(postid = postid!!)
+                                        if (result == null) {
+                                            // TODO:
+                                        } else {
+                                            post = post.copy(scraps = post.scraps + 1)
+                                        }
+                                    }
+                                },
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically
@@ -205,7 +209,17 @@ fun PostScreen(postid:Int?){
                 item{Divider(modifier = Modifier.padding(vertical = 4.dp))}
 
                 comments.forEach{
-                    item{ParentCommentView(it)}
+                    item{
+                        ParentCommentView(it,
+                        {
+                            parentcommentid = it.parentcommentid
+                            keyboardController?.show()
+                        },
+                        {
+                            // TODO:  
+                        }
+                        )
+                    }
                     item{Divider()}
                 }
             }
@@ -220,7 +234,9 @@ fun PostScreen(postid:Int?){
 
 @Composable
 @Preview
-fun PostView(post:PostDetail = PostDetail(postId=1, userId=35, title="waffle", content="waffle", category="FREE_BOARD", createdAt="2024-01-18T19:13:04.000+00:00", likes=1, 0,0)){
+fun PostView(
+    post:PostDetail = PostDetail(postId=1, userId=35, title="waffle", content="waffle", category="FREE_BOARD", createdAt="2024-01-18T19:13:04.000+00:00", likes=1, 0,0)
+){
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.Start,
@@ -276,25 +292,66 @@ fun PostView(post:PostDetail = PostDetail(postId=1, userId=35, title="waffle", c
 
 @Composable
 @Preview
-fun ParentCommentView(comment: ParentComment = ParentComment(parentcommentid=2, userId=8, postId=1, content="comment2", createdAt="2024-01-19T15:03:58.000+00:00", childComments=listOf(ChildComment(childcommentid=3, userId=8, postId=1, content="comment3", parentCommentId=2, createdAt="2024-01-19T15:04:15.000+00:00", likes=0), ChildComment(childcommentid=4, userId=8, postId=1, content="comment4", parentCommentId=2, createdAt="2024-01-19T15:04:21.000+00:00", likes=0)), likes=0)){
+fun ParentCommentView(
+    comment: ParentComment = ParentComment(parentcommentid=2, userId=8, postId=1, content="comment2", createdAt="2024-01-19T15:03:58.000+00:00", childComments=listOf(ChildComment(childcommentid=3, userId=8, postId=1, content="comment3", parentCommentId=2, createdAt="2024-01-19T15:04:15.000+00:00", likes=0), ChildComment(childcommentid=4, userId=8, postId=1, content="comment4", parentCommentId=2, createdAt="2024-01-19T15:04:21.000+00:00", likes=0)), likes=0),
+    onclickcomment: () -> Unit = {},
+    onclicklike: () -> Unit = {}
+){
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.Start
     ){
-        Row{
-            Icon(
-                imageVector = Icons.Sharp.AccountBox,
-                contentDescription = "User",
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ){
+            Row {
+                Icon(
+                    imageVector = Icons.Sharp.AccountBox,
+                    contentDescription = "User",
+                    modifier = Modifier
+                        .width(40.dp)
+                        .height(40.dp)
+                )
+                Text(
+                    text = "익명",
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(start = 5.dp, top = 8.dp)
+                )
+            }
+
+            Row(
                 modifier = Modifier
-                    .width(40.dp)
-                    .height(40.dp)
-            )
-            Text(
-                text = "익명",
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(start = 5.dp, top = 8.dp)
-            )
+                    .padding(top = 5.dp, end = 10.dp)
+                    .background(color = Color(0xBEE6E6E6), shape = RoundedCornerShape(5.dp))
+            ) {
+                Icon(
+                    imageVector = Icons.Sharp.ChatBubbleOutline,
+                    contentDescription = "",
+                    modifier = Modifier
+                        .clickable {
+                            onclickcomment()
+                        }
+                        .padding(horizontal = 10.dp, vertical = 4.dp)
+                        .height(14.dp),
+                    tint = Color.Gray
+                )
+                Divider(modifier = Modifier
+                    .height(22.dp)
+                    .width(1.dp))
+                Icon(
+                    imageVector = Icons.Sharp.FavoriteBorder,
+                    contentDescription = "",
+                    modifier = Modifier
+                        .clickable {
+                            onclicklike()
+                        }
+                        .padding(horizontal = 10.dp, vertical = 4.dp)
+                        .height(14.dp),
+                    tint = Color.Gray
+                )
+            }
         }
 
         Text(

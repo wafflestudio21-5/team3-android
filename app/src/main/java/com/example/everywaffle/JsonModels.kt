@@ -97,3 +97,10 @@ data class PostComment(
     @Json(name = "parentCommentId") val parentcommentid:Int,
     @Json(name = "likes") val likes:Int
 )
+
+@JsonClass(generateAdapter = true)
+data class PostScrapResponse(
+    @Json(name = "scrapId") val scrapid:Int,
+    @Json(name = "userId") val userid:Int,
+    @Json(name = "postId") val postId:Int
+)

@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Comment
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.sharp.AccountBox
 import androidx.compose.material.icons.sharp.DeviceUnknown
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -344,7 +345,10 @@ fun GraduateBoardContent() {
 }
 */
 @Composable
-fun PopularPost() {
+fun PopularPost(
+    navController: NavHostController,
+    post:PostDetail
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -356,26 +360,48 @@ fun PopularPost() {
             modifier = Modifier
                 .background(Color.White)
                 .clickable {
-                    // TODO: 상세 게시글로 넘어가는 로직
+                    navController.navigate("Post/${post.postId}")
                 }
                 .padding(16.dp)
         ) {
-            Text("게시글 제목", fontWeight = FontWeight.Bold)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row {
+                    Icon(
+                        imageVector = Icons.Sharp.AccountBox,
+                        contentDescription = "User",
+                        modifier = Modifier
+                            .width(30.dp)
+                            .height(30.dp)
+                    )
+                    Text(
+                        text = "익명",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(start = 5.dp, top = 8.dp)
+                    )
+                }
+                Row {
+                    Text(post.createdAt, fontSize = 12.sp, color = Color.Gray)
+                }
+            }
+            Text(post.title, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(4.dp))
-            Text("게시글 내용 미리보기...", color = Color.Gray)
+            Text(post.content, color = Color.Gray)
             Spacer(modifier = Modifier.height(4.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("01/02 01:22", fontSize = 12.sp, color = Color.Gray)
-                Row {
-                    Icon(imageVector = Icons.Default.Favorite, contentDescription = "Likes", tint = Color.Red)
-                    Text("공감", modifier = Modifier.padding(start = 4.dp))
+                Text(post.category, fontSize = 12.sp, color = Color.Gray)
+                Row{
+                    ReactionNumberView("Like",post.likes,"Normal")
                     Spacer(modifier = Modifier.width(8.dp))
-                    Icon(imageVector = Icons.Default.Comment, contentDescription = "Comments", tint = Color.Gray)
-                    Text("댓글", modifier = Modifier.padding(start = 4.dp))
+                    ReactionNumberView("Comment",post.comments,"Normal")
                 }
             }
         }

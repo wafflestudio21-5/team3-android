@@ -81,4 +81,22 @@ interface RestAPI {
         @Header("Authorization") token:String="Bearer "+MyApplication.prefs.getString("token"),
         @Body() comment:PostComment
     ): ChildComment
+
+    @POST("/api/post/{postId}/scrap")
+    suspend fun postscrap(
+        @Path("postId") postid:Int,
+        @Header("Authorization") token:String="Bearer "+MyApplication.prefs.getString("token"),
+        @Body() userid:UserId
+    ): PostScrapResponse
+
+    @GET("/api/home/post/{category}")
+    suspend fun getrecent(
+        @Path("category") category:String,
+        @Header("Authorization") token:String="Bearer "+MyApplication.prefs.getString("token")
+    ): PostDetail
+
+    @GET("/api/home/post-trending")
+    suspend fun gettrending(
+        @Header("Authorization") token:String="Bearer "+MyApplication.prefs.getString("token")
+    ): List<PostDetail>
 }

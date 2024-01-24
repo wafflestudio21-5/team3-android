@@ -88,7 +88,7 @@ fun InitScreen(
     var signinpw by remember { mutableStateOf("") }
     var signinfail by remember { mutableStateOf(false) }
 
-    val kakaologin = Kakaologin()
+    //val kakaologin = Kakaologin()
     val context = LocalContext.current
 
     var isLoggingIn by remember { mutableStateOf(false) }
@@ -224,6 +224,7 @@ fun InitScreen(
             val context = LocalContext.current
             Button(
                 onClick = {
+                    /*
                     isLoggingIn = true
                     loginError = ""
                     CoroutineScope(Dispatchers.Main).launch {
@@ -240,6 +241,7 @@ fun InitScreen(
                             isLoggingIn = false
                         }
                     }
+                     */
                 },
 
                 colors = ButtonDefaults.buttonColors(Color(0xFFFFEB3B)),
