@@ -1,8 +1,12 @@
 package com.example.everywaffle
 
+import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
+import android.widget.Button
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -48,16 +52,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.kakao.sdk.auth.AuthApiClient
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.common.model.KakaoSdkError
+import com.kakao.sdk.common.util.Utility
 import com.kakao.sdk.user.UserApiClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 fun savetoken(context: Context, token: String) {
     val sharedPref = context.getSharedPreferences("MyApp", Context.MODE_PRIVATE)
@@ -71,6 +78,8 @@ fun checkloginstatus(context: Context): Boolean {
     val sharedPref = context.getSharedPreferences("MyApp", Context.MODE_PRIVATE)
     return sharedPref.getString("Token", null) != null
 }
+
+@SuppressLint("SuspiciousIndentation")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 //@Preview
 @Composable
@@ -82,6 +91,7 @@ fun InitScreen(
     onNavigateToDetail: () -> Unit ={}
 ) {
     val mainViewModel = hiltViewModel<MainViewModel>()
+    val viewModel:MainViewModel= hiltViewModel()
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
     var signinid by remember { mutableStateOf("") }
@@ -220,30 +230,17 @@ fun InitScreen(
             }
 
             // 카카오 로그인
-
-            val context = LocalContext.current
             Button(
                 onClick = {
-                    /*
-                    isLoggingIn = true
-                    loginError = ""
-                    CoroutineScope(Dispatchers.Main).launch {
-                        try {
-                            val oAuthToken = kakaologin.getKakaoOAuthToken(context)
-                            if (oAuthToken != null) {
-                                onNavigateToHome()
-                            } else {
-                                loginError = "Login failed: Unknown error"
-                            }
-                        } catch (e: Throwable) {
-                            loginError = "Login failed: ${e.localizedMessage}"
-                        } finally {
-                            isLoggingIn = false
+                    viewModel.loginWithKakao(context,
+                        onSuccess = {
+                            onNavigateToHome()
+                        },
+                        onError = { errorMessage ->
+                            Log.e("LOGIN", errorMessage)
                         }
-                    }
-                     */
+                    )
                 },
-
                 colors = ButtonDefaults.buttonColors(Color(0xFFFFEB3B)),
                 shape = RectangleShape,
                 modifier = Modifier

@@ -41,7 +41,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
-//@Preview
+
 @Composable
 fun DetailScreen(
     onNavigateToInit: () -> Unit = {}

@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Comment
 import androidx.compose.material.icons.filled.Favorite
@@ -25,6 +26,8 @@ import androidx.compose.material.icons.sharp.Home
 import androidx.compose.material.icons.sharp.ManageAccounts
 import androidx.compose.material.icons.sharp.MoreVert
 import androidx.compose.material.icons.sharp.Search
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
@@ -34,22 +37,29 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -58,11 +68,12 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @Composable
-//@Preview
 fun HomeScreen(
     navController: NavHostController,
     onNavigateToBoard : () -> Unit = {},
-    onNavigateToUser : () -> Unit = {}
+    onNavigateToUser : () -> Unit = {},
+    onNavigateToCreate: () -> Unit = {}
+
 ){
     val mainViewModel = hiltViewModel<MainViewModel>()
     val recentpost= remember{mutableStateMapOf<String,String>()}
@@ -215,13 +226,16 @@ fun BoardList(navController: NavHostController, recent:Map<String,String>, trend
 @Composable
 fun BoardScreen(
     boardid:String?,
-    navController: NavHostController
-){
+    navController: NavHostController,
+    viewModel: MainViewModel= hiltViewModel()
+) {
     val mainViewModel = hiltViewModel<MainViewModel>()
     var page by remember { mutableStateOf(1) }
     val loading = remember { mutableStateOf(false) }
     val itemList = remember { mutableStateListOf<PostDetail>() }
     val listState = rememberLazyListState()
+
+    val postChanged by MainViewModel.postchanged.collectAsState()
 
     Surface(
         modifier = Modifier
@@ -229,14 +243,14 @@ fun BoardScreen(
             .fillMaxSize()
             .padding(5.dp)
     ) {
-        LaunchedEffect(Unit){
-            itemList.addAll(mainViewModel.getpostcategory(boardid!!,0)!!)
+        LaunchedEffect(Unit) {
+            itemList.addAll(mainViewModel.getpostcategory(boardid!!, 0)!!)
         }
 
-        LaunchedEffect(key1 = page) {
+        LaunchedEffect(page) {
             loading.value = true
             delay(1000)
-            itemList.addAll(mainViewModel.getpostcategory(boardid!!,page)!!)
+            itemList.addAll(mainViewModel.getpostcategory(boardid!!, page)!!)
             loading.value = false
         }
 
@@ -244,27 +258,39 @@ fun BoardScreen(
             snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
                 .collectLatest { index ->
                     if (!loading.value && index != null && index >= itemList.size - 5) {
-                        page+=1
+                        page += 1
                     }
                 }
         }
 
+        LaunchedEffect(postChanged) {
+            if (postChanged) {
+                val newPosts = boardid?.let { viewModel.getpostcategory(it, 0) }
+                if (newPosts != null) {
+                    itemList.clear()
+                    itemList.addAll(newPosts)
+                }
+                viewModel.postChanged()
+            }
+        }
+
+    }
         Column(
             modifier = Modifier
                 .fillMaxSize()
-        ){
+        ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = {navController.navigate("Home")}) {
+                IconButton(onClick = { navController.navigate("Home") }) {
                     Icon(imageVector = Icons.Sharp.ArrowBack, contentDescription = "Back")
                 }
 
                 Text(text = boardid!!, fontSize = 12.sp, fontWeight = FontWeight.Bold)
 
-                Row(){
+                Row() {
                     IconButton(onClick = { }) {
                         Icon(imageVector = Icons.Sharp.Search, contentDescription = "Search")
                     }
@@ -278,60 +304,91 @@ fun BoardScreen(
 
             LazyColumn(
                 state = listState,
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .weight(1f),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 itemList.forEach {
-                    item{PostPreview(it,navController)}
+                    item { PostPreview(it, navController) }
                 }
                 item {
                     if (loading.value) {
-                        Box(modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(10.dp), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator(modifier = Modifier.width(50.dp), strokeWidth = 2.dp)
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(10.dp), contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.width(50.dp),
+                                strokeWidth = 2.dp
+                            )
                         }
                     }
                 }
             }
+            CreatePost(navController = navController)
         }
     }
-}
 
-@Composable
-fun PostPreview(
-    post:PostDetail,
-    navController: NavHostController
-){
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.White),
-        shape = RectangleShape
+    @Composable
+    fun PostPreview(
+        post: PostDetail,
+        navController: NavHostController
     ) {
-        Column(
+        Card(
             modifier = Modifier
-                .background(Color.White)
-                .clickable {
-                    navController.navigate("Post/${post.postId}")
-                }
-                .padding(horizontal = 16.dp)
+                .fillMaxWidth()
+                .background(Color.White),
+            shape = RectangleShape
         ) {
-            Text(post.title, fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(post.content, color = Color.Gray)
-            Spacer(modifier = Modifier.height(4.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+
+            Column(
+                modifier = Modifier
+                    .background(Color.White)
+                    .clickable {
+                        navController.navigate("Post/${post.postId}")
+                    }
+                    .padding(horizontal = 16.dp)
             ) {
-                ReactionNumberView("Like",post.likes,"Normal")
-                Spacer(modifier = Modifier.width(8.dp))
-                ReactionNumberView("Comment",post.comments,"Normal")
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(post.createdAt, fontSize = 12.sp, color = Color.Gray)
+                Text(post.title, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(post.content, color = Color.Gray)
+                Spacer(modifier = Modifier.height(4.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    ReactionNumberView("Like", post.likes, "Normal")
+                    Spacer(modifier = Modifier.width(8.dp))
+                    ReactionNumberView("Comment", post.comments, "Normal")
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(post.createdAt, fontSize = 12.sp, color = Color.Gray)
+                }
             }
+            Divider()
         }
-        Divider()
     }
-}
+
+    @Composable
+    fun CreatePost(navController: NavController) {
+        Button(
+            onClick = {
+                navController.navigate("CreatePost") {
+                    popUpTo("BoardScreen") { inclusive = true }
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .height(50.dp)
+                .clip(RoundedCornerShape(8.dp)),
+            colors = ButtonDefaults.buttonColors(Color.Red)
+        ) {
+            Text(
+                text = "글 쓰기",
+                color = Color.White,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }

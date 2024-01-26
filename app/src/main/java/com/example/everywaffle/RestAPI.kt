@@ -99,4 +99,10 @@ interface RestAPI {
     suspend fun gettrending(
         @Header("Authorization") token:String="Bearer "+MyApplication.prefs.getString("token")
     ): List<PostDetail>
+
+    @POST("/api/post")
+    suspend fun createpost(
+        @Header("Authorization")token:String = "Bearer" + MyApplication.prefs.getString("token"),
+        @Body() postRequest: PostRequest
+    ):PostResponse
 }

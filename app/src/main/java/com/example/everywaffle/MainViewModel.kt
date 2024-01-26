@@ -1,14 +1,18 @@
 package com.example.everywaffle
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.remember
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.kakao.sdk.user.UserApiClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -91,6 +95,26 @@ class MainViewModel @Inject constructor(
         }
         catch (e:retrofit2.HttpException){
             return null
+        }
+    }
+
+    fun loginWithKakao(context: Context, onSuccess: () -> Unit, onError: (String) -> Unit) {
+        if (UserApiClient.instance.isKakaoTalkLoginAvailable(context)) {
+            UserApiClient.instance.loginWithKakaoTalk(context) { token, error ->
+                if (error != null) {
+                    onError(error.toString())
+                } else if (token != null) {
+                    onSuccess()
+                }
+            }
+        } else {
+            UserApiClient.instance.loginWithKakaoAccount(context) { token, error ->
+                if (error != null) {
+                    onError(error.toString())
+                } else if (token != null) {
+                    onSuccess()
+                }
+            }
         }
     }
 
@@ -195,5 +219,22 @@ class MainViewModel @Inject constructor(
             gettrending = null
         }
         return gettrending
+    }
+
+
+    suspend fun createpost(title: String, content: String): Int? {
+        return try {
+            val token = "Bearer " + MyApplication.prefs.getString("token")
+            val postRequest = PostRequest(title, content)
+            val createPostResponse = api.createpost(token, postRequest)
+            createPostResponse.postId // 게시글 ID 반환
+        } catch (e: Exception) {
+            null
+        }
+    }
+    fun postChanged() {
+        viewModelScope.launch {
+            _postchanged.emit(true)
+        }
     }
 }

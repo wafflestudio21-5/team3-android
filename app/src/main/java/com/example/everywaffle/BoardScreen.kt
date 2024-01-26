@@ -106,5 +106,6 @@ fun AllBoards(
                 onclick = onNavigateToUser
             )
         }
+
     }
 }

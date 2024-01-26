@@ -36,6 +36,7 @@ import androidx.compose.material.icons.sharp.Send
 import androidx.compose.material.icons.sharp.StarBorder
 import androidx.compose.material.icons.sharp.SubdirectoryArrowRight
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -72,6 +73,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -79,6 +81,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
+
 fun PostScreen(postid:Int?){
     val mainViewModel = hiltViewModel<MainViewModel>()
     var post by remember { mutableStateOf(PostDetail(1,0,"","","","",0, 0,0)) }
@@ -93,6 +96,7 @@ fun PostScreen(postid:Int?){
         comments.clear()
         comments.addAll(mainViewModel.getcomments(post.postId)!!)
     }
+
 
     Surface(
         modifier = Modifier
@@ -122,7 +126,8 @@ fun PostScreen(postid:Int?){
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(630.dp)
+                    //.height(630.dp)
+                    .weight(1f)
             ){
                 item { PostView(post = post) }
 
@@ -224,6 +229,7 @@ fun PostScreen(postid:Int?){
                 }
             }
 
+
             BottomTextField(
                 postid = postid!!,
                 parentcommentid = parentcommentid
@@ -291,7 +297,6 @@ fun PostView(
 }
 
 @Composable
-@Preview
 fun ParentCommentView(
     comment: ParentComment = ParentComment(parentcommentid=2, userId=8, postId=1, content="comment2", createdAt="2024-01-19T15:03:58.000+00:00", childComments=listOf(ChildComment(childcommentid=3, userId=8, postId=1, content="comment3", parentCommentId=2, createdAt="2024-01-19T15:04:15.000+00:00", likes=0), ChildComment(childcommentid=4, userId=8, postId=1, content="comment4", parentCommentId=2, createdAt="2024-01-19T15:04:21.000+00:00", likes=0)), likes=0),
     onclickcomment: () -> Unit = {},
@@ -391,7 +396,6 @@ fun ParentCommentView(
 }
 
 @Composable
-@Preview
 fun ChildCommentView(comment: ChildComment = ChildComment(childcommentid=3, userId=8, postId=1, content="comment3", parentCommentId=2, createdAt="2024-01-19T15:04:15.000+00:00", likes=0)) {
     Column(
         modifier = Modifier.fillMaxWidth(),
