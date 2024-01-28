@@ -133,18 +133,16 @@ fun HomeScreen(
                 }
             }
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.Center
             ) {
                 IconButtonWithText(
                     imageVector = Icons.Sharp.Home,
                     text = "홈"
                 )
-                IconButtonWithText(
-                    imageVector = Icons.Sharp.Dashboard,
-                    text = "게시판",
-                    onclick = onNavigateToBoard
-                )
+                Spacer(Modifier.width(80.dp))
                 IconButtonWithText(
                     imageVector = Icons.Sharp.ManageAccounts,
                     text = "마이페이지",

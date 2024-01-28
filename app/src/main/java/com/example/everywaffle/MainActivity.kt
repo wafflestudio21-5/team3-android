@@ -305,6 +305,12 @@ val accountOptions = listOf(
     "이메일 변경" to 2
 )
 
+val postOptions = listOf(
+    "내가 쓴 글" to "내가 쓴 글",
+    "댓글 단 글" to "댓글 단 글",
+    "스크랩" to "스크랩"
+)
+
 val communityOptions = listOf(
     "닉네임 설정" to "닉네임 설정",
     "게시판 프로필 사진 변경" to "게시판 프로필 사진 변경",

@@ -84,6 +84,7 @@ fun UserScreen(
                     studentId = MyApplication.prefs.getString("studentid")
                 )
                 UserOptionsSection("계정", accountOptions, onclicklist)
+                UserOptionsSection("게시글", postOptions, onclicklist)
                 UserOptionsSection("커뮤니티", communityOptions, onclicklist)
                 UserOptionsSection("앱 설정", appSettingsOptions, onclicklist)
                 UserOptionsSection("이용 안내", usageOptions, onclicklist)
