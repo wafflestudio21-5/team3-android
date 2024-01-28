@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -38,6 +39,8 @@ import androidx.compose.material.icons.sharp.SubdirectoryArrowRight
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -69,11 +72,14 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -82,10 +88,11 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 
-fun PostScreen(postid:Int?){
+fun PostScreen(postid:Int?, navController: NavHostController){
     val mainViewModel = hiltViewModel<MainViewModel>()
     var post by remember { mutableStateOf(PostDetail(1,0,"","","","",0, 0,0)) }
     val comments = remember { mutableStateListOf<ParentComment>() }
+    var dropmenuexpanded by remember { mutableStateOf(false) }
     var parentcommentid by remember { mutableStateOf(0) }
     val postchangedkey by MainViewModel.postchanged.collectAsState()
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -116,7 +123,9 @@ fun PostScreen(postid:Int?){
 
                 Text(text = post.category, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                 
-                IconButton(onClick = { }) {
+                IconButton(onClick = {
+                    if(post.userId == MyApplication.prefs.getString("userid").toInt()) dropmenuexpanded = true
+                }) {
                     Icon(imageVector = Icons.Sharp.MoreVert, contentDescription = "")
                 }
             }
@@ -233,6 +242,33 @@ fun PostScreen(postid:Int?){
             BottomTextField(
                 postid = postid!!,
                 parentcommentid = parentcommentid
+            )
+        }
+
+        DropdownMenu(
+            modifier = Modifier.wrapContentSize(),
+            expanded = dropmenuexpanded,
+            onDismissRequest = {dropmenuexpanded = false},
+            offset = DpOffset(260.dp, -820.dp) // 펼쳐지는 메뉴의 위치 조정
+        ) {
+            DropdownMenuItem(
+                text = {Text("수정")},
+                onClick = {
+                    navController.navigate("UpdatePost/${post.category}/${post.postId}/${post.title}/${post.content}") {
+                        popUpTo("BoardScreen") { inclusive = true }
+                    }
+                }
+            )
+            DropdownMenuItem(
+                text = {Text("삭제")},
+                onClick = {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        val result = mainViewModel.deletepost(post.postId)
+                        if(result!=null){
+                            navController.navigate("Board/${post.category}")
+                        }
+                    }
+                }
             )
         }
     }

@@ -2,6 +2,7 @@ package com.example.everywaffle
 
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
@@ -105,4 +106,17 @@ interface RestAPI {
         @Header("Authorization") token:String = "Bearer " + MyApplication.prefs.getString("token"),
         @Body() postRequest: PostRequest
     ):PostDetail
+
+    @PUT("/api/post/{postId}")
+    suspend fun updatepost(
+        @Header("Authorization") token:String="Bearer "+MyApplication.prefs.getString("token"),
+        @Path("postId") postid:Int,
+        @Body() postRequest: PostRequest
+    ):PostDetail
+
+    @DELETE("/api/post/{postId}")
+    suspend fun deletepost(
+        @Header("Authorization") token:String="Bearer "+MyApplication.prefs.getString("token"),
+        @Path("postId") postid:Int
+    ):Response<Unit>
 }

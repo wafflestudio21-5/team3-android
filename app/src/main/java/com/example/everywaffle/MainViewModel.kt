@@ -237,4 +237,31 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    suspend fun updatepost(title: String, content: String, category:String, postid:Int): PostDetail? {
+        return try {
+            val topost = PostRequest(
+                userId = MyApplication.prefs.getString("userid").toInt(),
+                title = title,
+                content = content,
+                category = category
+            )
+            api.updatepost(postid = postid, postRequest = topost)
+        } catch (e: retrofit2.HttpException) {
+            Log.d("aaaa",e.toString())
+            null
+        }
+    }
+
+    suspend fun deletepost(postid:Int):Int?{
+        try {
+            api.deletepost(
+                postid = postid
+            )
+            return 1
+        }
+        catch (e: retrofit2.HttpException){
+            Log.d("aaaa",e.toString())
+            return null
+        }
+    }
 }

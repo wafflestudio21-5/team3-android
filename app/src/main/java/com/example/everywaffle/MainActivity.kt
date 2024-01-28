@@ -15,8 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Comment
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.sharp.AccountBox
 import androidx.compose.material.icons.sharp.DeviceUnknown
 import androidx.compose.material3.AlertDialog
@@ -154,6 +152,7 @@ fun MyAppNavHost(
         ){backstackEntry ->
             PostScreen(
                 postid = backstackEntry.arguments?.getInt("post_id"),
+                navController = navController
             )
         }
         composable(
@@ -164,9 +163,34 @@ fun MyAppNavHost(
                 }
             )
         ){backstackEntry ->
-            CreateScreen(
+            Createpost(
                 navController = navController,
                 category = backstackEntry.arguments?.getString("category")
+            )
+        }
+        composable(
+            route = "UpdatePost/{category}/{postId}/{pretitle}/{precontent}",
+            arguments = listOf(
+                navArgument("category"){
+                    type = NavType.StringType
+                },
+                navArgument("postId"){
+                    type = NavType.IntType
+                },
+                navArgument("pretitle"){
+                    type = NavType.StringType
+                },
+                navArgument("precontent"){
+                    type = NavType.StringType
+                }
+            )
+        ){backstackEntry ->
+            UpdatePost(
+                navController = navController,
+                category = backstackEntry.arguments?.getString("category"),
+                postid = backstackEntry.arguments?.getInt("postId"),
+                pretitle = backstackEntry.arguments?.getString("pretitle"),
+                precontent = backstackEntry.arguments?.getString("precontent")
             )
         }
     }
