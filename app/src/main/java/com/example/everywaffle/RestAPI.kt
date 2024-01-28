@@ -102,7 +102,7 @@ interface RestAPI {
 
     @POST("/api/post")
     suspend fun createpost(
-        @Header("Authorization")token:String = "Bearer" + MyApplication.prefs.getString("token"),
+        @Header("Authorization") token:String = "Bearer " + MyApplication.prefs.getString("token"),
         @Body() postRequest: PostRequest
-    ):PostResponse
+    ):PostDetail
 }

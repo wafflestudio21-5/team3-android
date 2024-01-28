@@ -222,19 +222,19 @@ class MainViewModel @Inject constructor(
     }
 
 
-    suspend fun createpost(title: String, content: String): Int? {
+    suspend fun createpost(title: String, content: String, category:String): PostDetail? {
         return try {
-            val token = "Bearer " + MyApplication.prefs.getString("token")
-            val postRequest = PostRequest(title, content)
-            val createPostResponse = api.createpost(token, postRequest)
-            createPostResponse.postId // 게시글 ID 반환
-        } catch (e: Exception) {
+            val topost = PostRequest(
+                userId = MyApplication.prefs.getString("userid").toInt(),
+                title = title,
+                content = content,
+                category = category
+            )
+            api.createpost(postRequest = topost)
+        } catch (e: retrofit2.HttpException) {
+            Log.d("aaaa",e.toString())
             null
         }
     }
-    fun postChanged() {
-        viewModelScope.launch {
-            _postchanged.emit(true)
-        }
-    }
+
 }

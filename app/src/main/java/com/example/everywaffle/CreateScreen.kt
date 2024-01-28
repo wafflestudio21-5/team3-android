@@ -40,10 +40,13 @@ import java.nio.file.WatchEvent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateScreen(navController: NavHostController, viewModel: MainViewModel = hiltViewModel()) {
+fun CreateScreen(navController: NavHostController, category:String?) {
+
+    val mainViewModel = hiltViewModel<MainViewModel>()
     var title by rememberSaveable { mutableStateOf("") }
     var content by rememberSaveable { mutableStateOf("") }
     val recentpost = remember { mutableStateMapOf<String, String>() }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -56,13 +59,21 @@ fun CreateScreen(navController: NavHostController, viewModel: MainViewModel = hi
                 actions = {
                     Button(onClick = {
                         if (title.isNotBlank() && content.isNotBlank()) {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                val result = mainViewModel.createpost(title, content, category!!)
+                                if (result!=null){
+                                    navController.navigate("Board/${category}")
+                                }
+                            }
+
+                            /*
                             CoroutineScope(Dispatchers.IO).launch {
                                 try {
-                                    val newPostId = viewModel.createpost(title, content)
+                                    val newPostId = mainViewModel.createpost(title, content)
                                     newPostId?.let {
-                                        val newPostDetail = viewModel.getpost(it)
+                                        val newPostDetail = mainViewModel.getpost(it)
                                         if (newPostDetail != null) {
-                                            viewModel.postChanged()
+                                            //mainViewModel.postChanged()
                                             CoroutineScope(Dispatchers.Main).launch {
                                                 navController.navigate("Board/${newPostDetail.category}") {
                                                     popUpTo("BoardScreen") { inclusive = true }
@@ -74,6 +85,7 @@ fun CreateScreen(navController: NavHostController, viewModel: MainViewModel = hi
                                     Log.e("CreateScreen", "Error creating post: $e")
                                 }
                             }
+                             */
                         }
                     }) {
                         Text("완료")

@@ -107,11 +107,8 @@ data class PostScrapResponse(
 
 @JsonClass(generateAdapter = true)
 data class PostRequest(
-    @Json(name="title") val title: String,
-    @Json(name="content") val content: String
-)
-
-@JsonClass(generateAdapter = true)
-data class PostResponse(
-    @Json(name="postId") val postId:Int
+    @Json(name = "userId") val userId:Int,
+    @Json(name = "title") val title:String,
+    @Json(name = "content") val content:String,
+    @Json(name = "category") val category:String
 )

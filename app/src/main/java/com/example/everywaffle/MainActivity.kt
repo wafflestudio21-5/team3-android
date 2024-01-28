@@ -21,7 +21,6 @@ import androidx.compose.material.icons.sharp.AccountBox
 import androidx.compose.material.icons.sharp.DeviceUnknown
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,14 +29,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -135,9 +131,6 @@ fun MyAppNavHost(
                 onNavigateToUser = {navController.navigate("User")}
             )
         }
-        composable("CreatePost") {
-            CreateScreen(navController = navController)
-        }
         composable(
             route="Board/{board_id}",
             arguments = listOf(
@@ -163,8 +156,65 @@ fun MyAppNavHost(
                 postid = backstackEntry.arguments?.getInt("post_id"),
             )
         }
+        composable(
+            route = "CreatePost/{category}",
+            arguments = listOf(
+                navArgument("category"){
+                    type = NavType.StringType
+                }
+            )
+        ){backstackEntry ->
+            CreateScreen(
+                navController = navController,
+                category = backstackEntry.arguments?.getString("category")
+            )
+        }
     }
 }
+/*
+suspend fun UserApiClient.Companion.loginWithKakao(context: Context): OAuthToken {
+    return if (instance.isKakaoTalkLoginAvailable(context)) {
+        try {
+            loginWithKakaoTalk(context)
+        } catch (e: ClientError) {
+            if (e.reason == ClientErrorCause.Cancelled) {
+                throw e
+            } else {
+                loginWithKakaoAccount(context)
+            }
+        } catch (e: Throwable) {
+            loginWithKakaoAccount(context)
+        }
+    } else {
+        loginWithKakaoAccount(context)
+    }
+}
+
+suspend fun UserApiClient.Companion.loginWithKakaoTalk(context: Context): OAuthToken {
+    return suspendCancellableCoroutine { continuation ->
+        instance.loginWithKakaoTalk(context) { token, error ->
+            when {
+                error != null -> continuation.cancel(error)
+                token != null -> continuation.resume(token)
+                else -> continuation.cancel(RuntimeException("Fail to access kakao"))
+            }
+        }
+    }
+}
+suspend fun UserApiClient.Companion.loginWithKakaoAccount(context: Context): OAuthToken {
+    return suspendCancellableCoroutine { continuation ->
+        instance.loginWithKakaoAccount(context) { token, error ->
+            when {
+                error != null -> continuation.cancel(CancellationException("Kakao login failed", error))
+                token != null -> continuation.resume(token)
+                else -> continuation.cancel(RuntimeException("Fail to access Kakao."))
+            }
+        }
+        continuation.invokeOnCancellation {}
+    }
+}
+ */
+
 
 @Composable
 fun MakeAlertDialog(
@@ -367,8 +417,6 @@ fun PopularPost(
                     ReactionNumberView("Comment",post.comments,"Normal")
                 }
             }
-
-
         }
     }
 }
@@ -380,6 +428,5 @@ fun String.isNumber(): Boolean {
         else -> true
     }
 }
-
 
 val postdetailtemp = PostDetail(postId=1, userId=35, title="waffle", content="waffle", category="FREE_BOARD", createdAt="2024-01-18T19:13:04.000+00:00", likes=1,0,0)

@@ -48,8 +48,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.startActivity
@@ -83,8 +85,6 @@ fun checkloginstatus(context: Context): Boolean {
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 //@Preview
 @Composable
-
-
 fun InitScreen(
     onNavigateToSignup: () -> Unit ={},
     onNavigateToHome: () -> Unit ={},
@@ -119,10 +119,21 @@ fun InitScreen(
             .fillMaxSize()
     ) {
         Column {
-            Spacer(modifier = Modifier.height(70.dp))
+            Spacer(modifier = Modifier.height(106.dp))
+
+            Text(
+                text = "함께하는 와플생활",
+                modifier = Modifier.height(18.dp).fillMaxWidth(),
+                fontSize = 15.sp,
+                textAlign = TextAlign.Center,
+                color = Color.Black,
+                fontWeight = FontWeight.Bold
+            )
 
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -130,7 +141,7 @@ fun InitScreen(
                     painter = painterResource(id = R.drawable.ic_launcher_foreground),
                     contentDescription = "",
                     modifier = Modifier
-                        .height(50.dp)
+                        .height(49.dp)
                         .border(width = 3.dp, color = Color.Black)
                 )
                 Text(
@@ -138,22 +149,21 @@ fun InitScreen(
                     color = Color.Black,
                     fontWeight = FontWeight.Bold,
                     fontSize = 40.sp,
-                    modifier = Modifier
-                        .padding(10.dp)
+                    modifier = Modifier.padding(start = 15.dp)
                 )
             }
 
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(55.dp))
 
             TextField(
                 value = signinid,
                 onValueChange = { signinid = it },
                 placeholder = { Text(text = "아이디", fontSize = 15.sp) },
                 modifier = Modifier
-                    .padding(horizontal = 15.dp, vertical = 3.dp)
+                    .padding(horizontal = 18.dp)
                     .fillMaxWidth()
                     .height(50.dp),
-                shape = RoundedCornerShape(15.dp),
+                shape = RoundedCornerShape(13.dp),
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
                 keyboardActions = KeyboardActions(
                     onNext = {

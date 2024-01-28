@@ -230,12 +230,23 @@ fun BoardScreen(
     viewModel: MainViewModel= hiltViewModel()
 ) {
     val mainViewModel = hiltViewModel<MainViewModel>()
-    var page by remember { mutableStateOf(1) }
+    val page by remember { mutableStateOf(1) }
     val loading = remember { mutableStateOf(false) }
     val itemList = remember { mutableStateListOf<PostDetail>() }
     val listState = rememberLazyListState()
 
     val postChanged by MainViewModel.postchanged.collectAsState()
+
+    LaunchedEffect(Unit) {
+        itemList.addAll(mainViewModel.getpostcategory(boardid!!, 0)!!)
+    }
+
+    LaunchedEffect(page) {
+        loading.value = true
+        delay(1000)
+        itemList.addAll(mainViewModel.getpostcategory(boardid!!, page)!!)
+        loading.value = false
+    }
 
     Surface(
         modifier = Modifier
@@ -243,38 +254,6 @@ fun BoardScreen(
             .fillMaxSize()
             .padding(5.dp)
     ) {
-        LaunchedEffect(Unit) {
-            itemList.addAll(mainViewModel.getpostcategory(boardid!!, 0)!!)
-        }
-
-        LaunchedEffect(page) {
-            loading.value = true
-            delay(1000)
-            itemList.addAll(mainViewModel.getpostcategory(boardid!!, page)!!)
-            loading.value = false
-        }
-
-        LaunchedEffect(listState) {
-            snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
-                .collectLatest { index ->
-                    if (!loading.value && index != null && index >= itemList.size - 5) {
-                        page += 1
-                    }
-                }
-        }
-
-        LaunchedEffect(postChanged) {
-            if (postChanged) {
-                val newPosts = boardid?.let { viewModel.getpostcategory(it, 0) }
-                if (newPosts != null) {
-                    itemList.clear()
-                    itemList.addAll(newPosts)
-                }
-                viewModel.postChanged()
-            }
-        }
-
-    }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -326,9 +305,10 @@ fun BoardScreen(
                     }
                 }
             }
-            CreatePost(navController = navController)
+            CreatePost(navController = navController, category = boardid!!)
         }
     }
+}
 
     @Composable
     fun PostPreview(
@@ -369,26 +349,25 @@ fun BoardScreen(
         }
     }
 
-    @Composable
-    fun CreatePost(navController: NavController) {
-        Button(
-            onClick = {
-                navController.navigate("CreatePost") {
-                    popUpTo("BoardScreen") { inclusive = true }
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .height(50.dp)
-                .clip(RoundedCornerShape(8.dp)),
-            colors = ButtonDefaults.buttonColors(Color.Red)
-        ) {
-            Text(
-                text = "글 쓰기",
-                color = Color.White,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
+@Composable
+fun CreatePost(navController: NavController, category:String) {
+    Button(
+        onClick = {
+            navController.navigate("CreatePost/${category}") {
+                popUpTo("BoardScreen") { inclusive = true }
+            } },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .height(50.dp)
+            .clip(RoundedCornerShape(8.dp)),
+        colors = ButtonDefaults.buttonColors(Color.Red)
+    ) {
+        Text(
+            text = "글 쓰기",
+            color = Color.White,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold
+        )
     }
+}
