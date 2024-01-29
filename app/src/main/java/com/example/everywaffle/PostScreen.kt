@@ -121,7 +121,7 @@ fun PostScreen(postid:Int?, navController: NavHostController){
                     Icon(imageVector = Icons.Sharp.ArrowBack, contentDescription = "Back")
                 }
 
-                Text(text = post.category, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Text(text = boardnames.filterValues { it == post.category }.keys.first(), fontSize = 12.sp, fontWeight = FontWeight.Bold)
                 
                 IconButton(onClick = {
                     if(post.userId == MyApplication.prefs.getString("userid").toInt()) dropmenuexpanded = true

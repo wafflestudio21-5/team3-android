@@ -129,20 +129,31 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    suspend fun getpostcategory(boardid:String, page:Int, size:Int=10):List<PostDetail>?{
+    suspend fun getpostcategory(boardid:String, page:Int, size:Int=10, keyword:String=""):List<PostDetail>?{
         var getPostCategory:List<PostDetail>?
         try{
-            getPostCategory = when(boardid) {
-                "myposts" -> api.getmyposts(
+            getPostCategory = when {
+                boardid=="myposts" -> api.getmyposts(
                     userid = MyApplication.prefs.getString("userid").toInt(),
                     page = page,
                     size = size
                 ).content
-                "mycommented" -> api.getmycommented(
+                boardid=="mycommented" -> api.getmycommented(
                     userid = MyApplication.prefs.getString("userid").toInt(),
                     page = page,
                     size = size
                 ).content
+                "whole" in boardid -> api.searchwhole(
+                    keyword = keyword,
+                    page = page,
+                    size = size
+                )
+                "Search" in boardid -> api.searchcategory(
+                    category = boardid.substring(7),
+                    keyword = keyword,
+                    page = page,
+                    size = size
+                )
                 else -> api.getpostcategory(boardid = boardid, page = page, size = size)
             }
         }

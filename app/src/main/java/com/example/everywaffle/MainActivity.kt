@@ -101,12 +101,6 @@ fun MyAppNavHost(
                 navController = navController
             )
         }
-        composable("Search"){
-            SearchScreen(
-                onNavigateBack={navController.popBackStack()},
-                onNavigateToHome = {navController.navigate("Home")}
-            )
-        }
         composable("AllBoards"){
             AllBoards(
                 navController = navController,
@@ -127,6 +121,21 @@ fun MyAppNavHost(
         composable("ChangeEmail"){
             EmailChangeScreen(
                 onNavigateToUser = {navController.navigate("User")}
+            )
+        }
+        composable(
+            route ="Search/{board_id}",
+            arguments = listOf(
+                navArgument("board_id"){
+                    type= NavType.StringType
+                }
+            )
+        ){backstackEntry ->
+            SearchScreen(
+                onNavigateBack={navController.popBackStack()},
+                onNavigateToHome = {navController.navigate("Home")},
+                navController = navController,
+                boardid = backstackEntry.arguments?.getString("board_id")
             )
         }
         composable(

@@ -145,17 +145,3 @@ data class Sort(
     @Json(name = "unsorted") val unsorted:Boolean
 )
 
-@JsonClass(generateAdapter = true)
-data class MycommentedResponse(
-    @Json(name = "totalPages") val totalPages:Int,
-    @Json(name = "totalElements") val totalElements:Int,
-    @Json(name = "size") val size:Int,
-    @Json(name = "content") val content:List<PostDetail>,
-    @Json(name = "number") val number:Int,
-    @Json(name = "sort") val sort:Sort,
-    @Json(name = "first") val first:Boolean,
-    @Json(name = "last") val last:Boolean,
-    @Json(name = "numberOfElements") val numberOfElements:Int,
-    @Json(name = "pageable") val pageable:Pageable,
-    @Json(name = "empty") val empty:Boolean
-)

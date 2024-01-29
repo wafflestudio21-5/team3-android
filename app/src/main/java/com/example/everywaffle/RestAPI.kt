@@ -135,4 +135,21 @@ interface RestAPI {
         @Query("page") page:Int,
         @Query("size") size:Int
     ):MypostResponse
+
+    @GET("/api/post/search")
+    suspend fun searchwhole(
+        @Header("Authorization") token:String="Bearer "+MyApplication.prefs.getString("token"),
+        @Query("keyword") keyword:String,
+        @Query("page") page:Int,
+        @Query("size") size:Int
+    ):List<PostDetail>
+
+    @GET("/api/post/search/{catagory}")
+    suspend fun searchcategory(
+        @Header("Authorization") token:String="Bearer "+MyApplication.prefs.getString("token"),
+        @Path("catagory") category:String,
+        @Query("keyword") keyword:String,
+        @Query("page") page:Int,
+        @Query("size") size:Int
+    ):List<PostDetail>
 }

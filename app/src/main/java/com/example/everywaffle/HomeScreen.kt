@@ -116,7 +116,7 @@ fun HomeScreen(
                             .border(width = 3.dp, color = Color.Black)
                     )
                 }
-                IconButton(onClick = { navController.navigate("Search") }) {
+                IconButton(onClick = { navController.navigate("Search/whole") }) {
                     Icon(imageVector = Icons.Sharp.Search, contentDescription = "Search")
                 }
                 IconButton(onClick = onNavigateToUser) {
@@ -224,7 +224,7 @@ fun BoardList(navController: NavHostController, recent:Map<String,String>, trend
 @Composable
 fun BoardScreen(
     boardid:String?,
-    navController: NavHostController
+    navController: NavHostController,
 ) {
     val mainViewModel = hiltViewModel<MainViewModel>()
     val page by remember { mutableStateOf(1) }
@@ -232,9 +232,8 @@ fun BoardScreen(
     val itemList = remember { mutableStateListOf<PostDetail>() }
     val listState = rememberLazyListState()
 
-    val postChanged by MainViewModel.postchanged.collectAsState()
-
     LaunchedEffect(Unit) {
+        itemList.clear()
         itemList.addAll(mainViewModel.getpostcategory(boardid!!, 0)!!)
     }
 
@@ -264,10 +263,10 @@ fun BoardScreen(
                     Icon(imageVector = Icons.Sharp.ArrowBack, contentDescription = "Back")
                 }
 
-                Text(text = boardid!!, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Text(text = boardnames.filterValues { it == boardid!! }.keys.first(), fontSize = 12.sp, fontWeight = FontWeight.Bold)
 
                 Row() {
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = { navController.navigate("Search/${boardid!!}") }) {
                         Icon(imageVector = Icons.Sharp.Search, contentDescription = "Search")
                     }
                     IconButton(onClick = { }) {
@@ -307,44 +306,44 @@ fun BoardScreen(
     }
 }
 
-    @Composable
-    fun PostPreview(
-        post: PostDetail,
-        navController: NavHostController
+@Composable
+fun PostPreview(
+    post: PostDetail,
+    navController: NavHostController
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White),
+        shape = RectangleShape
     ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.White),
-            shape = RectangleShape
-        ) {
 
-            Column(
-                modifier = Modifier
-                    .background(Color.White)
-                    .clickable {
-                        navController.navigate("Post/${post.postId}")
-                    }
-                    .padding(horizontal = 16.dp)
-            ) {
-                Text(post.title, fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(post.content, color = Color.Gray)
-                Spacer(modifier = Modifier.height(4.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    ReactionNumberView("Like", post.likes, "Normal")
-                    Spacer(modifier = Modifier.width(8.dp))
-                    ReactionNumberView("Comment", post.comments, "Normal")
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(post.createdAt, fontSize = 12.sp, color = Color.Gray)
+        Column(
+            modifier = Modifier
+                .background(Color.White)
+                .clickable {
+                    navController.navigate("Post/${post.postId}")
                 }
+                .padding(horizontal = 16.dp)
+        ) {
+            Text(post.title, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(post.content, color = Color.Gray)
+            Spacer(modifier = Modifier.height(4.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                ReactionNumberView("Like", post.likes, "Normal")
+                Spacer(modifier = Modifier.width(8.dp))
+                ReactionNumberView("Comment", post.comments, "Normal")
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(post.createdAt, fontSize = 12.sp, color = Color.Gray)
             }
-            Divider()
         }
+        Divider()
     }
+}
 
 @Composable
 fun CreatePost(navController: NavController, category:String) {
