@@ -306,8 +306,8 @@ val accountOptions = listOf(
 )
 
 val postOptions = listOf(
-    "내가 쓴 글" to "내가 쓴 글",
-    "댓글 단 글" to "댓글 단 글",
+    "내가 쓴 글" to 3,
+    "댓글 단 글" to 4,
     "스크랩" to "스크랩"
 )
 

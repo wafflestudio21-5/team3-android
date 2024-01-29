@@ -224,8 +224,7 @@ fun BoardList(navController: NavHostController, recent:Map<String,String>, trend
 @Composable
 fun BoardScreen(
     boardid:String?,
-    navController: NavHostController,
-    viewModel: MainViewModel= hiltViewModel()
+    navController: NavHostController
 ) {
     val mainViewModel = hiltViewModel<MainViewModel>()
     val page by remember { mutableStateOf(1) }
@@ -303,7 +302,7 @@ fun BoardScreen(
                     }
                 }
             }
-            CreatePost(navController = navController, category = boardid!!)
+            if (boardid in boardnames.values) CreatePost(navController = navController, category = boardid!!)
         }
     }
 }

@@ -119,4 +119,20 @@ interface RestAPI {
         @Header("Authorization") token:String="Bearer "+MyApplication.prefs.getString("token"),
         @Path("postId") postid:Int
     ):Response<Unit>
+
+    @GET("/api/post/myposts")
+    suspend fun getmyposts(
+        @Header("Authorization") token:String="Bearer "+MyApplication.prefs.getString("token"),
+        @Query("user") userid:Int,
+        @Query("page") page:Int,
+        @Query("size") size:Int
+    ):MypostResponse
+
+    @GET("/api/post/mycommented")
+    suspend fun getmycommented(
+        @Header("Authorization") token:String="Bearer "+MyApplication.prefs.getString("token"),
+        @Query("user") userid:Int,
+        @Query("page") page:Int,
+        @Query("size") size:Int
+    ):MypostResponse
 }

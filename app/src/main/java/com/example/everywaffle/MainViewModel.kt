@@ -132,7 +132,19 @@ class MainViewModel @Inject constructor(
     suspend fun getpostcategory(boardid:String, page:Int, size:Int=10):List<PostDetail>?{
         var getPostCategory:List<PostDetail>?
         try{
-            getPostCategory = api.getpostcategory(boardid = boardid, page = page, size = size)
+            getPostCategory = when(boardid) {
+                "myposts" -> api.getmyposts(
+                    userid = MyApplication.prefs.getString("userid").toInt(),
+                    page = page,
+                    size = size
+                ).content
+                "mycommented" -> api.getmycommented(
+                    userid = MyApplication.prefs.getString("userid").toInt(),
+                    page = page,
+                    size = size
+                ).content
+                else -> api.getpostcategory(boardid = boardid, page = page, size = size)
+            }
         }
         catch (e: retrofit2.HttpException){
             Log.d("aaaa",e.toString())
