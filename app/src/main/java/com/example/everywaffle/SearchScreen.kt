@@ -209,7 +209,7 @@ fun SearchPostPreview(
                 Spacer(modifier = Modifier.width(8.dp))
                 ReactionNumberView("Comment", post.comments, "Normal")
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(post.createdAt, fontSize = 12.sp, color = Color.Gray)
+                Text(timetoprint(post.createdAt), fontSize = 12.sp, color = Color.Gray)
             }
         }
         Divider()

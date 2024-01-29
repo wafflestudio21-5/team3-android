@@ -84,6 +84,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.Period
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
@@ -299,7 +304,7 @@ fun PostView(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = post.createdAt,
+                    text = timetoprint(post.createdAt),
                     fontSize = 12.sp,
                 )
             }
@@ -405,7 +410,7 @@ fun ParentCommentView(
             modifier = Modifier.padding(top = 5.dp)
         ){
             Text(
-                text = comment.createdAt,
+                text = timetoprint(comment.createdAt),
                 fontSize = 12.sp,
                 modifier = Modifier.padding(start = 5.dp)
             )
@@ -463,7 +468,7 @@ fun ChildCommentView(comment: ChildComment = ChildComment(childcommentid=3, user
             modifier = Modifier.padding(top = 5.dp)
         ) {
             Text(
-                text = comment.createdAt,
+                text = timetoprint(comment.createdAt),
                 fontSize = 12.sp,
                 modifier = Modifier.padding(start = 5.dp)
             )

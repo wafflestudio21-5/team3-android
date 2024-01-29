@@ -39,6 +39,9 @@ import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity(){
@@ -472,6 +475,35 @@ fun Collection<String>.firstOrDefault(default:String = ""): String {
     return when (this.firstOrNull()==null){
         true -> default
         else -> this.first()
+    }
+}
+
+fun timetoprint(t:String):String{
+    val time = Instant.parse(t).atZone(ZoneId.of("Asia/Seoul"))
+    val timec = LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul"))
+
+    return when{
+        timec.minusMinutes(1).isBefore(time) -> "방금 전"
+        timec.minusHours(1).isBefore(time) -> {
+            var diff = 0L
+            while(true){
+                diff+=1
+                if(timec.minusMinutes(diff).isBefore(time)) break
+            }
+            "${diff-1}분 전"
+        }
+        timec.dayOfMonth == time.dayOfMonth -> time.toString().slice(11..15)
+        timec.minusYears(1).isBefore(time) -> {
+            time.toString().slice(5..9).replace("-","/")
+        }
+        else -> {
+            var diff = 0L
+            while(true){
+                diff+=1
+                if(timec.minusYears(diff).isBefore(time)) break
+            }
+            "${diff-1}년 전"
+        }
     }
 }
 
