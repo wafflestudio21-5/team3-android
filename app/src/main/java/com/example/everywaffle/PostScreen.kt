@@ -90,7 +90,7 @@ import kotlinx.coroutines.launch
 
 fun PostScreen(postid:Int?, navController: NavHostController){
     val mainViewModel = hiltViewModel<MainViewModel>()
-    var post by remember { mutableStateOf(PostDetail(1,0,"","","","",0, 0,0)) }
+    var post by remember { mutableStateOf(PostDetail(-1,0,"","","","",0, 0,0)) }
     val comments = remember { mutableStateListOf<ParentComment>() }
     var dropmenuexpanded by remember { mutableStateOf(false) }
     var parentcommentid by remember { mutableStateOf(0) }
@@ -103,7 +103,6 @@ fun PostScreen(postid:Int?, navController: NavHostController){
         comments.clear()
         comments.addAll(mainViewModel.getcomments(post.postId)!!)
     }
-
 
     Surface(
         modifier = Modifier
@@ -121,7 +120,7 @@ fun PostScreen(postid:Int?, navController: NavHostController){
                     Icon(imageVector = Icons.Sharp.ArrowBack, contentDescription = "Back")
                 }
 
-                Text(text = boardnames.filterValues { it == post.category }.keys.first(), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Text(text = boardnames.filterValues { it == post.category }.keys.firstOrDefault(), fontSize = 12.sp, fontWeight = FontWeight.Bold)
                 
                 IconButton(onClick = {
                     if(post.userId == MyApplication.prefs.getString("userid").toInt()) dropmenuexpanded = true

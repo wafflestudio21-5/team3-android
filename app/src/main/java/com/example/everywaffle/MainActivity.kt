@@ -468,4 +468,11 @@ fun String.isNumber(): Boolean {
     }
 }
 
+fun Collection<String>.firstOrDefault(default:String = ""): String {
+    return when (this.firstOrNull()==null){
+        true -> default
+        else -> this.first()
+    }
+}
+
 val postdetailtemp = PostDetail(postId=1, userId=35, title="waffle", content="waffle", category="FREE_BOARD", createdAt="2024-01-18T19:13:04.000+00:00", likes=1,0,0)

@@ -263,7 +263,7 @@ fun BoardScreen(
                     Icon(imageVector = Icons.Sharp.ArrowBack, contentDescription = "Back")
                 }
 
-                Text(text = boardnames.filterValues { it == boardid!! }.keys.first(), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Text(text = boardnames.filterValues { it == boardid!! }.keys.firstOrDefault(), fontSize = 12.sp, fontWeight = FontWeight.Bold)
 
                 Row() {
                     IconButton(onClick = { navController.navigate("Search/${boardid!!}") }) {
