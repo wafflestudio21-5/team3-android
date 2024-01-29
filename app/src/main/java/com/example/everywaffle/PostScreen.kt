@@ -121,7 +121,9 @@ fun PostScreen(postid:Int?, navController: NavHostController){
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = {}) {
+                IconButton(onClick = {
+                    navController.popBackStack()
+                }) {
                     Icon(imageVector = Icons.Sharp.ArrowBack, contentDescription = "Back")
                 }
 

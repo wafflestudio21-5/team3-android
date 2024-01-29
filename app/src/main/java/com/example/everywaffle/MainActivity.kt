@@ -135,8 +135,6 @@ fun MyAppNavHost(
             )
         ){backstackEntry ->
             SearchScreen(
-                onNavigateBack={navController.popBackStack()},
-                onNavigateToHome = {navController.navigate("Home")},
                 navController = navController,
                 boardid = backstackEntry.arguments?.getString("board_id")
             )
@@ -320,7 +318,7 @@ val accountOptions = listOf(
 val postOptions = listOf(
     "내가 쓴 글" to 3,
     "댓글 단 글" to 4,
-    "스크랩" to "스크랩"
+    "스크랩" to 5
 )
 
 val communityOptions = listOf(
@@ -479,32 +477,37 @@ fun Collection<String>.firstOrDefault(default:String = ""): String {
 }
 
 fun timetoprint(t:String):String{
-    val time = Instant.parse(t).atZone(ZoneId.of("Asia/Seoul"))
-    val timec = LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul"))
+    try {
+        val time = Instant.parse(t).atZone(ZoneId.of("Asia/Seoul"))
+        val timec = LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul"))
 
-    return when{
-        timec.minusMinutes(1).isBefore(time) -> "방금 전"
-        timec.minusHours(1).isBefore(time) -> {
-            var diff = 0L
-            while(true){
-                diff+=1
-                if(timec.minusMinutes(diff).isBefore(time)) break
+        return when {
+            timec.minusMinutes(1).isBefore(time) -> "방금 전"
+            timec.minusHours(1).isBefore(time) -> {
+                var diff = 0L
+                while (true) {
+                    diff += 1
+                    if (timec.minusMinutes(diff).isBefore(time)) break
+                }
+                "${diff - 1}분 전"
             }
-            "${diff-1}분 전"
-        }
-        timec.dayOfMonth == time.dayOfMonth -> time.toString().slice(11..15)
-        timec.minusYears(1).isBefore(time) -> {
-            time.toString().slice(5..9).replace("-","/")
-        }
-        else -> {
-            var diff = 0L
-            while(true){
-                diff+=1
-                if(timec.minusYears(diff).isBefore(time)) break
+
+            timec.dayOfMonth == time.dayOfMonth -> time.toString().slice(11..15)
+            timec.minusYears(1).isBefore(time) -> {
+                time.toString().slice(5..9).replace("-", "/")
             }
-            "${diff-1}년 전"
+
+            else -> {
+                var diff = 0L
+                while (true) {
+                    diff += 1
+                    if (timec.minusYears(diff).isBefore(time)) break
+                }
+                "${diff - 1}년 전"
+            }
         }
     }
+    catch(e:Exception) {return ""}
 }
 
 val postdetailtemp = PostDetail(postId=1, userId=35, title="waffle", content="waffle", category="FREE_BOARD", createdAt="2024-01-18T19:13:04.000+00:00", likes=1,0,0)

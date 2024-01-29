@@ -144,4 +144,3 @@ data class Sort(
     @Json(name = "sorted") val sorted:Boolean,
     @Json(name = "unsorted") val unsorted:Boolean
 )
-

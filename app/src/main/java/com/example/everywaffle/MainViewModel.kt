@@ -143,6 +143,11 @@ class MainViewModel @Inject constructor(
                     page = page,
                     size = size
                 ).content
+                boardid=="myscrapped" -> api.getmyscrapped(
+                    userid = MyApplication.prefs.getString("userid").toInt(),
+                    page = page,
+                    size = size
+                ).content
                 "whole" in boardid -> api.searchwhole(
                     keyword = keyword,
                     page = page,

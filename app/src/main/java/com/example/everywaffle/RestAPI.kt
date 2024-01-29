@@ -136,6 +136,14 @@ interface RestAPI {
         @Query("size") size:Int
     ):MypostResponse
 
+    @GET("/api/post/myscrapped")
+    suspend fun getmyscrapped(
+        @Header("Authorization") token:String="Bearer "+MyApplication.prefs.getString("token"),
+        @Query("user") userid:Int,
+        @Query("page") page:Int,
+        @Query("size") size:Int
+    ):MypostResponse
+
     @GET("/api/post/search")
     suspend fun searchwhole(
         @Header("Authorization") token:String="Bearer "+MyApplication.prefs.getString("token"),

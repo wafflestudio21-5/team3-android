@@ -55,8 +55,6 @@ import kotlinx.coroutines.delay
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
-    onNavigateBack:()->Unit,
-    onNavigateToHome : () -> Unit = {},
     navController: NavHostController,
     boardid: String?
 ){
@@ -71,7 +69,7 @@ fun SearchScreen(
                     .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = onNavigateToHome) {
+                IconButton(onClick = {navController.popBackStack()}) {
                     Icon(imageVector = Icons.Sharp.ArrowBack, contentDescription = "")
                 }
                 Spacer(modifier = Modifier.weight(1f))

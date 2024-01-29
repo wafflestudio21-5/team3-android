@@ -259,7 +259,7 @@ fun BoardScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { navController.navigate("Home") }) {
+                IconButton(onClick = { navController.popBackStack() }) {
                     Icon(imageVector = Icons.Sharp.ArrowBack, contentDescription = "Back")
                 }
 

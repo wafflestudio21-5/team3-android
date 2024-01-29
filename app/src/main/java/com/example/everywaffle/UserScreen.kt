@@ -84,7 +84,8 @@ fun UserScreen(
                     },
                     {navController.navigate("ChangeEmail")},
                     {navController.navigate("Board/myposts")},
-                    {navController.navigate("Board/mycommented")}
+                    {navController.navigate("Board/mycommented")},
+                    {navController.navigate("Board/myscrapped")}
                 )
 
                 Header(onNavigateToHome)
