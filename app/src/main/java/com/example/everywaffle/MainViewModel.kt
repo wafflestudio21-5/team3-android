@@ -67,6 +67,7 @@ class MainViewModel @Inject constructor(
         catch (e:retrofit2.HttpException){
             updateUserInforesponse=null
         }
+        Log.d("aaaa",updateUserInforesponse.toString())
         return updateUserInforesponse
     }
 

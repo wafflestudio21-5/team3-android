@@ -282,7 +282,7 @@ fun BoardScreen(
             Divider(modifier = Modifier.padding(vertical = 4.dp))
 
             LazyColumn(
-               state = listState,
+                state = listState,
                 modifier = Modifier
                     .weight(1f),
                 verticalArrangement = Arrangement.spacedBy(10.dp)

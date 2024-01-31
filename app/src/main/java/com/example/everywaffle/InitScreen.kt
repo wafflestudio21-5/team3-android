@@ -152,7 +152,7 @@ fun InitScreen(
                     color = Color.Black,
                     fontWeight = FontWeight.Bold,
                     fontSize = 40.sp,
-                    modifier = Modifier.padding(start = 15.dp)
+                    modifier = Modifier.padding(start = 14.dp)
                 )
             }
 
@@ -174,11 +174,11 @@ fun InitScreen(
                     }
                 ),
                 colors = TextFieldDefaults.textFieldColors(
-                    containerColor = Color(0x10000000),
+                    containerColor = Color(0xFFF2F2F2),
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
                     disabledIndicatorColor = Color.Transparent,
-                    placeholderColor = Color.Gray
+                    placeholderColor = Color(0xFFBBBBBB)
                 )
             )
 
@@ -187,10 +187,10 @@ fun InitScreen(
                 onValueChange = { signinpw = it },
                 placeholder = { Text(text = "비밀번호", fontSize = 15.sp) },
                 modifier = Modifier
-                    .padding(horizontal = 15.dp, vertical = 3.dp)
+                    .padding(horizontal = 18.dp, vertical = 6.dp)
                     .fillMaxWidth()
                     .height(50.dp),
-                shape = RoundedCornerShape(15.dp),
+                shape = RoundedCornerShape(13.dp),
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(
                     onDone = {
@@ -199,11 +199,11 @@ fun InitScreen(
                     }
                 ),
                 colors = TextFieldDefaults.textFieldColors(
-                    containerColor = Color(0x10000000),
+                    containerColor = Color(0xFFF2F2F2),
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
                     disabledIndicatorColor = Color.Transparent,
-                    placeholderColor = Color.Gray
+                    placeholderColor = Color(0xFFBBBBBB)
                 )
             )
 
@@ -228,17 +228,18 @@ fun InitScreen(
                         }
                     }
                 },
-                colors = ButtonDefaults.buttonColors(Color(0xF0FF0000)),
-                shape = RoundedCornerShape(15.dp),
+                colors = ButtonDefaults.buttonColors(Color(0xFFF91F15)),
+                shape = RoundedCornerShape(13.dp),
                 modifier = Modifier
-                    .padding(horizontal = 15.dp, vertical = 3.dp)
+                    .padding(horizontal = 18.dp)
                     .fillMaxWidth()
-                    .height(50.dp)
+                    .height(42.dp)
             ) {
 
                 Text(
                     text = "에브리와플 로그인",
                     color = Color.White,
+                    fontWeight = FontWeight.Bold,
                     fontSize = 15.sp
                 )
             }
@@ -255,29 +256,31 @@ fun InitScreen(
                         }
                     )
                 },
-                colors = ButtonDefaults.buttonColors(Color(0xFFFFEB3B)),
-                shape = RoundedCornerShape(15),
+                colors = ButtonDefaults.buttonColors(Color(0xFFFEE500)),
+                shape = RoundedCornerShape(13.dp),
                 modifier = Modifier
-                    .padding(horizontal = 15.dp, vertical = 3.dp)
+                    .padding(horizontal = 18.dp, vertical = 6.dp)
                     .fillMaxWidth()
-                    .height(50.dp)
+                    .height(42.dp)
             )
             {
                 Icon(
                     painter = painterResource(id = R.drawable.kakaologo),
                     contentDescription = "KaKao Logo",
-                    tint = Color.Unspecified
+                    tint = Color.Unspecified,
+                    modifier = Modifier.height(20.dp)
                 )
                 Spacer(modifier= Modifier.width(8.dp))
                 Text(
                     text = "카카오로 로그인",
                     color = Color.Black,
-                    fontSize = 15.sp
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold
                 )
             }
 
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(vertical = 18.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
