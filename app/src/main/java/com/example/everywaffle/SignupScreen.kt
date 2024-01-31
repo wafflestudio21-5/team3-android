@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.magnifier
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -37,9 +38,11 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
@@ -80,10 +83,12 @@ fun SignupScreen(
         ) {
             Row(
                 modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
+                    .fillMaxWidth()
+                    .height(53.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                Text(text = "", modifier = Modifier.width(40.dp))
                 Text(
                     text = "회원가입",
                     color = Color.Black,
@@ -94,19 +99,19 @@ fun SignupScreen(
                 IconButton(
                     onClick = onNavigateToInit
                 ){
-                    Icon(imageVector = Icons.Outlined.Cancel, contentDescription = "")
+                    Icon(painter = painterResource(id = R.drawable.union), "")
                 }
             }
 
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(23.dp))
 
             Text(
                 text = "아이디",
-                color = Color.Black,
-                fontSize = 10.sp,
+                color = Color(0xFF616161),
+                fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
-                    .padding(start = 20.dp, top = 3.dp, bottom = 3.dp)
+                    .padding(start = 28.dp, bottom = 8.dp)
             )
 
             TextField(
@@ -114,10 +119,10 @@ fun SignupScreen(
                 onValueChange = { signupid = it },
                 placeholder = { Text(text = "아이디", fontSize = 15.sp) },
                 modifier = Modifier
-                    .padding(horizontal = 20.dp, vertical = 3.dp)
+                    .padding(horizontal = 18.dp)
                     .fillMaxWidth()
                     .height(50.dp),
-                shape = RoundedCornerShape(15.dp),
+                shape = RoundedCornerShape(13.dp),
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
                 keyboardActions = KeyboardActions(
                     onNext = {
@@ -125,11 +130,11 @@ fun SignupScreen(
                     }
                 ),
                 colors = TextFieldDefaults.textFieldColors(
-                    containerColor = Color(0x10000000),
+                    containerColor = Color(0xFFF2F2F2),
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
                     disabledIndicatorColor = Color.Transparent,
-                    placeholderColor = Color.Gray
+                    placeholderColor = Color(0xFFBBBBBB)
                 )
             )
 
@@ -137,11 +142,11 @@ fun SignupScreen(
 
             Text(
                 text = "이메일",
-                color = Color.Black,
-                fontSize = 10.sp,
+                color = Color(0xFF616161),
+                fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
-                    .padding(start = 20.dp, top = 3.dp, bottom = 3.dp)
+                    .padding(start = 28.dp, bottom = 8.dp)
             )
 
             TextField(
@@ -149,10 +154,10 @@ fun SignupScreen(
                 onValueChange = { signupemail = it },
                 placeholder = { Text(text = "everywaffle@happy.com", fontSize = 15.sp) },
                 modifier = Modifier
-                    .padding(horizontal = 20.dp, vertical = 3.dp)
+                    .padding(horizontal = 18.dp)
                     .fillMaxWidth()
                     .height(50.dp),
-                shape = RoundedCornerShape(15.dp),
+                shape = RoundedCornerShape(13.dp),
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(
                     onDone = {
@@ -161,11 +166,11 @@ fun SignupScreen(
                     }
                 ),
                 colors = TextFieldDefaults.textFieldColors(
-                    containerColor = Color(0x10000000),
+                    containerColor = Color(0xFFF2F2F2),
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
                     disabledIndicatorColor = Color.Transparent,
-                    placeholderColor = Color.Gray
+                    placeholderColor = Color(0xFFBBBBBB)
                 )
             )
 
@@ -175,19 +180,19 @@ fun SignupScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 18.dp)
+                        .padding(horizontal = 28.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
                         text = "비밀번호",
-                        color = Color.Black,
-                        fontSize = 10.sp,
+                        color = Color(0xFF616161),
+                        fontSize = 11.sp,
                         fontWeight = FontWeight.Bold
                     )
-                    Spacer(modifier = Modifier.width(80.dp))
                     Text(
                         text = "영문, 숫자, 특문이 2종류 이상 조합된 8~20자",
-                        color = Color.Gray,
-                        fontSize = 10.sp,
+                        color = Color(0xFF979797),
+                        fontSize = 10.5.sp,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -197,10 +202,10 @@ fun SignupScreen(
                     onValueChange = { signuppw = it },
                     placeholder = { Text(text = "비밀번호", fontSize = 15.sp) },
                     modifier = Modifier
-                        .padding(horizontal = 20.dp, vertical = 3.dp)
+                        .padding(horizontal = 18.dp, vertical = 5.dp)
                         .fillMaxWidth()
                         .height(50.dp),
-                    shape = RoundedCornerShape(15.dp),
+                    shape = RoundedCornerShape(13.dp),
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
                     keyboardActions = KeyboardActions(
                         onNext = {
@@ -208,11 +213,11 @@ fun SignupScreen(
                         }
                     ),
                     colors = TextFieldDefaults.textFieldColors(
-                        containerColor = Color(0x10000000),
+                        containerColor = Color(0xFFF2F2F2),
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
                         disabledIndicatorColor = Color.Transparent,
-                        placeholderColor = Color.Gray
+                        placeholderColor = Color(0xFFBBBBBB)
                     )
                 )
 
@@ -221,10 +226,10 @@ fun SignupScreen(
                     onValueChange = { signuppw = it },
                     placeholder = { Text(text = "비밀번호 확인", fontSize = 15.sp) },
                     modifier = Modifier
-                        .padding(horizontal = 20.dp, vertical = 3.dp)
+                        .padding(horizontal = 18.dp)
                         .fillMaxWidth()
                         .height(50.dp),
-                    shape = RoundedCornerShape(15.dp),
+                    shape = RoundedCornerShape(13.dp),
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
                     keyboardActions = KeyboardActions(
                         onNext = {
@@ -232,15 +237,15 @@ fun SignupScreen(
                         }
                     ),
                     colors = TextFieldDefaults.textFieldColors(
-                        containerColor = Color(0x10000000),
+                        containerColor = Color(0xFFF2F2F2),
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
                         disabledIndicatorColor = Color.Transparent,
-                        placeholderColor = Color.Gray
+                        placeholderColor = Color(0xFFBBBBBB)
                     )
                 )
 
-                Spacer(Modifier.height(20.dp))
+                Spacer(Modifier.height(40.dp))
                 Button(
                     onClick = {
                         focusManager.clearFocus()
@@ -256,17 +261,18 @@ fun SignupScreen(
                             }
                         }
                     },
-                    colors = ButtonDefaults.buttonColors(Color(0xDFF00000)),
-                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(Color(0xFFF91F15)),
+                    shape = RoundedCornerShape(13.dp),
                     modifier = Modifier
-                        .padding(horizontal = 20.dp, vertical = 3.dp)
+                        .padding(horizontal = 18.dp)
                         .fillMaxWidth()
-                        .height(50.dp)
+                        .height(42.dp)
                 ) {
                     Text(
                         text = "에브리와플 회원가입",
                         color = Color.White,
-                        fontSize = 15.sp
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 }
 
