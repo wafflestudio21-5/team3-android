@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,9 +25,11 @@ import androidx.compose.material.icons.sharp.ArrowBack
 import androidx.compose.material.icons.sharp.SmsFailed
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -39,12 +42,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -107,29 +112,65 @@ fun UserScreen(
 
 @Composable
 fun UserInfoSection(
-    realname:String,
+    realname: String,
     nickname: String,
     department: String,
-    studentId : String
-){
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 16.dp)
-            .background(Color.White)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = "사용자 정보",
-                fontWeight = FontWeight.Bold,
-                color = Color.Black,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-            UserInfoItem(label = "이름", realname)
-            UserInfoItem(label = "닉네임", nickname)
-            UserInfoItem(label = "학과", department)
-            UserInfoItem(label = "학번", studentId)
+    studentId: String
+) {
+    Column {
+        Card(
+            shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.mypagename),
+                    tint=Color.Unspecified,
+                    contentDescription = "User Icon",
+                    modifier = Modifier.size(48.dp)
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Column {
+                    Text(
+                        text = realname
+                    )
+                    Text(
+                        text = "$department $studentId"
+                    )
+                }
+            }
+        }
 
+        Card(
+            shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.profile),
+                    contentDescription = "Profile Icon",
+                    tint=Color.Unspecified,
+                    modifier = Modifier.size(48.dp)
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(
+                    text = nickname
+                )
+            }
         }
     }
 }
@@ -148,33 +189,42 @@ fun UserInfoItem(label : String, value : String){
 }
 @Composable
 fun Header(onNavigateToHome: () -> Unit) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
         IconButton(onClick = onNavigateToHome) {
-            Icon(imageVector = Icons.Sharp.ArrowBack, contentDescription = "")
+            Icon(imageVector = Icons.Sharp.ArrowBack, contentDescription = "Back")
         }
+        Spacer(modifier = Modifier.weight(1f))
         Text(
             text = "내 정보",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold
         )
+        Spacer(modifier = Modifier.weight(1f))
     }
 }
 
+
 @Composable
+
 fun UserOptionsSection(title: String, options: List<Pair<String, Any>>, onclicklist:List<() -> Unit>) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 16.dp)
-            .background(Color.White)
-            .border(1.dp, Color.Gray, RoundedCornerShape(4.dp))
+            .padding(vertical = 8.dp, horizontal = 16.dp) // Adjust padding as needed
+            .background(Color.White, shape = RoundedCornerShape(12.dp)) // Set the corner radius here
+            .shadow(1.dp, shape = RoundedCornerShape(12.dp)), // Optional shadow
+        shape = RoundedCornerShape(12.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 text = title,
                 color = Color.Black,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 4.dp, top = 4.dp, start = 4.dp)
+                modifier = Modifier.padding(bottom = 8.dp)
             )
             options.forEach { (buttonText, command) ->
                 when (command){  // 여기서 option의 형태에 따라 다른 화면 구성
@@ -206,6 +256,7 @@ fun OptionButton(buttonText: String, onclick: () -> Unit ={}) {
 }
 
 @Composable
+
 fun OptionRow(Text1: String, Text2: String) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -548,7 +599,7 @@ fun PasswordChangeScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "비밀번호 변경",
+                        text = "이메일 변경",
                         color = Color.Black,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold

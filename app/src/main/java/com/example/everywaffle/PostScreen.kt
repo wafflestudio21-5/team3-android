@@ -365,7 +365,7 @@ fun ParentCommentView(
         ){
             Row {
                 Icon(
-                    imageVector = Icons.Sharp.AccountBox,
+                    painter = painterResource(id = R.drawable.profile),
                     contentDescription = "User",
                     modifier = Modifier
                         .width(40.dp)
