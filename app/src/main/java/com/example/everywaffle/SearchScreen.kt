@@ -12,9 +12,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -28,9 +30,11 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -44,6 +48,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,6 +59,7 @@ import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+
 fun SearchScreen(
     navController: NavHostController,
     boardid: String?
@@ -63,6 +69,7 @@ fun SearchScreen(
 
     Surface (modifier = Modifier.fillMaxSize()){
         Column{
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -76,22 +83,35 @@ fun SearchScreen(
             }
 
             OutlinedTextField(
-                value = searchQuery ,
+                value = searchQuery,
                 onValueChange = { newText ->
                     searchQuery = newText
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                label = { Text("검색어를 입력하세요. ") },
+                    .padding(6.dp), // Adjust padding as needed
+                label = { Text("글 제목, 내용, 해시태그") },
                 singleLine = true,
                 trailingIcon = {
-                    IconButton(onClick ={
-                        keyword = searchQuery
-                    }){
-                        Icon(imageVector = Icons.Default.Search, contentDescription = "Search")
+                    if(navController != null) {
+                        IconButton(onClick = {
+                            keyword = searchQuery
+                        }) {
+                    Icon(imageVector = Icons.Default.Search, contentDescription = "Search")
+                      }
                     }
                 },
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    textColor = MaterialTheme.colorScheme.onSurface,
+                    disabledTextColor = Color.Transparent,
+                    cursorColor = MaterialTheme.colorScheme.primary,
+                    errorCursorColor = MaterialTheme.colorScheme.error,
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    containerColor = Color.Gray,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+                    disabledBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                ),
+                shape = MaterialTheme.shapes.small.copy(CornerSize(16.dp)),
                 keyboardOptions = KeyboardOptions.Default.copy(
                     imeAction = ImeAction.Search
                 ),
@@ -101,6 +121,23 @@ fun SearchScreen(
             )
 
             if (keyword!="") SearchBoardScreen(boardid = "Search_${boardid!!}", navController = navController, key = keyword)
+        }
+        Box(contentAlignment = Alignment.Center) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Search",
+                    modifier = Modifier.size(100.dp),
+                    tint = Color.Gray
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = "전체 게시판의 글을 검색해보세요",
+                    fontSize = 20.sp,
+                    textAlign = TextAlign.Center,
+                    color = Color.Gray
+                )
+            }
         }
     }
 }

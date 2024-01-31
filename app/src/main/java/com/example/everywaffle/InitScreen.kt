@@ -18,10 +18,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.sharp.SmsFailed
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -44,6 +47,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -52,6 +56,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.startActivity
@@ -83,7 +88,7 @@ fun checkloginstatus(context: Context): Boolean {
 
 @SuppressLint("SuspiciousIndentation")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
-//@Preview
+@Preview
 @Composable
 fun InitScreen(
     onNavigateToSignup: () -> Unit ={},
@@ -98,7 +103,6 @@ fun InitScreen(
     var signinpw by remember { mutableStateOf("") }
     var signinfail by remember { mutableStateOf(false) }
 
-    //val kakaologin = Kakaologin()
     val context = LocalContext.current
 
     var isLoggingIn by remember { mutableStateOf(false) }
@@ -138,11 +142,10 @@ fun InitScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                    painter = painterResource(id = R.drawable.everywafflelogo),
+                    tint = Color.Unspecified,
                     contentDescription = "",
-                    modifier = Modifier
-                        .height(49.dp)
-                        .border(width = 3.dp, color = Color.Black)
+                    modifier = Modifier.size(50.dp)
                 )
                 Text(
                     text = "에브리와플",
@@ -226,12 +229,13 @@ fun InitScreen(
                     }
                 },
                 colors = ButtonDefaults.buttonColors(Color(0xF0FF0000)),
-                shape = RectangleShape,
+                shape = RoundedCornerShape(15.dp),
                 modifier = Modifier
                     .padding(horizontal = 15.dp, vertical = 3.dp)
                     .fillMaxWidth()
                     .height(50.dp)
             ) {
+
                 Text(
                     text = "에브리와플 로그인",
                     color = Color.White,
@@ -252,15 +256,21 @@ fun InitScreen(
                     )
                 },
                 colors = ButtonDefaults.buttonColors(Color(0xFFFFEB3B)),
-                shape = RectangleShape,
+                shape = RoundedCornerShape(15),
                 modifier = Modifier
                     .padding(horizontal = 15.dp, vertical = 3.dp)
                     .fillMaxWidth()
                     .height(50.dp)
             )
             {
+                Icon(
+                    painter = painterResource(id = R.drawable.kakaologo),
+                    contentDescription = "KaKao Logo",
+                    tint = Color.Unspecified
+                )
+                Spacer(modifier= Modifier.width(8.dp))
                 Text(
-                    text = "카카오계정으로 로그인",
+                    text = "카카오로 로그인",
                     color = Color.Black,
                     fontSize = 15.sp
                 )

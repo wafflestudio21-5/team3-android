@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Comment
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.sharp.ArrowBack
 import androidx.compose.material.icons.sharp.Dashboard
@@ -108,12 +109,12 @@ fun HomeScreen(
                     modifier = Modifier.weight(.1f)
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                        painter = painterResource(id = R.drawable.everywafflelogo),
                         contentDescription = "",
+                        tint= Color.Unspecified,
                         modifier = Modifier
                             .height(40.dp)
                             .width(40.dp)
-                            .border(width = 3.dp, color = Color.Black)
                     )
                 }
                 IconButton(onClick = { navController.navigate("Search/whole") }) {
@@ -154,6 +155,7 @@ fun HomeScreen(
 }
 
 @Composable
+
 fun BoardList(navController: NavHostController, recent:Map<String,String>, trend:List<PostDetail>) {
     val boardNames = listOf("자유게시판", "비밀게시판", "졸업생게시판", "새내기게시판", "시사·이슈", "장터게시판", "정보게시판")
     Column(modifier = Modifier.padding(bottom = 100.dp)) {
@@ -191,6 +193,7 @@ fun BoardList(navController: NavHostController, recent:Map<String,String>, trend
 
                             false -> {}
                         }
+
                     }
                     .padding(vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -202,7 +205,7 @@ fun BoardList(navController: NavHostController, recent:Map<String,String>, trend
                 )
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
-                    text = recent.getOrDefault(name, ""),
+                   text = recent.getOrDefault(name, ""),
                     fontSize = 12.sp,
                     color = Color.Gray
                 )
@@ -216,7 +219,7 @@ fun BoardList(navController: NavHostController, recent:Map<String,String>, trend
             modifier = Modifier.padding(bottom = 16.dp)
         )
         trend.forEach {
-            PopularPost(navController, it)
+          PopularPost(navController, it)
         }
     }
 }
@@ -231,6 +234,7 @@ fun BoardScreen(
     val loading = remember { mutableStateOf(false) }
     val itemList = remember { mutableStateListOf<PostDetail>() }
     val listState = rememberLazyListState()
+
 
     LaunchedEffect(Unit) {
         itemList.clear()
@@ -278,7 +282,7 @@ fun BoardScreen(
             Divider(modifier = Modifier.padding(vertical = 4.dp))
 
             LazyColumn(
-                state = listState,
+               state = listState,
                 modifier = Modifier
                     .weight(1f),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -346,24 +350,42 @@ fun PostPreview(
 }
 
 @Composable
-fun CreatePost(navController: NavController, category:String) {
-    Button(
-        onClick = {
-            navController.navigate("CreatePost/${category}") {
-                popUpTo("BoardScreen") { inclusive = true }
-            } },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-            .height(50.dp)
-            .clip(RoundedCornerShape(8.dp)),
-        colors = ButtonDefaults.buttonColors(Color.Red)
+fun CreatePost(navController: NavController, category: String) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Bottom
     ) {
-        Text(
-            text = "글 쓰기",
-            color = Color.White,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold
-        )
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Button(
+                onClick = {
+                    navController.navigate("CreatePost/$category") {
+                        popUpTo("BoardScreen") { inclusive = true }
+                    }
+                },
+                modifier = Modifier
+                    .height(50.dp)
+                    .clip(RoundedCornerShape(50)),
+                colors = ButtonDefaults.buttonColors(Color.Gray)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Edit,
+                    contentDescription = "글 쓰기",
+                    tint = Color.Red
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "글 쓰기",
+                    color = Color.Black,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }

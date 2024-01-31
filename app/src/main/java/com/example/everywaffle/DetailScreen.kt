@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -33,6 +34,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -43,6 +45,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 
 @Composable
+
 fun DetailScreen(
     onNavigateToInit: () -> Unit = {}
 ){
@@ -66,7 +69,7 @@ fun DetailScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 10.dp),
-                horizontalArrangement = Arrangement.Start,
+                horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ){
                 Text(
@@ -77,10 +80,19 @@ fun DetailScreen(
                 )
             }
 
+            Text(
+                text = "이름",
+                color = Color.Black,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .padding(start = 20.dp, top = 3.dp, bottom = 3.dp)
+            )
+
             TextField(
                 value = realname,
                 onValueChange = {realname = it},
-                placeholder = { Text(text = "이름", fontSize = 15.sp) },
+                placeholder = { Text(text = "", fontSize = 15.sp) },
                 modifier = Modifier
                     .padding(horizontal = 15.dp, vertical = 3.dp)
                     .fillMaxWidth()
@@ -99,12 +111,22 @@ fun DetailScreen(
                     disabledIndicatorColor = Color.Transparent,
                     placeholderColor = Color.Gray
                 )
+            )
+            Spacer(Modifier.height(10.dp))
+
+            Text(
+                text = "닉네임",
+                color = Color.Black,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .padding(start = 20.dp, top = 3.dp, bottom = 3.dp)
             )
 
             TextField(
                 value = nickname,
                 onValueChange = {nickname = it},
-                placeholder = { Text(text = "닉네임", fontSize = 15.sp) },
+                placeholder = { Text(text = "", fontSize = 15.sp) },
                 modifier = Modifier
                     .padding(horizontal = 15.dp, vertical = 3.dp)
                     .fillMaxWidth()
@@ -125,10 +147,21 @@ fun DetailScreen(
                 )
             )
 
+            Spacer(Modifier.height(10.dp))
+
+            Text(
+                text = "학과",
+                color = Color.Black,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .padding(start = 20.dp, top = 3.dp, bottom = 3.dp)
+            )
+
             TextField(
                 value = department,
                 onValueChange = {department = it},
-                placeholder = { Text(text = "학과", fontSize = 15.sp) },
+                placeholder = { Text(text = "디자인과", fontSize = 15.sp) },
                 modifier = Modifier
                     .padding(horizontal = 15.dp, vertical = 3.dp)
                     .fillMaxWidth()
@@ -147,13 +180,24 @@ fun DetailScreen(
                     disabledIndicatorColor = Color.Transparent,
                     placeholderColor = Color.Gray
                 )
+            )
+
+            Spacer(Modifier.height(10.dp))
+
+            Text(
+                text = "학번",
+                color = Color.Black,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .padding(start = 20.dp, top = 3.dp, bottom = 3.dp)
             )
 
             TextField(
                 value = studentId,
                 onValueChange = {
                     if(it.isNumber()) studentId = it},
-                placeholder = { Text(text = "학번", fontSize = 15.sp) },
+                placeholder = { Text(text = "입학연도/학번", fontSize = 15.sp) },
                 modifier = Modifier
                     .padding(horizontal = 15.dp, vertical = 3.dp)
                     .fillMaxWidth()
@@ -177,6 +221,8 @@ fun DetailScreen(
                     placeholderColor = Color.Gray
                 )
             )
+
+            Spacer(Modifier.height(30.dp))
 
             Button(
                 onClick = {
