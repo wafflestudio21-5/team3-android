@@ -68,7 +68,6 @@ fun UserScreen(
     onNavigateToHome: () -> Unit = {},
     navController: NavHostController
 ) {
-    //val userInfo = UserInfo("","","","")
     Surface(
         modifier = Modifier
             .background(color = Color.White)

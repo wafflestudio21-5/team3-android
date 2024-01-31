@@ -1,6 +1,7 @@
 package com.example.everywaffle
 
 import android.util.Log
+import android.view.RoundedCorner
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -30,8 +32,10 @@ import androidx.compose.material.icons.sharp.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DividerDefaults.color
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
@@ -50,6 +54,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
@@ -169,52 +174,75 @@ fun BoardList(navController: NavHostController, recent:Map<String,String>, trend
             Text(
                 text = "즐겨찾는 게시판",
                 fontSize = 20.sp,
+                color=Color(0xFF000000),
                 fontWeight = FontWeight.Bold
             )
             Text(
                 text = "더 보기 >",
                 fontSize = 10.sp,
+                color=Color(0xFF616161),
                 modifier = Modifier
                     .clickable {
                         navController.navigate("AllBoards")
                     }
             )
         }
-        Divider(modifier = Modifier.padding(vertical = 4.dp))
+
+        //Divider(modifier = Modifier.padding(vertical = 4.dp))
+        Card(
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            shape = RoundedCornerShape(20.dp)
+        ){
         boardNames.forEach { name ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        when (name in boardnames.keys) {
-                            true -> {
-                                navController.navigate("Board/${boardnames[name]}")
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            when (name in boardnames.keys) {
+                                true -> {
+                                    navController.navigate("Board/${boardnames[name]}")
+                                }
+
+                                false -> {}
                             }
 
-                            false -> {}
                         }
-
-                    }
-                    .padding(vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = name,
-                    fontSize = 14.sp,
-                    color = Color.Black
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                Text(
-                   text = recent.getOrDefault(name, ""),
-                    fontSize = 12.sp,
-                    color = Color.Gray
-                )
+                        .padding(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = name,
+                        fontSize = 14.sp,
+                        color = Color(0xFF000000),
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(
+                        text = recent.getOrDefault(name, ""),
+                        fontSize = 12.sp,
+                        color = Color(0xFF616161)
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    Icon(
+                        painter = painterResource(id = R.drawable.newpost),
+                        contentDescription = "New Post",
+                        tint = Color.Unspecified,
+                        modifier = Modifier
+                            .size(24.dp)
+                    )
+                }
             }
         }
-        Divider(modifier = Modifier.padding(top = 4.dp, bottom = 20.dp))
+        //Divider(modifier = Modifier.padding(top = 4.dp, bottom = 20.dp))
+        Spacer(modifier = Modifier.height(20.dp))
         Text(
             text = "실시간 인기 글",
             fontSize = 20.sp,
+            color = Color(0xFF000000),
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 16.dp)
         )
@@ -311,6 +339,7 @@ fun BoardScreen(
 }
 
 @Composable
+
 fun PostPreview(
     post: PostDetail,
     navController: NavHostController
@@ -338,10 +367,12 @@ fun PostPreview(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                ReactionNumberView("Like", post.likes, "Normal")
-                Spacer(modifier = Modifier.width(8.dp))
-                ReactionNumberView("Comment", post.comments, "Normal")
-                Spacer(modifier = Modifier.width(8.dp))
+                Icon(painter = painterResource(id = R.drawable.likeicon), contentDescription = "Like", Modifier.size(20.dp),tint=Color(0xFFF91F15))
+                Text(text = "${post.likes}", modifier = Modifier.padding(start = 4.dp),color=Color(0xFFF91F15))
+                Spacer(modifier = Modifier.height(4.dp))
+                Icon(painter = painterResource(id = R.drawable.replyicon), contentDescription = "Comment", Modifier.size(20.dp),tint = Color(0xFF05BCBC))
+                Text(text = "${post.comments}", modifier = Modifier.padding(start = 4.dp),color=Color(0xFF05BCBC))
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(timetoprint(post.createdAt), fontSize = 12.sp, color = Color.Gray)
             }
         }
@@ -370,7 +401,7 @@ fun CreatePost(navController: NavController, category: String) {
                 modifier = Modifier
                     .height(50.dp)
                     .clip(RoundedCornerShape(50)),
-                colors = ButtonDefaults.buttonColors(Color.Gray)
+                colors = ButtonDefaults.buttonColors(Color(0xFFF9F9F9))
             ) {
                 Icon(
                     imageVector = Icons.Filled.Edit,
@@ -380,7 +411,7 @@ fun CreatePost(navController: NavController, category: String) {
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "글 쓰기",
-                    color = Color.Black,
+                    color = Color(0xFF616161),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )

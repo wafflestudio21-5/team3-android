@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -44,6 +45,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -66,6 +68,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -281,7 +284,7 @@ fun PostScreen(postid:Int?, navController: NavHostController){
 }
 
 @Composable
-@Preview
+//@Preview
 fun PostView(
     post:PostDetail = PostDetail(postId=1, userId=35, title="waffle", content="waffle", category="FREE_BOARD", createdAt="2024-01-18T19:13:04.000+00:00", likes=1, 0,0)
 ){
@@ -329,16 +332,24 @@ fun PostView(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(top = 15.dp)
         ) {
-            ReactionNumberView("Like",post.likes,"Small")
-            Spacer(modifier = Modifier.width(5.dp))
-            ReactionNumberView("Comment",post.comments,"Small")
-            Spacer(modifier = Modifier.width(5.dp))
-            ReactionNumberView("Scrap",post.scraps,"Small")
+            Icon(painter = painterResource(id = R.drawable.likeicon), contentDescription = "Like", Modifier.size(15.dp),tint=Color(0xFFF91F15))
+            Text(text = "${post.likes}", modifier = Modifier.padding(start = 4.dp),color=Color(0xFFF91F15))
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Icon(painter = painterResource(id = R.drawable.replyicon), contentDescription = "Comment", Modifier.size(15.dp),tint = Color(0xFF05BCBC))
+            Text(text = "${post.comments}", modifier = Modifier.padding(start = 4.dp),color=Color(0xFF05BCBC))
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Icon(painter = painterResource(id = R.drawable.staricon), contentDescription = "Scrap", Modifier.size(15.dp),tint = Color(0xFFFFD330))
+            Text(text = "${post.scraps}", modifier = Modifier.padding(start = 4.dp),color=Color(0xFFFFD330))
         }
     }
 }
 
 @Composable
+@Preview
 fun ParentCommentView(
     comment: ParentComment = ParentComment(parentcommentid=2, userId=8, postId=1, content="comment2", createdAt="2024-01-19T15:03:58.000+00:00", childComments=listOf(ChildComment(childcommentid=3, userId=8, postId=1, content="comment3", parentCommentId=2, createdAt="2024-01-19T15:04:15.000+00:00", likes=0), ChildComment(childcommentid=4, userId=8, postId=1, content="comment4", parentCommentId=2, createdAt="2024-01-19T15:04:21.000+00:00", likes=0)), likes=0),
     onclickcomment: () -> Unit = {},
@@ -373,29 +384,42 @@ fun ParentCommentView(
                     .padding(top = 5.dp, end = 10.dp)
                     .background(color = Color(0xBEE6E6E6), shape = RoundedCornerShape(5.dp))
             ) {
-                Icon(
-                    imageVector = Icons.Sharp.ChatBubbleOutline,
-                    contentDescription = "",
-                    modifier = Modifier
+                    Icon(painter = painterResource(id = R.drawable.replyicon),
+                        contentDescription = "Comment",
+                        modifier = Modifier
                         .clickable {
                             onclickcomment()
                         }
                         .padding(horizontal = 10.dp, vertical = 4.dp)
-                        .height(14.dp),
+                        .size(14.dp),
                     tint = Color.Gray
                 )
                 Divider(modifier = Modifier
                     .height(22.dp)
                     .width(1.dp))
                 Icon(
-                    imageVector = Icons.Sharp.FavoriteBorder,
-                    contentDescription = "",
+                    painter = painterResource(id = R.drawable.likeicon),
+                    contentDescription = "Like",
                     modifier = Modifier
                         .clickable {
                             onclicklike()
                         }
                         .padding(horizontal = 10.dp, vertical = 4.dp)
-                        .height(14.dp),
+                        .size(14.dp),
+                    tint = Color.Gray
+                )
+                Divider(modifier = Modifier
+                    .height(22.dp)
+                    .width(1.dp))
+                Icon(
+                    painter = painterResource(id = R.drawable.threedot),
+                    contentDescription = "",
+                    modifier = Modifier
+                        .clickable {
+                            //TODO
+                        }
+                        .padding(horizontal = 10.dp, vertical = 4.dp)
+                        .size(14.dp),
                     tint = Color.Gray
                 )
             }
@@ -431,32 +455,71 @@ fun ParentCommentView(
                         .height(15.dp)
                 )
 
-                ChildCommentView(it)
+                ChildCommentView()
             }
         }
     }
 }
 
 @Composable
-fun ChildCommentView(comment: ChildComment = ChildComment(childcommentid=3, userId=8, postId=1, content="comment3", parentCommentId=2, createdAt="2024-01-19T15:04:15.000+00:00", likes=0)) {
+fun ChildCommentView(onclickcomment: () -> Unit = {},
+                     onclicklike: () -> Unit = {},
+                     comment: ChildComment = ChildComment(childcommentid=3, userId=8, postId=1, content="comment3", parentCommentId=2, createdAt="2024-01-19T15:04:15.000+00:00", likes=0)) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.Start
     ) {
-        Row {
-            Icon(
-                imageVector = Icons.Sharp.AccountBox,
-                contentDescription = "User",
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row {
+                Icon(
+                    imageVector = Icons.Sharp.AccountBox,
+                    contentDescription = "User",
+                    modifier = Modifier
+                        .width(40.dp)
+                        .height(40.dp)
+                )
+                Text(
+                    text = "익명",
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(start = 5.dp, top = 8.dp)
+                )
+            }
+            Row(
                 modifier = Modifier
-                    .width(40.dp)
-                    .height(40.dp)
-            )
-            Text(
-                text = "익명",
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(start = 5.dp, top = 8.dp)
-            )
+                    .padding(top = 5.dp, end = 10.dp)
+                    .background(color = Color(0xBEE6E6E6), shape = RoundedCornerShape(5.dp))
+            ) {
+                Icon(painter = painterResource(id = R.drawable.replyicon),
+                    contentDescription = "Comment",
+                    modifier = Modifier
+                        .clickable {
+                            onclickcomment()
+                        }
+                        .padding(horizontal = 10.dp, vertical = 4.dp)
+                        .size(14.dp),
+                    tint = Color.Gray
+                )
+                Divider(
+                    modifier = Modifier
+                        .height(22.dp)
+                        .width(1.dp)
+                )
+                Icon(
+                    painter = painterResource(id = R.drawable.likeicon),
+                    contentDescription = "Like",
+                    modifier = Modifier
+                        .clickable {
+                            onclicklike()
+                        }
+                        .padding(horizontal = 10.dp, vertical = 4.dp)
+                        .size(14.dp),
+                    tint = Color.Gray
+                )
+            }
         }
 
         Text(
@@ -474,7 +537,7 @@ fun ChildCommentView(comment: ChildComment = ChildComment(childcommentid=3, user
                 fontSize = 12.sp,
                 modifier = Modifier.padding(start = 5.dp)
             )
-            ReactionNumberView("Like",comment.likes,"Small")
+            ReactionNumberView("Like", comment.likes, "Small")
         }
     }
 }
@@ -524,14 +587,11 @@ fun ReactionNumberView(
         }
     }
 
-    Icon(
-        imageVector = icon,
-        contentDescription = "",
-        tint = color,
-        modifier = Modifier
-            .width(dpsize)
-            .padding(start = padding)
-    )
+    Icon(painter = painterResource(id = R.drawable.likeicon),
+        contentDescription = "Like",
+        Modifier
+            .size(10.dp),
+        tint=Color(0xFFF91F15))
     Text(
         number.toString(),
         modifier = Modifier.padding(start = 4.dp),
