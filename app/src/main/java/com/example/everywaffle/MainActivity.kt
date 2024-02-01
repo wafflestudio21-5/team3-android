@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -32,6 +33,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -286,15 +288,16 @@ fun MakeAlertDialog(
 fun IconButtonWithText(
     imageVector: Painter,
     text:String = "",
+    size: Dp = 48.dp,
     onclick : () -> Unit = {}
 ){
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
     ){
         IconButton(onClick = onclick) {
-            Icon(painter = imageVector, contentDescription = "", modifier = Modifier
-                .width(20.dp)
-                .height(20.dp), tint = Color.Unspecified)
+            Icon(painter = imageVector, contentDescription = "",
+                modifier = Modifier.size(size),
+                tint = Color.Unspecified)
         }
         Text(
             text = text

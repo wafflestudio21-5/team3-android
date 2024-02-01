@@ -66,6 +66,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -173,13 +174,16 @@ fun HomeScreen(
 }
 
 
+
 @Composable
 fun LowBar(navController: NavHostController, key:Int){
+
+    val iconSize = 64.dp
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 16.dp),
+            .padding(horizontal = 16.dp),
         horizontalArrangement = Arrangement.SpaceAround
     ) {
 
@@ -187,12 +191,14 @@ fun LowBar(navController: NavHostController, key:Int){
         if (key==1) {
             IconButtonWithText(
                 imageVector = painterResource(id = R.drawable.home_selected),
+                size = iconSize,
                 onclick = { navController.navigate("Home") }
             )
         }
         else{
             IconButtonWithText(
                 imageVector = painterResource(id = R.drawable.home),
+                size = iconSize,
                 onclick = { navController.navigate("Home") }
             )
         }

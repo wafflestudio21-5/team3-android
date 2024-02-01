@@ -123,11 +123,13 @@ fun UserInfoSection(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp)
+                .background(Color.White)
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(16.dp)
+                    .background(color = Color.White),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
@@ -142,7 +144,7 @@ fun UserInfoSection(
                         text = realname
                     )
                     Text(
-                        text = "$department $studentId"
+                        text = "$department $studentId 학번"
                     )
                 }
             }
@@ -153,11 +155,13 @@ fun UserInfoSection(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp)
+                .background(Color.White)
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(16.dp)
+                    .background(color = Color.White),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
