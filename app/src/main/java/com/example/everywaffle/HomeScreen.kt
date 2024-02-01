@@ -160,7 +160,6 @@ fun HomeScreen(
 }
 
 @Composable
-
 fun BoardList(navController: NavHostController, recent:Map<String,String>, trend:List<PostDetail>) {
     val boardNames = listOf("자유게시판", "비밀게시판", "졸업생게시판", "새내기게시판", "시사·이슈", "장터게시판", "정보게시판")
     Column(modifier = Modifier.padding(bottom = 100.dp)) {
@@ -258,7 +257,7 @@ fun BoardScreen(
     navController: NavHostController,
 ) {
     val mainViewModel = hiltViewModel<MainViewModel>()
-    val page by remember { mutableStateOf(1) }
+    var page by remember { mutableStateOf(1) }
     val loading = remember { mutableStateOf(false) }
     val itemList = remember { mutableStateListOf<PostDetail>() }
     val listState = rememberLazyListState()
@@ -273,6 +272,9 @@ fun BoardScreen(
         loading.value = true
         delay(1000)
         itemList.addAll(mainViewModel.getpostcategory(boardid!!, page)!!)
+        if(!mainViewModel.getpostcategory(boardid, page+1)!!.isEmpty()){
+            page+=1
+        }
         loading.value = false
     }
 
@@ -291,7 +293,9 @@ fun BoardScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { navController.popBackStack() }) {
+                IconButton(onClick = {
+                    navController.navigate("Home")
+                }) {
                     Icon(imageVector = Icons.Sharp.ArrowBack, contentDescription = "Back")
                 }
 
@@ -312,7 +316,7 @@ fun BoardScreen(
             LazyColumn(
                 state = listState,
                 modifier = Modifier
-                    .weight(1f),
+                    .height(600.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 itemList.forEach {
@@ -339,7 +343,6 @@ fun BoardScreen(
 }
 
 @Composable
-
 fun PostPreview(
     post: PostDetail,
     navController: NavHostController
@@ -350,7 +353,6 @@ fun PostPreview(
             .background(Color.White),
         shape = RectangleShape
     ) {
-
         Column(
             modifier = Modifier
                 .background(Color.White)

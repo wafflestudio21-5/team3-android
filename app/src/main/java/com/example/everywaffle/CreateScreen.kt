@@ -78,7 +78,7 @@ fun Createpost(navController: NavHostController, category: String?) {
                         }
                     },
                     navigationIcon = {
-                        IconButton(onClick = { navController.popBackStack()}) {
+                        IconButton(onClick = {navController.popBackStack()}) {
                             Icon(
                                 Icons.Filled.Close,
                                 contentDescription = "닫기",
@@ -147,15 +147,15 @@ fun Createpost(navController: NavHostController, category: String?) {
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 BasicTextField(
-                    value = title,
-                    onValueChange = { title = it },
+                    value = content,
+                    onValueChange = { content = it },
                     singleLine = true,
                     textStyle = TextStyle(color = Color.Black),
                     cursorBrush = SolidColor(Color.Black),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     decorationBox = { innerTextField ->
                         Column {
-                            if (title.isEmpty()) {
+                            if (content.isEmpty()) {
                                 Text("내용을 입력하세요. ", style =
                                 TextStyle(
                                     color = Color.Gray,
@@ -205,27 +205,6 @@ fun UpdatePost(navController: NavHostController, category:String?, postid:Int?, 
                                     navController.navigate("Board/${category}")
                                 }
                             }
-
-                            /*
-                            CoroutineScope(Dispatchers.IO).launch {
-                                try {
-                                    val newPostId = mainViewModel.createpost(title, content)
-                                    newPostId?.let {
-                                        val newPostDetail = mainViewModel.getpost(it)
-                                        if (newPostDetail != null) {
-                                            //mainViewModel.postChanged()
-                                            CoroutineScope(Dispatchers.Main).launch {
-                                                navController.navigate("Board/${newPostDetail.category}") {
-                                                    popUpTo("BoardScreen") { inclusive = true }
-                                                }
-                                            }
-                                        }
-                                    }
-                                } catch (e: Exception) {
-                                    Log.e("CreateScreen", "Error creating post: $e")
-                                }
-                            }
-                             */
                         }
                     }) {
                         Text("완료")

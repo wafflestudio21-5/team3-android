@@ -438,7 +438,7 @@ fun PopularPost(
                     )
                 }
                 Row {
-                    Text(post.createdAt, fontSize = 12.sp, color = Color.Gray)
+                    Text(timetoprint(post.createdAt), fontSize = 12.sp, color = Color.Gray)
                 }
             }
             Text(post.title, fontWeight = FontWeight.Bold)
@@ -450,7 +450,7 @@ fun PopularPost(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(post.category, fontSize = 12.sp, color = Color.Gray)
+                Text(boardnames.filterValues { it == post.category }.keys.firstOrDefault(), fontSize = 12.sp, color = Color.Gray)
                 Row{
                     ReactionNumberView("Like",post.likes,"Normal")
                     Spacer(modifier = Modifier.width(8.dp))
