@@ -119,6 +119,12 @@ fun MyAppNavHost(
                 onNavigateToUser = {navController.navigate("User")}
             )
         }
+        composable("Chat"){
+            ChatScreen(navController = navController)
+        }
+        composable("SendScreen"){
+            SendScreen(navController=navController)
+        }
         composable(
             route ="Search/{board_id}",
             arguments = listOf(
@@ -286,7 +292,9 @@ fun IconButtonWithText(
         horizontalAlignment = Alignment.CenterHorizontally,
     ){
         IconButton(onClick = onclick) {
-            Icon(painter = imageVector, contentDescription = "", modifier = Modifier.width(20.dp).height(20.dp), tint = Color.Unspecified)
+            Icon(painter = imageVector, contentDescription = "", modifier = Modifier
+                .width(20.dp)
+                .height(20.dp), tint = Color.Unspecified)
         }
         Text(
             text = text

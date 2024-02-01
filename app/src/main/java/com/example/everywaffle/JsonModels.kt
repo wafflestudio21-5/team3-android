@@ -169,3 +169,4 @@ data class VoteResult(
     @Json(name = "currentAgreeCnt") val currentAgreeCnt:Int,
     @Json(name = "currentDisagreeCnt") val currentDisagreeCnt:Int,
 )
+

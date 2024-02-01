@@ -1,18 +1,13 @@
 package com.example.everywaffle
 
 import android.content.Context
+import android.content.pm.PackageInstaller
 import android.util.Log
-import androidx.compose.runtime.remember
-import androidx.core.text.isDigitsOnly
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.kakao.sdk.user.UserApiClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -342,4 +337,6 @@ class MainViewModel @Inject constructor(
             return null
         }
     }
+
+
 }

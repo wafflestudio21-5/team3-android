@@ -172,55 +172,67 @@ fun HomeScreen(
     }
 }
 
+
 @Composable
 fun LowBar(navController: NavHostController, key:Int){
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 16.dp, vertical = 16.dp),
         horizontalArrangement = Arrangement.SpaceAround
     ) {
+
+
         if (key==1) {
             IconButtonWithText(
                 imageVector = painterResource(id = R.drawable.home_selected),
-                text = "홈",
                 onclick = { navController.navigate("Home") }
             )
         }
         else{
             IconButtonWithText(
                 imageVector = painterResource(id = R.drawable.home),
-                text = "홈",
                 onclick = { navController.navigate("Home") }
             )
         }
 
         if (key==3){
             IconButtonWithText(
-                imageVector = painterResource(id =R.drawable.chat_selected),
-                text = "투표",
+                imageVector = painterResource(id =R.drawable.vote_selected),
                 onclick = {navController.navigate("Board/VOTE_BOARD")}
             )
         }
+
         else{
             IconButtonWithText(
-                imageVector = painterResource(id =R.drawable.chat),
-                text = "투표",
+                imageVector = painterResource(id =R.drawable.vote),
                 onclick = {navController.navigate("Board/VOTE_BOARD")}
             )
         }
 
         if (key==4){
             IconButtonWithText(
+                imageVector = painterResource(id =R.drawable.chat_selected),
+                onclick = {navController.navigate("Chat")}
+            )
+        }
+        else{
+            IconButtonWithText(
+                imageVector = painterResource(id =R.drawable.chat),
+                onclick = {navController.navigate("Chat")}
+            )
+        }
+
+        if (key==5){
+            IconButtonWithText(
                 imageVector = painterResource(id =R.drawable.user_selected),
-                text = "마이페이지",
                 onclick = {navController.navigate("User")}
             )
         }
         else{
             IconButtonWithText(
                 imageVector = painterResource(id =R.drawable.user),
-                text = "마이페이지",
                 onclick = {navController.navigate("User")}
             )
         }
