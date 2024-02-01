@@ -293,4 +293,24 @@ class MainViewModel @Inject constructor(
             return null
         }
     }
+
+    suspend fun postcommentlike(commentid:Int):Int?{
+        try{
+            api.postcommentlike(commentId = commentid, userid = UserId(MyApplication.prefs.getString("userid").toInt()))
+            return 1
+        }
+        catch (e:retrofit2.HttpException){
+            return null
+        }
+    }
+
+    suspend fun deletecomment(commentid:Int):Int?{
+        try {
+            api.deletecomment(commentId = commentid)
+            return 1
+        }
+        catch (e:retrofit2.HttpException){
+            return null
+        }
+    }
 }

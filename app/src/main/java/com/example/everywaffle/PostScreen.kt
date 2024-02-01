@@ -106,7 +106,6 @@ fun PostScreen(postid:Int?, navController: NavHostController){
     val keyboardController = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(Unit, postchangedkey){
-        Log.d("aaaa","abc")
         post = mainViewModel.getpost(postid!!)!!
         comments.clear()
         comments.addAll(mainViewModel.getcomments(post.postId)!!)
@@ -234,13 +233,35 @@ fun PostScreen(postid:Int?, navController: NavHostController){
                 comments.forEach{
                     item{
                         ParentCommentView(it,
-                        {
-                            parentcommentid = it.parentcommentid
-                            keyboardController?.show()
-                        },
-                        {
-                            // TODO:  
-                        }
+                            {
+                                parentcommentid = it.parentcommentid
+                                keyboardController?.show()
+                            },
+                            {
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    val result = mainViewModel.postcommentlike(it.parentcommentid)
+                                    if(result==null){
+                                        // TODO:
+                                    }
+                                    else{
+                                        if(MainViewModel._postchanged.value) MainViewModel._postchanged.emit(false)
+                                        else MainViewModel._postchanged.emit(true)
+                                    }
+                                }
+                            },
+                            {},
+                            {
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    val result = mainViewModel.deletecomment(it.parentcommentid)
+                                    if(result==null){
+                                        // TODO:
+                                    }
+                                    else{
+                                        if(MainViewModel._postchanged.value) MainViewModel._postchanged.emit(false)
+                                        else MainViewModel._postchanged.emit(true)
+                                    }
+                                }
+                            }
                         )
                     }
                     item{Divider()}
@@ -353,8 +374,13 @@ fun PostView(
 fun ParentCommentView(
     comment: ParentComment = ParentComment(parentcommentid=2, userId=8, postId=1, content="comment2", createdAt="2024-01-19T15:03:58.000+00:00", childComments=listOf(ChildComment(childcommentid=3, userId=8, postId=1, content="comment3", parentCommentId=2, createdAt="2024-01-19T15:04:15.000+00:00", likes=0), ChildComment(childcommentid=4, userId=8, postId=1, content="comment4", parentCommentId=2, createdAt="2024-01-19T15:04:21.000+00:00", likes=0)), likes=0),
     onclickcomment: () -> Unit = {},
-    onclicklike: () -> Unit = {}
+    onclicklike: () -> Unit = {},
+    onclickupdate : () -> Unit = {},
+    onclickdelete : () -> Unit = {}
 ){
+
+    var dropmenuexpanded by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.Start
@@ -387,11 +413,11 @@ fun ParentCommentView(
                     Icon(painter = painterResource(id = R.drawable.replyicon),
                         contentDescription = "Comment",
                         modifier = Modifier
-                        .clickable {
-                            onclickcomment()
-                        }
-                        .padding(horizontal = 10.dp, vertical = 4.dp)
-                        .size(14.dp),
+                            .clickable {
+                                onclickcomment()
+                            }
+                            .padding(horizontal = 10.dp, vertical = 4.dp)
+                            .size(14.dp),
                     tint = Color.Gray
                 )
                 Divider(modifier = Modifier
@@ -408,20 +434,43 @@ fun ParentCommentView(
                         .size(14.dp),
                     tint = Color.Gray
                 )
+
                 Divider(modifier = Modifier
                     .height(22.dp)
                     .width(1.dp))
+
                 Icon(
                     painter = painterResource(id = R.drawable.threedot),
                     contentDescription = "",
                     modifier = Modifier
                         .clickable {
-                            //TODO
+                            if (comment.userId == MyApplication.prefs
+                                    .getString("userid")
+                                    .toInt()
+                            ) dropmenuexpanded = true
                         }
                         .padding(horizontal = 10.dp, vertical = 4.dp)
                         .size(14.dp),
                     tint = Color.Gray
                 )
+
+                DropdownMenu(
+                    modifier = Modifier.wrapContentSize(),
+                    expanded = dropmenuexpanded,
+                    onDismissRequest = {dropmenuexpanded = false},
+                    //offset = DpOffset() // 펼쳐지는 메뉴의 위치 조정
+                ) {
+                    DropdownMenuItem(
+                        text = {Text("수정")},
+                        onClick = {
+
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = {Text("삭제")},
+                        onClick = onclickdelete
+                    )
+                }
             }
         }
 

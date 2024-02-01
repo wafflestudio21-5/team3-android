@@ -96,6 +96,7 @@ fun HomeScreen(
                 if(result!=null) recentpost[kor] = result.title
             }
         }
+        accountOptions[0] = Pair("아이디",MyApplication.prefs.getString("id"))
     }
 
     Surface(

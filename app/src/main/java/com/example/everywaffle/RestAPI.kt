@@ -160,4 +160,17 @@ interface RestAPI {
         @Query("page") page:Int,
         @Query("size") size:Int
     ):List<PostDetail>
+
+    @POST("/api/comment/{commentId}/likes")
+    suspend fun postcommentlike(
+        @Header("Authorization") token:String="Bearer "+MyApplication.prefs.getString("token"),
+        @Path("commentId") commentId:Int,
+        @Body() userid:UserId
+    ):Response<Unit>
+
+    @DELETE("/api/comment/{commentId}")
+    suspend fun deletecomment(
+        @Header("Authorization") token:String="Bearer "+MyApplication.prefs.getString("token"),
+        @Path("commentId") commentId:Int
+    ):Response<Unit>
 }
