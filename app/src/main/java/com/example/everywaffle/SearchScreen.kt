@@ -72,6 +72,11 @@ fun SearchScreen(
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
+    LaunchedEffect(keyword){
+        focusManager.clearFocus()
+        keyboardController?.hide()
+    }
+
     Surface (modifier = Modifier.fillMaxSize()){
         Column{
 
@@ -101,8 +106,6 @@ fun SearchScreen(
                     if(navController != null) {
                         IconButton(onClick = {
                             keyword = searchQuery
-                            focusManager.clearFocus()
-                            keyboardController?.hide()
                         }) {
                     Icon(imageVector = Icons.Default.Search, contentDescription = "Search")
                       }
@@ -125,7 +128,6 @@ fun SearchScreen(
                 keyboardActions = KeyboardActions(
                     onSearch = {
                         keyword = searchQuery
-
                     }
                 )
             )

@@ -59,7 +59,11 @@ data class PostDetail(
     @Json(name = "createdAt") val createdAt:String,
     @Json(name = "likes") val likes:Int,
     @Json(name = "scraps") val scraps:Int,
-    @Json(name = "comments") val comments:Int
+    @Json(name = "comments") val comments:Int,
+    @Json(name = "isVoting") val isVoting:Boolean,
+    @Json(name = "makeVoteCnt") val makeVoteCnt:Int,
+    @Json(name = "agree") val agree:Int,
+    @Json(name = "disagree") val disagree:Int
 )
 
 @JsonClass(generateAdapter = true)
@@ -143,4 +147,25 @@ data class Sort(
     @Json(name = "empty") val empty:Boolean,
     @Json(name = "sorted") val sorted:Boolean,
     @Json(name = "unsorted") val unsorted:Boolean
+)
+
+@JsonClass(generateAdapter = true)
+data class MakeVoteDetail(
+    @Json(name = "userId") val userid:Int,
+    @Json(name = "postId") val postid:Int,
+    @Json(name = "currentMakeVoteCnt") val makevotecnt:Int
+)
+
+@JsonClass(generateAdapter = true)
+data class Vote(
+    @Json(name = "userId") val userid:Int,
+    @Json(name = "vote") val vote:String
+)
+
+@JsonClass(generateAdapter = true)
+data class VoteResult(
+    @Json(name = "userId") val userId:Int,
+    @Json(name = "postId") val postId:Int,
+    @Json(name = "currentAgreeCnt") val currentAgreeCnt:Int,
+    @Json(name = "currentDisagreeCnt") val currentDisagreeCnt:Int,
 )

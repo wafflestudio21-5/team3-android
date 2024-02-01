@@ -1,6 +1,9 @@
 package com.example.everywaffle
 
 import android.util.Log
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -24,9 +27,11 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.Comment
+import androidx.compose.material.icons.filled.East
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.West
 import androidx.compose.material.icons.sharp.AccountBox
 import androidx.compose.material.icons.sharp.ArrowBack
 import androidx.compose.material.icons.sharp.ChatBubbleOutline
@@ -92,18 +97,29 @@ import java.time.LocalDateTime
 import java.time.Period
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import kotlin.math.pow
+import kotlin.math.round
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 
 fun PostScreen(postid:Int?, navController: NavHostController){
     val mainViewModel = hiltViewModel<MainViewModel>()
-    var post by remember { mutableStateOf(PostDetail(-1,0,"","","","",0, 0,0)) }
+    var post by remember { mutableStateOf(PostDetail(-1,0,"","","","",0, 0,0,false,0,0,0)) }
     val comments = remember { mutableStateListOf<ParentComment>() }
     var dropmenuexpanded by remember { mutableStateOf(false) }
     var parentcommentid by remember { mutableStateOf(0) }
     val postchangedkey by MainViewModel.postchanged.collectAsState()
     val keyboardController = LocalSoftwareKeyboardController.current
+    var expanded by remember { mutableStateOf(false) }
+    val extraPadding by animateDpAsState(
+        if (expanded) 15.dp else 0.dp,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        )
+    )
+    var voting by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit, postchangedkey){
         post = mainViewModel.getpost(postid!!)!!
@@ -130,7 +146,7 @@ fun PostScreen(postid:Int?, navController: NavHostController){
                 }
 
                 Text(text = boardnames.filterValues { it == post.category }.keys.firstOrDefault(), fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                
+
                 IconButton(onClick = {
                     if(post.userId == MyApplication.prefs.getString("userid").toInt()) dropmenuexpanded = true
                 }) {
@@ -225,6 +241,247 @@ fun PostScreen(postid:Int?, navController: NavHostController){
                                 )
                             }
                         }
+
+                        if(!post.isVoting) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .padding(top = 7.dp, start = 5.dp)
+                                    .clip(shape = RoundedCornerShape(8.dp))
+                                    .background(Color(0xBEE6E6E6))
+                                    .clickable {
+                                        CoroutineScope(Dispatchers.Main).launch {
+                                            val result =
+                                                mainViewModel.postmakevote(postid = postid!!)
+                                            if (result == null) {
+                                                // TODO:
+                                            } else {
+                                                post =
+                                                    post.copy(makeVoteCnt = post.makeVoteCnt + 1) // TODO:
+                                            }
+                                        }
+                                    },
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Spacer(modifier = Modifier.width(5.dp))
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.voteborder),
+                                        contentDescription = "",
+                                        modifier = Modifier.width(15.dp),
+                                        tint = Color.Unspecified
+                                    )
+                                    Text(
+                                        text = "투표 글로",
+                                        modifier = Modifier.padding(
+                                            start = 3.dp,
+                                            end = 5.dp,
+                                            top = 2.dp,
+                                            bottom = 2.dp
+                                        )
+                                    )
+                                }
+                            }
+                        }
+
+                        else{
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .padding(top = 7.dp, start = 5.dp)
+                                    .clip(shape = RoundedCornerShape(8.dp))
+                                    .background(Color(0xBEE6E6E6))
+                                    .clickable {
+                                        voting = true
+                                    },
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Spacer(modifier = Modifier.width(5.dp))
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.voteborder),
+                                        contentDescription = "",
+                                        modifier = Modifier.width(15.dp),
+                                        tint = Color.Unspecified
+                                    )
+                                    Text(
+                                        text = "투표하기",
+                                        modifier = Modifier.padding(
+                                            start = 3.dp,
+                                            end = 5.dp,
+                                            top = 2.dp,
+                                            bottom = 2.dp
+                                        )
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if(post.isVoting){
+                    item{
+                        Row (
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 7.dp)
+                                .padding(start = 5.dp)
+                                .clip(shape = RoundedCornerShape(7.dp))
+                                .background(Color(0xBEE6E6E6)),
+                        ){
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(bottom = extraPadding.coerceAtLeast(0.dp))
+                                    .padding(top = 15.dp, start = 10.dp)
+                            ) {
+                                if (expanded) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth()
+                                            .padding(end = 10.dp, bottom = 10.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "투표 결과 보기",
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 12.sp,
+                                            color = Color(0xFF616161)
+                                        )
+                                        IconButton(onClick = { expanded = !expanded }, modifier = Modifier.width(15.dp).height(15.dp)) {
+                                            Icon(
+                                                painter = if (expanded) painterResource(id = R.drawable.showless) else painterResource(
+                                                    id = R.drawable.showmore
+                                                ),
+                                                contentDescription = if (expanded) "Show less" else "Show more",
+                                                modifier = Modifier.width(15.dp),
+                                                tint = Color.Unspecified
+                                            )
+                                        }
+                                    }
+                                    if (post.agree+post.disagree ==0) {
+                                        Text(
+                                            text = "투표 참여자 : 0명",
+                                            fontSize = 9.sp,
+                                            color = Color(0xFF616161)
+                                        )
+                                    }
+                                    else{
+                                        Text(
+                                            text = "투표 참여자 : ${post.agree + post.disagree}명",
+                                            fontSize = 9.sp,
+                                            color = Color(0xFF616161)
+                                        )
+                                        Spacer(modifier = Modifier.height(5.dp))
+                                        Row(verticalAlignment = Alignment.CenterVertically){
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.vote_winning),
+                                                contentDescription = "",
+                                                tint = if(post.agree>=post.disagree) Color.Unspecified else Color(0xFFBBBBBB),
+                                                modifier = Modifier
+                                                    .width(7.dp)
+                                                    .height(7.dp)
+                                            )
+                                            Spacer(modifier = Modifier.width(5.dp))
+                                            Text(
+                                                text = "찬성 : ${percentage(post.agree,post.disagree,1)}%",
+                                                fontSize = 9.sp,
+                                                color = Color(0xFF616161)
+                                            )
+                                        }
+                                        Row(verticalAlignment = Alignment.CenterVertically){
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.vote_winning),
+                                                contentDescription = "",
+                                                tint = if(post.agree<post.disagree) Color.Unspecified else Color(0xFFBBBBBB),
+                                                modifier = Modifier
+                                                    .width(7.dp)
+                                                    .height(7.dp)
+                                            )
+                                            Spacer(modifier = Modifier.width(5.dp))
+                                            Text(
+                                                text = "반대 : ${percentage(post.agree,post.disagree,2)}%",
+                                                fontSize = 9.sp,
+                                                color = Color(0xFF616161)
+                                            )
+                                        }
+                                        Row(
+                                            modifier = Modifier
+                                                .height(25.dp)
+                                                .fillMaxWidth()
+                                                .padding(end = 15.dp)
+                                                .clip(shape = RoundedCornerShape(3.dp))
+                                        ){
+                                            if(post.agree>0) {
+                                                Text(
+                                                    text = percentage(
+                                                        post.agree,
+                                                        post.disagree,
+                                                        1
+                                                    ).toString(),
+                                                    modifier = Modifier
+                                                        .fillMaxHeight()
+                                                        .weight(post.agree.toFloat())
+                                                        .background(
+                                                            color = if (post.agree >= post.disagree) Color(
+                                                                0xFF6C59E4
+                                                            ) else Color(0xFFBBBBBB)
+                                                        ),
+                                                    textAlign = TextAlign.Start,
+                                                    color = Color.White
+                                                )
+                                            }
+                                            if(post.disagree>0) {
+                                                Text(
+                                                    text = percentage(
+                                                        post.agree,
+                                                        post.disagree,
+                                                        2
+                                                    ).toString(),
+                                                    modifier = Modifier
+                                                        .fillMaxHeight()
+                                                        .weight(post.disagree.toFloat())
+                                                        .background(
+                                                            color = if (post.agree < post.disagree) Color(
+                                                                0xFF6C59E4
+                                                            ) else Color(0xFFBBBBBB)
+                                                        ),
+                                                    textAlign = TextAlign.End,
+                                                    color = Color.White
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                                else{
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth()
+                                            .padding(end = 10.dp, bottom = 10.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "투표 결과 보기",
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 12.sp,
+                                            color = Color(0xFF616161)
+                                        )
+                                        IconButton(onClick = { expanded = !expanded }, modifier = Modifier.width(15.dp).height(15.dp)) {
+                                            Icon(
+                                                painter = if (expanded) painterResource(id = R.drawable.showless) else painterResource(
+                                                    id = R.drawable.showmore
+                                                ),
+                                                contentDescription = if (expanded) "Show less" else "Show more",
+                                                modifier = Modifier.width(15.dp),
+                                                tint = Color.Unspecified
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -301,13 +558,70 @@ fun PostScreen(postid:Int?, navController: NavHostController){
                 }
             )
         }
+        if(voting){
+            VoteDialog(
+                ondismiss = {voting = false},
+                onagree = {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        val result = mainViewModel.postvote(postid = postid!!, vote = "AGREE")
+                        if (result == null) {
+                            // TODO :
+                        }
+                        else{
+                            if(MainViewModel._postchanged.value) MainViewModel._postchanged.emit(false)
+                            else MainViewModel._postchanged.emit(true)
+                        }
+                    }
+                },
+                ondisagree = {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        val result = mainViewModel.postvote(postid = postid!!, vote = "DISAGREE")
+                        if (result == null) {
+                            // TODO :
+                        }
+                        else{
+                            if(MainViewModel._postchanged.value) MainViewModel._postchanged.emit(false)
+                            else MainViewModel._postchanged.emit(true)
+                        }
+                    }
+                }
+            )
+        }
+    }
+}
+
+@Composable
+@Preview
+fun Test(){
+    var expanded by remember { mutableStateOf(false) }
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "투표 결과 보기",
+            fontWeight = FontWeight.Bold,
+            fontSize = 12.sp,
+            color = Color(0xFF616161)
+        )
+        IconButton(onClick = { expanded = !expanded }, modifier = Modifier.width(15.dp).height(15.dp)) {
+            Icon(
+                painter = if (expanded) painterResource(id = R.drawable.showless) else painterResource(
+                    id = R.drawable.showmore
+                ),
+                contentDescription = if (expanded) "Show less" else "Show more",
+                modifier = Modifier.width(15.dp),
+                tint = Color.Unspecified
+            )
+        }
     }
 }
 
 @Composable
 //@Preview
 fun PostView(
-    post:PostDetail = PostDetail(postId=1, userId=35, title="waffle", content="waffle", category="FREE_BOARD", createdAt="2024-01-18T19:13:04.000+00:00", likes=1, 0,0)
+    post:PostDetail = PostDetail(postId=1, userId=35, title="waffle", content="waffle", category="FREE_BOARD", createdAt="2024-01-18T19:13:04.000+00:00", likes=1, 0,0,false,0,0,0)
 ){
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -365,6 +679,11 @@ fun PostView(
 
             Icon(painter = painterResource(id = R.drawable.staricon), contentDescription = "Scrap", Modifier.size(15.dp),tint = Color(0xFFFFD330))
             Text(text = "${post.scraps}", modifier = Modifier.padding(start = 4.dp),color=Color(0xFFFFD330))
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Icon(painter = painterResource(id = R.drawable.voteborder), contentDescription = "MakeVote", Modifier.size(15.dp),tint = Color(0xFF6C59E4))
+            Text(text = "${post.makeVoteCnt}", modifier = Modifier.padding(start = 4.dp),color=Color(0xFF6C59E4))
         }
     }
 }
@@ -380,6 +699,7 @@ fun ParentCommentView(
 ){
 
     var dropmenuexpanded by remember { mutableStateOf(false) }
+    val mainViewModel = hiltViewModel<MainViewModel>()
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -504,16 +824,45 @@ fun ParentCommentView(
                         .height(15.dp)
                 )
 
-                ChildCommentView()
+                ChildCommentView(
+                    comment = it,
+                    onclicklike = {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            val result = mainViewModel.postcommentlike(it.childcommentid)
+                            if(result==null){
+                                // TODO:
+                            }
+                            else{
+                                if(MainViewModel._postchanged.value) MainViewModel._postchanged.emit(false)
+                                else MainViewModel._postchanged.emit(true)
+                            }
+                        }
+                    },
+                    onclickdelete = {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            val result = mainViewModel.deletecomment(it.childcommentid)
+                            if(result==null){
+                                // TODO:
+                            }
+                            else{
+                                if(MainViewModel._postchanged.value) MainViewModel._postchanged.emit(false)
+                                else MainViewModel._postchanged.emit(true)
+                            }
+                        }
+                    }
+                )
             }
         }
     }
 }
 
 @Composable
-fun ChildCommentView(onclickcomment: () -> Unit = {},
-                     onclicklike: () -> Unit = {},
+fun ChildCommentView(onclicklike: () -> Unit = {},
+                     onclickdelete: () -> Unit = {},
                      comment: ChildComment = ChildComment(childcommentid=3, userId=8, postId=1, content="comment3", parentCommentId=2, createdAt="2024-01-19T15:04:15.000+00:00", likes=0)) {
+
+    var dropmenuexpanded by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.Start
@@ -542,21 +891,6 @@ fun ChildCommentView(onclickcomment: () -> Unit = {},
                     .padding(top = 5.dp, end = 10.dp)
                     .background(color = Color(0xBEE6E6E6), shape = RoundedCornerShape(5.dp))
             ) {
-                Icon(painter = painterResource(id = R.drawable.replyicon),
-                    contentDescription = "Comment",
-                    modifier = Modifier
-                        .clickable {
-                            onclickcomment()
-                        }
-                        .padding(horizontal = 10.dp, vertical = 4.dp)
-                        .size(14.dp),
-                    tint = Color.Gray
-                )
-                Divider(
-                    modifier = Modifier
-                        .height(22.dp)
-                        .width(1.dp)
-                )
                 Icon(
                     painter = painterResource(id = R.drawable.likeicon),
                     contentDescription = "Like",
@@ -568,6 +902,41 @@ fun ChildCommentView(onclickcomment: () -> Unit = {},
                         .size(14.dp),
                     tint = Color.Gray
                 )
+                Divider(modifier = Modifier
+                    .height(22.dp)
+                    .width(1.dp))
+
+                Icon(
+                    painter = painterResource(id = R.drawable.threedot),
+                    contentDescription = "",
+                    modifier = Modifier
+                        .clickable {
+                            if (comment.userId == MyApplication.prefs
+                                    .getString("userid")
+                                    .toInt()
+                            ) dropmenuexpanded = true
+                        }
+                        .padding(horizontal = 10.dp, vertical = 4.dp)
+                        .size(14.dp),
+                    tint = Color.Gray
+                )
+                DropdownMenu(
+                    modifier = Modifier.wrapContentSize(),
+                    expanded = dropmenuexpanded,
+                    onDismissRequest = {dropmenuexpanded = false},
+                    //offset = DpOffset() // 펼쳐지는 메뉴의 위치 조정
+                ) {
+                    DropdownMenuItem(
+                        text = {Text("수정")},
+                        onClick = {
+
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = {Text("삭제")},
+                        onClick = onclickdelete
+                    )
+                }
             }
         }
 
@@ -741,4 +1110,16 @@ fun BottomTextField(
             }
         }
     )
+}
+
+fun percentage(n1:Int, n2:Int, key:Int=1):Double{
+    return when(key){
+        1 -> {
+            round(n1.toDouble()/(n1+n2)*1000)/10
+        }
+        2 -> {
+            round(n2.toDouble()/(n1+n2)*1000)/10
+        }
+        else -> 0.0
+    }
 }

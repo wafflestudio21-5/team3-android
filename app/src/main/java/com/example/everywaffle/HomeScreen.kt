@@ -1,7 +1,10 @@
 package com.example.everywaffle
 
+import android.app.Activity
 import android.util.Log
 import android.view.RoundedCorner
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -10,6 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -57,6 +61,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -75,17 +81,23 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
-    navController: NavHostController,
-    onNavigateToBoard : () -> Unit = {},
-    onNavigateToUser : () -> Unit = {},
-    onNavigateToCreate: () -> Unit = {}
-
+    navController: NavHostController
 ){
     val mainViewModel = hiltViewModel<MainViewModel>()
     val recentpost= remember{mutableStateMapOf<String,String>()}
     val trendpost= remember{mutableStateListOf<PostDetail>()}
+    val context = LocalContext.current
+    val activity = (LocalContext.current as? Activity)
+    var backpressed = false
 
     LaunchedEffect(Unit){
+        CoroutineScope(Dispatchers.Main).launch {
+            val result2 = mainViewModel.getUserInfo()
+            Log.d("aaaa",result2.toString())
+            if (result2 == null) { // 입력된 사용자 정보가 없는 경우
+                navController.navigate("Detail")
+            }
+        }
         CoroutineScope(Dispatchers.Main).launch {
             trendpost.clear()
             trendpost.addAll(mainViewModel.gettrending()!!)
@@ -99,16 +111,32 @@ fun HomeScreen(
         accountOptions[0] = Pair("아이디",MyApplication.prefs.getString("id"))
     }
 
+
+    BackHandler {
+        if(backpressed) {
+            activity?.finish()
+        }
+        else{
+            Toast.makeText(context, "한 번 더 뒤로가기를 눌러 앱을 종료하세요.",Toast.LENGTH_SHORT).show()
+            CoroutineScope(Dispatchers.Main).launch {
+                backpressed=true
+                delay(1000)
+                backpressed=false
+            }
+        }
+    }
+
     Surface(
         modifier = Modifier
-            .background(color = Color.White)
             .fillMaxSize()
+            .background(color = Color.White)
             .padding(15.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(15.dp)
+                .padding(15.dp),
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
             Row() {
                 Row(
@@ -126,36 +154,75 @@ fun HomeScreen(
                 IconButton(onClick = { navController.navigate("Search/whole") }) {
                     Icon(imageVector = Icons.Sharp.Search, contentDescription = "Search")
                 }
-                IconButton(onClick = onNavigateToUser) {
+                IconButton(onClick = { navController.navigate("User") } ) {
                     Icon(imageVector = Icons.Sharp.ManageAccounts, contentDescription = "")
                 }
             }
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(580.dp)
+                    .weight(.1f)
             ){
                 item {
                     BoardList(navController = navController, recent = recentpost, trend = trendpost)
                 }
             }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                IconButtonWithText(
-                    imageVector = Icons.Sharp.Home,
-                    text = "홈"
-                )
-                Spacer(Modifier.width(80.dp))
-                IconButtonWithText(
-                    imageVector = Icons.Sharp.ManageAccounts,
-                    text = "마이페이지",
-                    onclick = onNavigateToUser
-                )
-            }
+            LowBar(navController, 1)
+        }
+    }
+}
+
+@Composable
+fun LowBar(navController: NavHostController, key:Int){
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.SpaceAround
+    ) {
+        if (key==1) {
+            IconButtonWithText(
+                imageVector = painterResource(id = R.drawable.home_selected),
+                text = "홈",
+                onclick = { navController.navigate("Home") }
+            )
+        }
+        else{
+            IconButtonWithText(
+                imageVector = painterResource(id = R.drawable.home),
+                text = "홈",
+                onclick = { navController.navigate("Home") }
+            )
+        }
+
+        if (key==3){
+            IconButtonWithText(
+                imageVector = painterResource(id =R.drawable.chat_selected),
+                text = "투표",
+                onclick = {navController.navigate("Board/VOTE_BOARD")}
+            )
+        }
+        else{
+            IconButtonWithText(
+                imageVector = painterResource(id =R.drawable.chat),
+                text = "투표",
+                onclick = {navController.navigate("Board/VOTE_BOARD")}
+            )
+        }
+
+        if (key==4){
+            IconButtonWithText(
+                imageVector = painterResource(id =R.drawable.user_selected),
+                text = "마이페이지",
+                onclick = {navController.navigate("User")}
+            )
+        }
+        else{
+            IconButtonWithText(
+                imageVector = painterResource(id =R.drawable.user),
+                text = "마이페이지",
+                onclick = {navController.navigate("User")}
+            )
         }
     }
 }
@@ -176,15 +243,6 @@ fun BoardList(navController: NavHostController, recent:Map<String,String>, trend
                 fontSize = 20.sp,
                 color=Color(0xFF000000),
                 fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = "더 보기 >",
-                fontSize = 10.sp,
-                color=Color(0xFF616161),
-                modifier = Modifier
-                    .clickable {
-                        navController.navigate("AllBoards")
-                    }
             )
         }
 
@@ -265,6 +323,7 @@ fun BoardScreen(
 
 
     LaunchedEffect(Unit) {
+        Log.d("aaaa",boardid.toString())
         itemList.clear()
         itemList.addAll(mainViewModel.getpostcategory(boardid!!, 0)!!)
     }
@@ -287,23 +346,26 @@ fun BoardScreen(
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxSize(),
+            //verticalArrangement = Arrangement.SpaceBetween
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = {
-                    navController.navigate("Home")
-                }) {
-                    Icon(imageVector = Icons.Sharp.ArrowBack, contentDescription = "Back")
+                if(!("VOTE" in boardid!!)){
+                    IconButton(onClick = {
+                        navController.navigate("Home")
+                    }) {
+                        Icon(imageVector = Icons.Sharp.ArrowBack, contentDescription = "Back")
+                    }
                 }
 
-                Text(text = boardnames.filterValues { it == boardid!! }.keys.firstOrDefault(), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Text(text = boardnames.filterValues { it == boardid }.keys.firstOrDefault(), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 10.dp))
 
                 Row() {
-                    IconButton(onClick = { navController.navigate("Search/${boardid!!}") }) {
+                    IconButton(onClick = { navController.navigate("Search/${boardid}") }) {
                         Icon(imageVector = Icons.Sharp.Search, contentDescription = "Search")
                     }
                     IconButton(onClick = { }) {
@@ -317,7 +379,8 @@ fun BoardScreen(
             LazyColumn(
                 state = listState,
                 modifier = Modifier
-                    .height(600.dp),
+                    .fillMaxWidth()
+                    .weight(.1f), // TODO:
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 itemList.forEach {
@@ -338,7 +401,14 @@ fun BoardScreen(
                     }
                 }
             }
-            if (boardid in boardnames.values) CreatePost(navController = navController, category = boardid!!)
+
+            if ("VOTE" in boardid!!) {
+                LowBar(navController = navController, 3)
+            }
+        }
+
+        if (!("VOTE" in boardid!!) && (boardid in boardnames.values)) {
+            CreatePost(navController = navController, category = boardid!!)
         }
     }
 }
@@ -386,7 +456,8 @@ fun PostPreview(
 @Composable
 fun CreatePost(navController: NavController, category: String) {
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize()
+            .background(Color.Transparent),
         verticalArrangement = Arrangement.Bottom
     ) {
         Box(

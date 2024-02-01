@@ -30,8 +30,8 @@ interface RestAPI {
 
     @GET("/api/details/{id}")
     suspend fun getUserInfo(
-        @Path("id") userid:Int,
-        @Header("Authorization") token:String="Bearer "+MyApplication.prefs.getString("token")
+        @Header("Authorization") token:String="Bearer "+MyApplication.prefs.getString("token"),
+        @Path("id") userid:Int
     ):GetUserDetail
 
     @POST("/api/details/{id}/change-passowrd")
@@ -173,4 +173,25 @@ interface RestAPI {
         @Header("Authorization") token:String="Bearer "+MyApplication.prefs.getString("token"),
         @Path("commentId") commentId:Int
     ):Response<Unit>
+
+    @POST("/api/post/{postId}/makeVote")
+    suspend fun postmakevote(
+        @Header("Authorization") token:String="Bearer "+MyApplication.prefs.getString("token"),
+        @Path("postId") postId:Int,
+        @Body() userid:UserId
+    ):MakeVoteDetail
+
+    @GET("/api/post/vote-board")
+    suspend fun getpostvote(
+        @Header("Authorization") token:String="Bearer "+MyApplication.prefs.getString("token"),
+        @Query("page") page:Int,
+        @Query("size") size:Int
+    ):List<PostDetail>
+
+    @POST("/api/post/{postId}/vote")
+    suspend fun postvote(
+        @Header("Authorization") token:String="Bearer "+MyApplication.prefs.getString("token"),
+        @Path("postId") postId:Int,
+        @Body() vote:Vote
+    ):VoteResult
 }

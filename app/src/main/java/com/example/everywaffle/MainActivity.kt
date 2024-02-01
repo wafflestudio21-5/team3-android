@@ -28,7 +28,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -92,9 +94,7 @@ fun MyAppNavHost(
         }*/
         composable("Home"){
             HomeScreen(
-                navController = navController,
-                onNavigateToBoard = {navController.navigate("AllBoards")},
-                onNavigateToUser = {navController.navigate("User")}
+                navController = navController
             )
         }
         composable("User"){
@@ -102,13 +102,6 @@ fun MyAppNavHost(
                 onNavigateToBoard = {navController.navigate("AllBoards")},
                 onNavigateToHome = {navController.navigate("Home")},
                 navController = navController
-            )
-        }
-        composable("AllBoards"){
-            AllBoards(
-                navController = navController,
-                onNavigateToHome = {navController.navigate("Home")},
-                onNavigateToUser = {navController.navigate("User")}
             )
         }
         composable("Detail"){
@@ -285,7 +278,7 @@ fun MakeAlertDialog(
 
 @Composable
 fun IconButtonWithText(
-    imageVector: ImageVector = Icons.Sharp.DeviceUnknown,
+    imageVector: Painter,
     text:String = "",
     onclick : () -> Unit = {}
 ){
@@ -293,7 +286,7 @@ fun IconButtonWithText(
         horizontalAlignment = Alignment.CenterHorizontally,
     ){
         IconButton(onClick = onclick) {
-            Icon(imageVector = imageVector, contentDescription = "")
+            Icon(painter = imageVector, contentDescription = "", modifier = Modifier.width(20.dp).height(20.dp), tint = Color.Unspecified)
         }
         Text(
             text = text
@@ -357,7 +350,8 @@ val boardnames = mapOf(
     "비밀게시판" to "SECRET_BOARD",
     "졸업생게시판" to "GRADUATE_BOARD",
     "새내기게시판" to "FRESHMAN_BOARD",
-    "정보게시판" to "INFO_BOARD"
+    "정보게시판" to "INFO_BOARD",
+    "투표게시판" to "VOTE_BOARD"
 )
 
 /*
@@ -509,5 +503,3 @@ fun timetoprint(t:String):String{
     }
     catch(e:Exception) {return ""}
 }
-
-val postdetailtemp = PostDetail(postId=1, userId=35, title="waffle", content="waffle", category="FREE_BOARD", createdAt="2024-01-18T19:13:04.000+00:00", likes=1,0,0)

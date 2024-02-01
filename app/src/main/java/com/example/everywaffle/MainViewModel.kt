@@ -30,6 +30,7 @@ class MainViewModel @Inject constructor(
         try {
             signupresponse= api.signup(SignupRequest(id,pw,email))
             MyApplication.prefs.setString("userid",signupresponse.userId.toString())
+            MyApplication.prefs.setString("token",signupresponse.token)
         }
         catch (e:retrofit2.HttpException){
             signupresponse= null
@@ -67,7 +68,6 @@ class MainViewModel @Inject constructor(
         catch (e:retrofit2.HttpException){
             updateUserInforesponse=null
         }
-        Log.d("aaaa",updateUserInforesponse.toString())
         return updateUserInforesponse
     }
 
@@ -149,6 +149,10 @@ class MainViewModel @Inject constructor(
                     page = page,
                     size = size
                 ).content
+                boardid=="VOTE_BOARD" -> api.getpostvote(
+                    page = page,
+                    size = size
+                )
                 "whole" in boardid -> api.searchwhole(
                     keyword = keyword,
                     page = page,
@@ -310,6 +314,31 @@ class MainViewModel @Inject constructor(
             return 1
         }
         catch (e:retrofit2.HttpException){
+            return null
+        }
+    }
+
+    suspend fun postmakevote(postid: Int):MakeVoteDetail?{
+        return try{
+            api.postmakevote(postId = postid, userid = UserId(MyApplication.prefs.getString("userid").toInt()))
+        }
+        catch (e:retrofit2.HttpException){
+            return null
+        }
+    }
+
+    suspend fun postvote(postid:Int, vote:String):VoteResult?{
+        return try{
+            api.postvote(
+                postId = postid,
+                vote = Vote(
+                    userid = MyApplication.prefs.getString("userid").toInt(),
+                    vote = vote
+                )
+            )
+        }
+        catch (e:retrofit2.HttpException){
+            Log.d("aaaa",e.toString())
             return null
         }
     }

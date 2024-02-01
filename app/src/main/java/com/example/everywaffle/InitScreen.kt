@@ -218,13 +218,7 @@ fun InitScreen(
                             signinfail=true
                         }
                         else{
-                            val result2 = mainViewModel.getUserInfo()
-                            if(result2==null){ // 입력된 사용자 정보가 없는 경우
-                                onNavigateToDetail()
-                            }
-                            else {
-                                onNavigateToHome()
-                            }
+                            onNavigateToHome()
                         }
                     }
                 },
