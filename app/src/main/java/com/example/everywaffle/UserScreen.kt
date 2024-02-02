@@ -76,11 +76,11 @@ fun UserScreen(
 ) {
     val mainViewModel = hiltViewModel<MainViewModel>()
     var towithdraw by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     var showAlert by remember{mutableStateOf(false)}
     val onFeaturedNotAvailable={showAlert=true}
 
-    val context = LocalContext.current
     LaunchedEffect(Unit){
         accountOptions[0] = Pair("아이디",MyApplication.prefs.getString("id"))
     }

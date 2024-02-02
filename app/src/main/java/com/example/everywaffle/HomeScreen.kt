@@ -181,24 +181,26 @@ fun HomeScreen(
 
 @Composable
 fun LowBar(navController: NavHostController, key:Int){
-
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.SpaceAround
+        horizontalArrangement = Arrangement.SpaceAround,
     ) {
 
         if (key==1) {
             IconButtonWithText(
                 imageVector = painterResource(id = R.drawable.home_selected),
+                iconWidth = 50.dp,
+                iconHeight = 50.dp,
                 onclick = { navController.navigate("Home") }
             )
         }
         else{
             IconButtonWithText(
                 imageVector = painterResource(id = R.drawable.home),
+                iconWidth = 50.dp,
+                iconHeight = 500.dp,
                 onclick = { navController.navigate("Home") }
             )
         }
@@ -206,6 +208,8 @@ fun LowBar(navController: NavHostController, key:Int){
         if (key==3){
             IconButtonWithText(
                 imageVector = painterResource(id =R.drawable.vote_selected),
+                iconWidth = 50.dp,
+                iconHeight = 50.dp,
                 onclick = {navController.navigate("Board/VOTE_BOARD")}
             )
         }
@@ -213,6 +217,8 @@ fun LowBar(navController: NavHostController, key:Int){
         else{
             IconButtonWithText(
                 imageVector = painterResource(id =R.drawable.vote),
+                iconWidth = 50.dp,
+                iconHeight = 50.dp,
                 onclick = {navController.navigate("Board/VOTE_BOARD")}
             )
         }
@@ -220,12 +226,16 @@ fun LowBar(navController: NavHostController, key:Int){
         if (key==4){
             IconButtonWithText(
                 imageVector = painterResource(id =R.drawable.chat_selected),
+                iconWidth = 50.dp,
+                iconHeight = 50.dp,
                 onclick = {navController.navigate("Chat")}
             )
         }
         else{
             IconButtonWithText(
                 imageVector = painterResource(id =R.drawable.chat),
+                iconWidth = 50.dp,
+                iconHeight = 50.dp,
                 onclick = {navController.navigate("Chat")}
             )
         }
@@ -233,12 +243,16 @@ fun LowBar(navController: NavHostController, key:Int){
         if (key==5){
             IconButtonWithText(
                 imageVector = painterResource(id =R.drawable.user_selected),
+                iconWidth = 50.dp,
+                iconHeight = 50.dp,
                 onclick = {navController.navigate("User")}
             )
         }
         else{
             IconButtonWithText(
                 imageVector = painterResource(id =R.drawable.user),
+                iconWidth = 50.dp,
+                iconHeight = 50.dp,
                 onclick = {navController.navigate("User")}
             )
         }
@@ -322,8 +336,22 @@ fun BoardList(navController: NavHostController, recent:Map<String,String>, trend
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 16.dp)
         )
-        trend.forEach {
-          PopularPost(navController, it)
+
+
+        Card(
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            shape = RoundedCornerShape(20.dp)
+        ) {
+            Column(modifier = Modifier.padding(8.dp)) {
+                trend.forEach {
+                    PopularPost(navController, it)
+                    Spacer(modifier = Modifier.height(8.dp)) 
+                }
+            }
         }
     }
 }
@@ -460,10 +488,10 @@ fun PostPreview(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(painter = painterResource(id = R.drawable.likeicon), contentDescription = "Like", Modifier.size(20.dp),tint=Color(0xFFF91F15))
+                Icon(painter = painterResource(id = R.drawable.likeicon), contentDescription = "Like", Modifier.size(15.dp),tint=Color(0xFFF91F15))
                 Text(text = "${post.likes}", modifier = Modifier.padding(start = 4.dp),color=Color(0xFFF91F15))
                 Spacer(modifier = Modifier.height(4.dp))
-                Icon(painter = painterResource(id = R.drawable.replyicon), contentDescription = "Comment", Modifier.size(20.dp),tint = Color(0xFF05BCBC))
+                Icon(painter = painterResource(id = R.drawable.replyicon), contentDescription = "Comment", Modifier.size(15.dp),tint = Color(0xFF05BCBC))
                 Text(text = "${post.comments}", modifier = Modifier.padding(start = 4.dp),color=Color(0xFF05BCBC))
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(timetoprint(post.createdAt), fontSize = 12.sp, color = Color.Gray)

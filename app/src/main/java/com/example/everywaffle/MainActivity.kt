@@ -271,7 +271,8 @@ fun MakeAlertDialog(
 fun IconButtonWithText(
     imageVector: Painter,
     text:String = "",
-    size: Dp = 48.dp,
+    iconWidth:Dp=50.dp,
+    iconHeight:Dp=50.dp,
     onclick : () -> Unit = {}
 ){
     Column(
@@ -279,7 +280,8 @@ fun IconButtonWithText(
     ){
         IconButton(onClick = onclick) {
             Icon(painter = imageVector, contentDescription = "",
-                modifier = Modifier.size(size),
+                modifier = Modifier
+                    .size(iconWidth, iconHeight),
                 tint = Color.Unspecified)
         }
         Text(

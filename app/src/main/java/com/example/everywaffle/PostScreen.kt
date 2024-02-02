@@ -715,22 +715,22 @@ fun PostView(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(top = 15.dp)
         ) {
-            Icon(painter = painterResource(id = R.drawable.likeicon), contentDescription = "Like", Modifier.size(15.dp),tint=Color(0xFFF91F15))
+            Icon(painter = painterResource(id = R.drawable.likeicon), contentDescription = "Like", Modifier.size(12.dp),tint=Color(0xFFF91F15))
             Text(text = "${post.likes}", modifier = Modifier.padding(start = 4.dp),color=Color(0xFFF91F15))
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            Icon(painter = painterResource(id = R.drawable.replyicon), contentDescription = "Comment", Modifier.size(15.dp),tint = Color(0xFF05BCBC))
+            Icon(painter = painterResource(id = R.drawable.replyicon), contentDescription = "Comment", Modifier.size(12.dp),tint = Color(0xFF05BCBC))
             Text(text = "${post.comments}", modifier = Modifier.padding(start = 4.dp),color=Color(0xFF05BCBC))
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            Icon(painter = painterResource(id = R.drawable.staricon), contentDescription = "Scrap", Modifier.size(15.dp),tint = Color(0xFFFFD330))
+            Icon(painter = painterResource(id = R.drawable.staricon), contentDescription = "Scrap", Modifier.size(12.dp),tint = Color(0xFFFFD330))
             Text(text = "${post.scraps}", modifier = Modifier.padding(start = 4.dp),color=Color(0xFFFFD330))
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            Icon(painter = painterResource(id = R.drawable.voteborder), contentDescription = "MakeVote", Modifier.size(15.dp),tint = Color(0xFF6C59E4))
+            Icon(painter = painterResource(id = R.drawable.voteborder), contentDescription = "MakeVote", Modifier.size(12.dp),tint = Color(0xFF6C59E4))
             Text(text = "${post.makeVoteCnt}", modifier = Modifier.padding(start = 4.dp),color=Color(0xFF6C59E4))
         }
     }
