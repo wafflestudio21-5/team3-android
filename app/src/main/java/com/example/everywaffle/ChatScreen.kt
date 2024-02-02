@@ -2,6 +2,7 @@ package com.example.everywaffle
 
 import android.app.Activity
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -68,6 +69,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -76,7 +78,10 @@ fun ChatScreen(navController: NavHostController) {
     val mainViewModel = hiltViewModel<MainViewModel>()
     var isBoatSelected by remember { mutableStateOf(true) }
     val sessions = remember { mutableStateListOf<SessionDetail>() }
+
     val activity = (LocalContext.current as? Activity)
+    val context = LocalContext.current
+    var backpressed = false
 
     LaunchedEffect(Unit){
         sessions.clear()
@@ -87,7 +92,17 @@ fun ChatScreen(navController: NavHostController) {
     }
 
     BackHandler {
-        activity?.finish()
+        if(backpressed) {
+            activity?.finish()
+        }
+        else{
+            Toast.makeText(context, "한 번 더 뒤로가기를 눌러 앱을 종료하세요.", Toast.LENGTH_SHORT).show()
+            CoroutineScope(Dispatchers.Main).launch {
+                backpressed=true
+                delay(1000)
+                backpressed=false
+            }
+        }
     }
 
     Surface(modifier = Modifier

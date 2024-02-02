@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -130,6 +131,87 @@ fun VoteDialog(
                         .wrapContentHeight(align = Alignment.CenterVertically),
                     color = if(chosen==0) Color(0xFFBBBBBB) else Color.White
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun WithdrawDialog(
+    ondismiss : () -> Unit = {},
+    onagree : () -> Unit
+){
+    var chosen by remember { mutableStateOf(0) }
+
+    Dialog(onDismissRequest = ondismiss) {
+        Surface(
+            modifier = Modifier
+                .height(145.dp)
+                .width(280.dp)
+                .clip(shape = RoundedCornerShape(13.dp))
+                .background(Color.White)
+                .border(width = 2.dp, color = Color.LightGray, shape = RoundedCornerShape(13.dp))
+        ){
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(20.dp)
+            ){
+                Text(
+                    text = "회원 탈퇴",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "정말로 탈퇴하시겠습니까?",
+                    fontSize = 13.sp,
+                    color = Color.Black
+                )
+
+                Spacer(modifier = Modifier.height(15.dp))
+
+                Row {
+                    Text(
+                        text = "네",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .height(34.dp)
+                            .weight(1f)
+                            .clip(shape = RoundedCornerShape(3.dp))
+                            .background(
+                                color = Color(0xFFF91F15)
+                            )
+                            .clickable {
+                                onagree()
+                            }
+                            .wrapContentHeight(align = Alignment.CenterVertically),
+                        color = Color.White
+                    )
+                    Spacer(modifier=Modifier.width(20.dp))
+                    Text(
+                        text = "아니오",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .height(34.dp)
+                            .weight(1f)
+                            .clip(shape = RoundedCornerShape(3.dp))
+                            .background(
+                                color = Color(0xFFF2F2F2)
+                            )
+                            .clickable {
+                                ondismiss()
+                            }
+                            .wrapContentHeight(align = Alignment.CenterVertically),
+                        color = Color(0xFFBBBBBB)
+                    )
+                }
             }
         }
     }

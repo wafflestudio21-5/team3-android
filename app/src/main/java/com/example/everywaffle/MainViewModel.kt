@@ -378,4 +378,15 @@ class MainViewModel @Inject constructor(
             null
         }
     }
+
+    suspend fun withdraw():Int?{
+        return try{
+            val response = api.withdraw(password = Password(MyApplication.prefs.getString("password")))
+            Log.d("aaaa",response.toString())
+            1
+        }
+        catch (e:retrofit2.HttpException){
+            null
+        }
+    }
 }

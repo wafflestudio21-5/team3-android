@@ -379,7 +379,7 @@ val usageOptions = listOf(
 
 val otherOptions = listOf(
     "정보 동의 설정" to "",
-    "회원 탈퇴" to "",
+    "회원 탈퇴" to 6,
     "로그아웃" to 1
 )
 

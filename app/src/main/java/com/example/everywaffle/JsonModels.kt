@@ -199,3 +199,8 @@ data class SendMessage(
     @Json(name = "senderId") val senderId:Int,
     @Json(name = "content") val content:String
 )
+
+@JsonClass(generateAdapter = true)
+data class Password(
+    @Json(name = "password") val password:String
+)

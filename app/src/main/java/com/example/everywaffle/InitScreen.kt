@@ -72,6 +72,7 @@ import com.kakao.sdk.common.util.Utility
 import com.kakao.sdk.user.UserApiClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -107,6 +108,7 @@ fun InitScreen(
 
     val context = LocalContext.current
     val activity = (LocalContext.current as? Activity)
+    var backpressed = false
 
     var isLoggingIn by remember { mutableStateOf(false) }
     var loginSuccess by remember { mutableStateOf(false) }
@@ -121,7 +123,17 @@ fun InitScreen(
     }
 
     BackHandler {
-        activity?.finish()
+        if(backpressed) {
+            activity?.finish()
+        }
+        else{
+            Toast.makeText(context, "한 번 더 뒤로가기를 눌러 앱을 종료하세요.", Toast.LENGTH_SHORT).show()
+            CoroutineScope(Dispatchers.Main).launch {
+                backpressed=true
+                delay(1000)
+                backpressed=false
+            }
+        }
     }
 
     Surface(

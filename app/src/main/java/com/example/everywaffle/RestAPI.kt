@@ -225,4 +225,10 @@ interface RestAPI {
         @Header("Authorization") token:String="Bearer "+MyApplication.prefs.getString("token"),
         @Body() users:UserId2
     ):Int
+
+    @POST("/api/withdrawal")
+    suspend fun withdraw(
+        @Header("Authorization") token:String="Bearer "+MyApplication.prefs.getString("token"),
+        @Body() password:Password
+    ):Response<Unit>
 }

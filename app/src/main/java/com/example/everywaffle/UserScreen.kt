@@ -74,6 +74,9 @@ fun UserScreen(
     onNavigateToHome: () -> Unit = {},
     navController: NavHostController
 ) {
+    val mainViewModel = hiltViewModel<MainViewModel>()
+    var towithdraw by remember { mutableStateOf(false) }
+
     LaunchedEffect(Unit){
         accountOptions[0] = Pair("아이디",MyApplication.prefs.getString("id"))
     }
@@ -94,7 +97,8 @@ fun UserScreen(
                     {navController.navigate("ChangeEmail")},
                     {navController.navigate("Board/myposts")},
                     {navController.navigate("Board/mycommented")},
-                    {navController.navigate("Board/myscrapped")}
+                    {navController.navigate("Board/myscrapped")},
+                    {towithdraw = true}
                 )
 
                 Header(onNavigateToHome)
@@ -112,6 +116,19 @@ fun UserScreen(
                 UserOptionsSection("기타", otherOptions, onclicklist)
             }
         }
+        if(towithdraw) WithdrawDialog(
+            ondismiss = {towithdraw = false},
+            onagree = {
+                CoroutineScope(Dispatchers.Main).launch {
+                    val result = mainViewModel.withdraw()
+                    if(result==null) {} //TODO:
+                    else{
+                        MyApplication.prefs.reset()
+                        navController.navigate("Init")
+                    }
+                }
+            }
+        )
     }
 }
 
