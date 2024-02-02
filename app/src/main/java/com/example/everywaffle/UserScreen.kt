@@ -1,9 +1,7 @@
 package com.example.everywaffle
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,13 +21,15 @@ import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.sharp.ArrowBack
 import androidx.compose.material.icons.sharp.SmsFailed
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -47,7 +47,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -55,14 +54,12 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.google.gson.internal.bind.ArrayTypeAdapter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -76,6 +73,8 @@ fun UserScreen(
 ) {
     val mainViewModel = hiltViewModel<MainViewModel>()
     var towithdraw by remember { mutableStateOf(false) }
+    var showAlert by remember{mutableStateOf(false)}
+    val onFeaturedNotAvailable={showAlert=true}
 
     LaunchedEffect(Unit){
         accountOptions[0] = Pair("아이디",MyApplication.prefs.getString("id"))
@@ -108,12 +107,12 @@ fun UserScreen(
                     department = MyApplication.prefs.getString("department"),
                     studentId = MyApplication.prefs.getString("studentid")
                 )
-                UserOptionsSection("계정", accountOptions, onclicklist)
-                UserOptionsSection("게시글", postOptions, onclicklist)
-                UserOptionsSection("커뮤니티", communityOptions, onclicklist)
-                UserOptionsSection("앱 설정", appSettingsOptions, onclicklist)
-                UserOptionsSection("이용 안내", usageOptions, onclicklist)
-                UserOptionsSection("기타", otherOptions, onclicklist)
+                UserOptionsSection("계정", accountOptions, onclicklist,onFeaturedNotAvailable)
+                UserOptionsSection("게시글", postOptions, onclicklist,onFeaturedNotAvailable)
+                UserOptionsSection("커뮤니티", communityOptions, onclicklist,onFeaturedNotAvailable)
+                UserOptionsSection("앱 설정", appSettingsOptions, onclicklist,onFeaturedNotAvailable)
+                UserOptionsSection("이용 안내", usageOptions, onclicklist,onFeaturedNotAvailable)
+                UserOptionsSection("기타", otherOptions, onclicklist,onFeaturedNotAvailable)
             }
         }
         if(towithdraw) WithdrawDialog(
@@ -129,6 +128,10 @@ fun UserScreen(
                 }
             }
         )
+
+        if (showAlert) {
+            AlertFeatureNotAvailableDialog(onDismissRequest = { showAlert = false })
+        }
     }
 }
 
@@ -139,67 +142,74 @@ fun UserInfoSection(
     department: String,
     studentId: String
 ) {
-    Column {
+    Column( modifier = Modifier
+        .fillMaxWidth()
+        .padding(vertical = 8.dp, horizontal = 16.dp)
+        .background(
+            Color.White,
+            shape = RoundedCornerShape(12.dp)
+        )
+        .shadow(1.dp, shape = RoundedCornerShape(12.dp))) {
         Card(
             shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp)
                 .background(Color.White)
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
                     .background(color = Color.White),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.mypagename),
-                    tint=Color.Unspecified,
+                    tint = Color.Unspecified,
                     contentDescription = "User Icon",
-                    modifier = Modifier.size(48.dp)
+                    modifier = Modifier.size(30.dp)
                 )
-                Spacer(modifier = Modifier.width(16.dp))
+                Spacer(modifier = Modifier.width(4.dp))
                 Column {
                     Text(
-                        text = realname
+                        text = realname,
+                        fontSize = 15.sp
                     )
                     Text(
-                        text = "$department $studentId 학번"
+                        text = "$department $studentId 학번",
+                        fontSize = 15.sp
                     )
                 }
+
             }
         }
-
         Card(
             shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp)
                 .background(Color.White)
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
                     .background(color = Color.White),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.profile),
                     contentDescription = "Profile Icon",
-                    tint=Color.Unspecified,
-                    modifier = Modifier.size(48.dp)
+                    tint = Color.Unspecified,
+                    modifier = Modifier.size(30.dp)
                 )
-                Spacer(modifier = Modifier.width(16.dp))
+                Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = nickname
+                    text = nickname,
+                    fontSize = 15.sp
                 )
             }
         }
     }
 }
+
 
 @Composable
 fun UserInfoItem(label : String, value : String){
@@ -236,7 +246,7 @@ fun Header(onNavigateToHome: () -> Unit) {
 
 @Composable
 
-fun UserOptionsSection(title: String, options: List<Pair<String, Any>>, onclicklist:List<() -> Unit>) {
+fun UserOptionsSection(title: String, options: MutableList<Pair<String, Any?>>, onclicklist:List<() -> Unit>, onFeatureNotAvailable: () -> Unit) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -256,6 +266,9 @@ fun UserOptionsSection(title: String, options: List<Pair<String, Any>>, onclickl
                 modifier = Modifier.padding(bottom = 8.dp)
             )
             options.forEach { (buttonText, command) ->
+                if(command==null){
+                    OptionButton(buttonText = buttonText, onclick = onFeatureNotAvailable)
+                }
                 when (command){  // 여기서 option의 형태에 따라 다른 화면 구성
                     is String -> {
                         OptionRow(Text1 = buttonText, Text2 = command)
@@ -276,11 +289,26 @@ fun OptionButton(buttonText: String, onclick: () -> Unit ={}) {
         text = buttonText,
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onclick.invoke() }
+            .clickable(onClick = onclick)
             .padding(vertical = 8.dp, horizontal = 16.dp),
         color = Color.Black,
         fontSize = 12.sp,
         fontWeight = FontWeight.Medium
+    )
+}
+
+@Composable
+fun AlertFeatureNotAvailableDialog(onDismissRequest: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        confirmButton = {
+            Button(onClick = onDismissRequest) {
+                Text("확인")
+            }
+        },
+        text = {
+            Text("추후 개발 예정인 버튼입니다!")
+        }
     )
 }
 
@@ -603,126 +631,167 @@ fun PasswordChangeScreen(
     }
 }
 
-    @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
-    @Composable
-    fun EmailChangeScreen(
-        onNavigateToUser: () -> Unit
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@Composable
+fun EmailChangeScreen(
+    onNavigateToUser: () -> Unit
+) {
+    val mainViewModel = hiltViewModel<MainViewModel>()
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+    var newemail by remember { mutableStateOf("") }
+    var changedone by remember { mutableStateOf(false) }
+    val currentEmail = remember { mutableStateOf(MyApplication.prefs.getString("mail", "")) }
+
+    Surface(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = Color.White)
+            .padding(15.dp)
     ) {
-        val mainViewModel = hiltViewModel<MainViewModel>()
-        val focusManager = LocalFocusManager.current
-        val keyboardController = LocalSoftwareKeyboardController.current
-        var newemail by remember { mutableStateOf("") }
-        var changedone by remember { mutableStateOf(false) }
+        Column {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "이메일 변경",
+                    color = Color.Black,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
 
-        Surface(
-            modifier = Modifier
-                .background(color = Color.White)
-                .fillMaxSize()
-                .padding(15.dp)
-        ) {
-            Column {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "이메일 변경",
-                        color = Color.Black,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
                     )
 
-                    IconButton(
-                        onClick = onNavigateToUser
-                    ) {
-                        Icon(imageVector = Icons.Outlined.Cancel, contentDescription = "")
+                IconButton(
+                    onClick = onNavigateToUser
+                ) {
+                    Icon(imageVector = Icons.Outlined.Cancel, contentDescription = "")
+                }
+            }
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 18.dp)
+            ) {
+                Text(
+                    text = "이메일",
+                    color = Color.Black,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+
+            TextField(
+                value = currentEmail.value,
+                onValueChange = { currentEmail.value = it },
+                modifier = Modifier
+                    .padding(horizontal = 15.dp, vertical = 3.dp)
+                    .fillMaxWidth()
+                    .height(50.dp),
+                shape = RoundedCornerShape(15.dp),
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+                keyboardActions = KeyboardActions(
+                    onNext = {
+                        focusManager.moveFocus(FocusDirection.Next)
                     }
-                }
-
-                TextField(
-                    value = MyApplication.prefs.getString("mail"),
-                    onValueChange = {},
-                    placeholder = {},
-                    modifier = Modifier
-                        .padding(horizontal = 15.dp, vertical = 3.dp)
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    shape = RoundedCornerShape(15.dp),
-                    colors = TextFieldDefaults.textFieldColors(
-                        containerColor = Color(0x10000000),
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        disabledIndicatorColor = Color.Transparent,
-                        placeholderColor = Color.Gray
-                    )
+                ),
+                colors = TextFieldDefaults.textFieldColors(
+                    containerColor = Color(0x10000000),
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
+                    placeholderColor = Color.Gray
                 )
+            )
 
-                TextField(
-                    value = newemail,
-                    onValueChange = { newemail = it },
-                    placeholder = { Text(text = "새 메일", fontSize = 15.sp) },
-                    modifier = Modifier
-                        .padding(horizontal = 15.dp, vertical = 3.dp)
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    shape = RoundedCornerShape(15.dp),
-                    keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Done,
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            keyboardController?.hide()
-                            focusManager.clearFocus()
-                        }
-                    ),
-                    colors = TextFieldDefaults.textFieldColors(
-                        containerColor = Color(0x10000000),
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        disabledIndicatorColor = Color.Transparent,
-                        placeholderColor = Color.Gray
-                    )
+            Spacer(modifier = Modifier.height(30.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 18.dp)
+            ) {
+                Text(
+                    text = "새 이메일",
+                    color = Color.Black,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold
                 )
+            }
 
-                Button(
-                    onClick = {
-                        focusManager.clearFocus()
+            TextField(
+                value = newemail,
+                onValueChange = { newemail = it },
+                placeholder = { Text(text = "새 이메일", fontSize = 15.sp) },
+                modifier = Modifier
+                    .padding(horizontal = 15.dp, vertical = 3.dp)
+                    .fillMaxWidth()
+                    .height(50.dp),
+                shape = RoundedCornerShape(15.dp),
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Done,
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
                         keyboardController?.hide()
-                        CoroutineScope(Dispatchers.Main).launch {
-                            val result = mainViewModel.changemail(newmail = newemail)
-                            if (result != null) {
-                                changedone = true
-                            }
-                        }
-                    },
-                    colors = ButtonDefaults.buttonColors(Color(0xF0FF0000)),
-                    shape = RectangleShape,
-                    modifier = Modifier
-                        .padding(horizontal = 15.dp, vertical = 3.dp)
-                        .fillMaxWidth()
-                        .height(50.dp)
-                ) {
-                    Text(
-                        text = "메일 변경",
-                        color = Color.White,
-                        fontSize = 15.sp
-                    )
-                }
+                        focusManager.clearFocus()
+                    }
+                ),
+                colors = TextFieldDefaults.textFieldColors(
+                    containerColor = Color(0x10000000),
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
+                    placeholderColor = Color.Gray
+                )
+            )
 
-                if (changedone) {
-                    MakeAlertDialog(
-                        onConfirmation = {
-                            onNavigateToUser()
-                            changedone = false
-                        },
-                        icon = Icons.Outlined.Check,
-                        title = "메일 변경 성공",
-                        content = "메일이 변경되었습니다.",
-                        confirmtext = "확인"
-                    )
-                }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Submit button
+            Button(
+                onClick = {
+                    focusManager.clearFocus()
+                    keyboardController?.hide()
+                    CoroutineScope(Dispatchers.Main).launch {
+                        val result = mainViewModel.changemail(newmail = newemail)
+                        if (result != null) {
+                            changedone = true
+                        }
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(Color(0xF0FF0000)),
+                shape = RoundedCornerShape(15.dp),
+                modifier = Modifier
+                    .padding(horizontal = 15.dp, vertical = 3.dp)
+                    .fillMaxWidth()
+                    .height(50.dp)
+            ) {
+                Text(
+                    text = "이메일 변경",
+                    color = Color.White,
+                    fontSize = 15.sp
+                )
+            }
+
+            // Alert Dialog
+            if (changedone) {
+                MakeAlertDialog(
+                    onConfirmation = {
+                        onNavigateToUser()
+                        changedone = false
+                    },
+                    icon = Icons.Outlined.Check,
+                    title = "메일 변경 성공",
+                    content = "메일이 변경되었습니다.",
+                    confirmtext = "확인"
+                )
             }
         }
     }
+}

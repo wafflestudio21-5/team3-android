@@ -336,49 +336,49 @@ fun IconButtonWithText(
 // option에서 두번째 요소가 Int이면 그 숫자에 해당하는 함수 호출
 // 함수 목록은 UserScreen.kt의 UserScreen 함수에서 onclicklist에 있고, 이를 UserOptionsSection 함수에서 감지 및 실행
 
-var accountOptions:MutableList<Pair<String,Any>> = mutableListOf(
-    Pair("아이디" , ""),
-    "실명 프로필 사진 변경" to "",
-    "학교 인증" to "",
-    "학과 설정" to "",
-    "학적 처리 내역" to "",
+var accountOptions: MutableList<Pair<String, Any?>> = mutableListOf(
+    Pair("아이디" , null),
+    "실명 프로필 사진 변경" to null ,
+    "학교 인증" to null,
+    "학과 설정" to null,
+    "학적 처리 내역" to null,
     "비밀번호 변경" to 0, //
     "이메일 변경" to 2
 )
 
-val postOptions = listOf(
+val postOptions: MutableList<Pair<String, Any?>> = mutableListOf(
     "내가 쓴 글" to 3,
     "댓글 단 글" to 4,
     "스크랩" to 5
 )
 
-val communityOptions = listOf(
-    "닉네임 설정" to "",
-    "게시판 프로필 사진 변경" to "",
-    "이용 제한 내역" to "",
-    "쪽지 설정" to "",
-    "커뮤니티 이용규칙" to ""
+val communityOptions: MutableList<Pair<String, Any?>> = mutableListOf(
+    "닉네임 설정" to null,
+    "게시판 프로필 사진 변경" to null,
+    "이용 제한 내역" to null,
+    "쪽지 설정" to null,
+    "커뮤니티 이용규칙" to null
 )
 
-val appSettingsOptions = listOf(
-    "다크 모드" to "",
-    "알림 설정" to "",
-    "암호 잠금" to "",
-    "캐시 삭제" to ""
+val appSettingsOptions: MutableList<Pair<String, Any?>> = mutableListOf(
+    "다크 모드" to null,
+    "알림 설정" to null,
+    "암호 잠금" to null,
+    "캐시 삭제" to null
 )
 
-val usageOptions = listOf(
-    "앱 버전" to "",
-    "문의하기" to "",
-    "공지사항" to "",
-    "서비스 이용약관" to "",
-    "개인정보 처리방침" to "",
-    "청소년 보호정책" to "",
-    "오픈소스 라이선스" to ""
+val usageOptions : MutableList<Pair<String, Any?>> = mutableListOf(
+    "앱 버전" to null,
+    "문의하기" to null,
+    "공지사항" to null,
+    "서비스 이용약관" to null,
+    "개인정보 처리방침" to null,
+    "청소년 보호정책" to null,
+    "오픈소스 라이선스" to null
 )
 
-val otherOptions = listOf(
-    "정보 동의 설정" to "",
+val otherOptions : MutableList<Pair<String, Any?>> = mutableListOf(
+    "정보 동의 설정" to null,
     "회원 탈퇴" to 6,
     "로그아웃" to 1
 )
