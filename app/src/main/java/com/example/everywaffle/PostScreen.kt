@@ -3,6 +3,7 @@ package com.example.everywaffle
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
@@ -132,6 +133,11 @@ fun PostScreen(postid:Int?, navController: NavHostController){
         comments.addAll(mainViewModel.getcomments(post.postId)!!)
     }
 
+    BackHandler {
+        if(parentcommentid==0) navController.popBackStack()
+        else parentcommentid=0
+    }
+
     Surface(
         modifier = Modifier
             .background(color = Color.White)
@@ -182,7 +188,13 @@ fun PostScreen(postid:Int?, navController: NavHostController){
                                     CoroutineScope(Dispatchers.Main).launch {
                                         val result = mainViewModel.postlike(postid = postid!!)
                                         if (result == null) {
-                                            Toast.makeText(context, "이미 공감한 글입니다.",Toast.LENGTH_SHORT).show()
+                                            Toast
+                                                .makeText(
+                                                    context,
+                                                    "이미 공감한 글입니다.",
+                                                    Toast.LENGTH_SHORT
+                                                )
+                                                .show()
                                         } else {
                                             post = post.copy(likes = post.likes + 1)
                                         }
@@ -220,7 +232,13 @@ fun PostScreen(postid:Int?, navController: NavHostController){
                                     CoroutineScope(Dispatchers.Main).launch {
                                         val result = mainViewModel.postscrap(postid = postid!!)
                                         if (result == null) {
-                                            Toast.makeText(context, "이미 스크랩한 글입니다.",Toast.LENGTH_SHORT).show()
+                                            Toast
+                                                .makeText(
+                                                    context,
+                                                    "이미 스크랩한 글입니다.",
+                                                    Toast.LENGTH_SHORT
+                                                )
+                                                .show()
                                         } else {
                                             post = post.copy(scraps = post.scraps + 1)
                                         }
@@ -260,7 +278,13 @@ fun PostScreen(postid:Int?, navController: NavHostController){
                                             val result =
                                                 mainViewModel.postmakevote(postid = postid!!)
                                             if (result == null) {
-                                                Toast.makeText(context, "이미 투표 글로 선택한 글입니다.",Toast.LENGTH_SHORT).show()
+                                                Toast
+                                                    .makeText(
+                                                        context,
+                                                        "이미 투표 글로 선택한 글입니다.",
+                                                        Toast.LENGTH_SHORT
+                                                    )
+                                                    .show()
                                             } else {
                                                 post =
                                                     post.copy(makeVoteCnt = post.makeVoteCnt + 1) // TODO:
@@ -345,7 +369,8 @@ fun PostScreen(postid:Int?, navController: NavHostController){
                             ) {
                                 if (expanded) {
                                     Row(
-                                        modifier = Modifier.fillMaxWidth()
+                                        modifier = Modifier
+                                            .fillMaxWidth()
                                             .padding(end = 10.dp, bottom = 10.dp),
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                         verticalAlignment = Alignment.CenterVertically
@@ -356,7 +381,9 @@ fun PostScreen(postid:Int?, navController: NavHostController){
                                             fontSize = 12.sp,
                                             color = Color(0xFF616161)
                                         )
-                                        IconButton(onClick = { expanded = !expanded }, modifier = Modifier.width(15.dp).height(15.dp)) {
+                                        IconButton(onClick = { expanded = !expanded }, modifier = Modifier
+                                            .width(15.dp)
+                                            .height(15.dp)) {
                                             Icon(
                                                 painter = if (expanded) painterResource(id = R.drawable.showless) else painterResource(
                                                     id = R.drawable.showmore
@@ -463,7 +490,8 @@ fun PostScreen(postid:Int?, navController: NavHostController){
                                 }
                                 else{
                                     Row(
-                                        modifier = Modifier.fillMaxWidth()
+                                        modifier = Modifier
+                                            .fillMaxWidth()
                                             .padding(end = 10.dp, bottom = 10.dp),
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                         verticalAlignment = Alignment.CenterVertically
@@ -474,7 +502,9 @@ fun PostScreen(postid:Int?, navController: NavHostController){
                                             fontSize = 12.sp,
                                             color = Color(0xFF616161)
                                         )
-                                        IconButton(onClick = { expanded = !expanded }, modifier = Modifier.width(15.dp).height(15.dp)) {
+                                        IconButton(onClick = { expanded = !expanded }, modifier = Modifier
+                                            .width(15.dp)
+                                            .height(15.dp)) {
                                             Icon(
                                                 painter = if (expanded) painterResource(id = R.drawable.showless) else painterResource(
                                                     id = R.drawable.showmore
@@ -527,7 +557,7 @@ fun PostScreen(postid:Int?, navController: NavHostController){
                                 CoroutineScope(Dispatchers.Main).launch {
                                     val result = mainViewModel.deletecomment(it.parentcommentid)
                                     if(result==null){
-                                        // TODO:
+                                        Toast.makeText(context,"댓글 삭제에 실패했습니다. 잠시 후 다시 시도해 주세요.",Toast.LENGTH_SHORT).show()
                                     }
                                     else{
                                         if(MainViewModel._postchanged.value) MainViewModel._postchanged.emit(false)
@@ -536,7 +566,8 @@ fun PostScreen(postid:Int?, navController: NavHostController){
                                 }
                             },
                             navController,
-                            post.userId
+                            post.userId,
+                            if(parentcommentid==it.parentcommentid) Color.Black else Color.Gray
                         )
                     }
                     item{Divider()}
@@ -590,7 +621,9 @@ fun PostScreen(postid:Int?, navController: NavHostController){
                 onClick = {
                     CoroutineScope(Dispatchers.Main).launch {
                         val result = mainViewModel.makesession(post.userId)
-                        if(result==null) {} // TODO:
+                        if(result==null) {
+                            Toast.makeText(context,"쪽지 세션 생성에 실패했습니다. 잠시 후 다시 시도해 주세요.",Toast.LENGTH_SHORT).show()
+                        }
                         else{
                             navController.navigate("SendScreen/${result}/${MyApplication.prefs.getString("userid").toInt()}"){
                                 popUpTo("Post/${postid}")
@@ -608,7 +641,7 @@ fun PostScreen(postid:Int?, navController: NavHostController){
                     CoroutineScope(Dispatchers.Main).launch {
                         val result = mainViewModel.postvote(postid = postid!!, vote = "AGREE")
                         if (result == null) {
-                            // TODO :
+                            Toast.makeText(context,"서버에 투표를 올리는데 실패했습니다. 잠시 후 다시 시도해 주세요.",Toast.LENGTH_SHORT).show()
                         }
                         else{
                             if(MainViewModel._postchanged.value) MainViewModel._postchanged.emit(false)
@@ -620,7 +653,7 @@ fun PostScreen(postid:Int?, navController: NavHostController){
                     CoroutineScope(Dispatchers.Main).launch {
                         val result = mainViewModel.postvote(postid = postid!!, vote = "DISAGREE")
                         if (result == null) {
-                            // TODO :
+                            Toast.makeText(context,"서버에 투표를 올리는데 실패했습니다. 잠시 후 다시 시도해 주세요.",Toast.LENGTH_SHORT).show()
                         }
                         else{
                             if(MainViewModel._postchanged.value) MainViewModel._postchanged.emit(false)
@@ -712,6 +745,7 @@ fun ParentCommentView(
     onclickdelete : () -> Unit = {},
     navController: NavHostController,
     posteduserid:Int,
+    commentcolor:Color
 ){
 
     var dropmenuexpanded by remember { mutableStateOf(false) }
@@ -757,7 +791,7 @@ fun ParentCommentView(
                             }
                             .padding(horizontal = 10.dp, vertical = 4.dp)
                             .size(14.dp),
-                    tint = Color.Gray
+                    tint = commentcolor
                 )
                 Divider(modifier = Modifier
                     .height(22.dp)
@@ -821,7 +855,9 @@ fun ParentCommentView(
                         onClick = {
                             CoroutineScope(Dispatchers.Main).launch {
                                 val result = mainViewModel.makesession(comment.userId)
-                                if(result==null) {} // TODO:
+                                if(result==null) {
+                                    Toast.makeText(context,"쪽지 세션 생성에 실패했습니다. 잠시 후 다시 시도해 주세요.",Toast.LENGTH_SHORT).show()
+                                }
                                 else{
                                     navController.navigate("SendScreen/${result}/${MyApplication.prefs.getString("userid").toInt()}"){
                                         popUpTo("Post/${comment.postId}")
@@ -882,7 +918,7 @@ fun ParentCommentView(
                         CoroutineScope(Dispatchers.Main).launch {
                             val result = mainViewModel.deletecomment(it.childcommentid)
                             if(result==null){
-                                // TODO:
+                                Toast.makeText(context,"댓글 삭제에 실패했습니다. 잠시 후 다시 시도해 주세요.",Toast.LENGTH_SHORT).show()
                             }
                             else{
                                 if(MainViewModel._postchanged.value) MainViewModel._postchanged.emit(false)
@@ -908,6 +944,7 @@ fun ChildCommentView(onclicklike: () -> Unit = {},
     var dropmenuexpanded by remember { mutableStateOf(false) }
     var dropmenuexpanded2 by remember { mutableStateOf(false) }
     val mainViewModel = hiltViewModel<MainViewModel>()
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -995,7 +1032,9 @@ fun ChildCommentView(onclicklike: () -> Unit = {},
                         onClick = {
                             CoroutineScope(Dispatchers.Main).launch {
                                 val result = mainViewModel.makesession(comment.userId)
-                                if(result==null) {} // TODO:
+                                if(result==null) {
+                                    Toast.makeText(context,"쪽지 세션 생성에 실패했습니다. 잠시 후 다시 시도해 주세요.",Toast.LENGTH_SHORT).show()
+                                }
                                 else{
                                     navController.navigate("SendScreen/${result}/${MyApplication.prefs.getString("userid").toInt()}"){
                                         popUpTo("Post/${comment.postId}")
@@ -1170,7 +1209,7 @@ fun BottomTextField(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = "댓글을 입력하세요.",
+                        text = if(parentcommentid==0) "댓글을 입력하세요." else "답글을 입력하세요.",
                         fontSize = 10.sp,
                         color = Color.LightGray,
                     )

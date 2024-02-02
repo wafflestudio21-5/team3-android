@@ -274,9 +274,7 @@ fun SignupScreen(
                             CoroutineScope(Dispatchers.Main).launch {
                                 val result = mainViewModel.signup(signupid, signuppw, signupemail)
                                 if (result != null) {
-                                    //mainViewModel.updateUserInfo(realname,nickname,department,studentId)
                                     signupdone = true
-                                    //onNavigateToDetail()
                                 } else {
                                     signupfail = true
                                 }
