@@ -318,7 +318,7 @@ class MainViewModel @Inject constructor(
             api.postmakevote(postId = postid, userid = UserId(MyApplication.prefs.getString("userid").toInt()))
         }
         catch (e:retrofit2.HttpException){
-            return null
+            null
         }
     }
 
@@ -334,9 +334,47 @@ class MainViewModel @Inject constructor(
         }
         catch (e:retrofit2.HttpException){
             Log.d("aaaa",e.toString())
-            return null
+            null
         }
     }
 
+    suspend fun getsessions():List<SessionDetail>?{
+        return try{
+            api.getsessions(userId = MyApplication.prefs.getString("userid").toInt())
+        }
+        catch (e:retrofit2.HttpException){
+            null
+        }
+    }
 
+    suspend fun getmessages(sessionid:Int):List<MessageDetail>?{
+        return try{
+            api.getmessages(sessionId = sessionid)
+        }
+        catch (e:retrofit2.HttpException){
+            null
+        }
+    }
+
+    suspend fun sendmessage(messagebody:SendMessage):MessageDetail?{
+        return try{
+            if (messagebody.sessionId==0) api.sendmessagerandom(messagebody = messagebody)
+            else api.sendmessage(messagebody = messagebody)
+        }
+        catch (e:retrofit2.HttpException){
+            null
+        }
+    }
+
+    suspend fun makesession(tosendid:Int):Int?{
+        return try{
+            api.makesession(users = UserId2(
+                user1Id = MyApplication.prefs.getString("userid").toInt(),
+                user2Id = tosendid
+            ))
+        }
+        catch (e:retrofit2.HttpException){
+            null
+        }
+    }
 }

@@ -112,7 +112,7 @@ fun InitScreen(
 
     // 토큰에 로그인 정보가 있는 경우, 앱 시작시 홈 화면으로 바로 이동
     LaunchedEffect(Unit) {
-        if (MyApplication.prefs.getString("token") != "-1") {
+        if (MyApplication.prefs.getString("id") != "-1") {
             onNavigateToHome()
         }
     }

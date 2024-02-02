@@ -124,8 +124,35 @@ fun MyAppNavHost(
         composable("Chat"){
             ChatScreen(navController = navController)
         }
-        composable("SendScreen"){
-            SendScreen(navController=navController)
+        composable(
+            route = "SendScreen/{session_id}/{sender_id}",
+            arguments = listOf(
+                navArgument("session_id"){
+                    type= NavType.IntType
+                },
+                navArgument("sender_id"){
+                    type= NavType.IntType
+                }
+            )
+        ){backstackEntry ->
+            SendScreen(
+                navController=navController,
+                sessionid = backstackEntry.arguments?.getInt("session_id"),
+                senderid = backstackEntry.arguments?.getInt("sender_id")
+            )
+        }
+        composable(
+            route = "Message/{session_id}",
+            arguments = listOf(
+                navArgument("session_id"){
+                    type= NavType.IntType
+                }
+            )
+        ){backstackEntry ->
+            MessageView(
+                sessionid = backstackEntry.arguments?.getInt("session_id"),
+                navController = navController
+            )
         }
         composable(
             route ="Search/{board_id}",
