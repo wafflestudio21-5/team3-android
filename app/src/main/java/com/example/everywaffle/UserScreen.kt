@@ -26,6 +26,8 @@ import androidx.compose.material.icons.sharp.SmsFailed
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -111,34 +113,40 @@ fun UserScreen(
 }
 
 @Composable
+
 fun UserInfoSection(
     realname: String,
     nickname: String,
     department: String,
     studentId: String
 ) {
-    Column {
+    Column (modifier = Modifier
+        .fillMaxWidth()
+        .background(Color.White)){
         Card(
-            shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp),
+            shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp),
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-                .background(Color.White)
+                .fillMaxSize()
+                .padding(8.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
-                    .background(color = Color.White),
+                    .background(
+                        Color.White,
+                        shape = RoundedCornerShape(12.dp)
+                    ),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                Spacer(modifier=Modifier.width(16.dp).height(14.dp))
                 Icon(
                     painter = painterResource(id = R.drawable.mypagename),
                     tint=Color.Unspecified,
                     contentDescription = "User Icon",
-                    modifier = Modifier.size(48.dp)
+                    modifier = Modifier.size(30.dp)
                 )
-                Spacer(modifier = Modifier.width(16.dp))
+                Spacer(modifier = Modifier.width(3.dp))
                 Column {
                     Text(
                         text = realname
@@ -147,33 +155,37 @@ fun UserInfoSection(
                         text = "$department $studentId 학번"
                     )
                 }
+                Spacer(modifier = Modifier.height(14.dp))
             }
         }
-
         Card(
             shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp),
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp)
-                .background(Color.White)
+                .fillMaxSize()
+                .padding(8.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
-                    .background(color = Color.White),
+                    .background(
+                        Color.White,
+                        shape = RoundedCornerShape(12.dp)
+                    ),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                Spacer(modifier=Modifier.width(16.dp).height(14.dp))
                 Icon(
                     painter = painterResource(id = R.drawable.profile),
                     contentDescription = "Profile Icon",
                     tint=Color.Unspecified,
-                    modifier = Modifier.size(48.dp)
+                    modifier = Modifier.size(30.dp)
                 )
-                Spacer(modifier = Modifier.width(16.dp))
+                Spacer(modifier = Modifier.width(3.dp))
                 Text(
                     text = nickname
                 )
+                Spacer(modifier=Modifier.height(14.dp))
             }
         }
     }
@@ -219,7 +231,10 @@ fun UserOptionsSection(title: String, options: List<Pair<String, Any>>, onclickl
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp, horizontal = 16.dp) // Adjust padding as needed
-            .background(Color.White, shape = RoundedCornerShape(12.dp)) // Set the corner radius here
+            .background(
+                Color.White,
+                shape = RoundedCornerShape(12.dp)
+            ) // Set the corner radius here
             .shadow(1.dp, shape = RoundedCornerShape(12.dp)), // Optional shadow
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -238,7 +253,9 @@ fun UserOptionsSection(title: String, options: List<Pair<String, Any>>, onclickl
                     is Int -> {
                         OptionButton(buttonText = buttonText,onclicklist[command])
                     }
-                    else -> {}
+                    else -> {
+
+                    }
                 }
             }
         }
