@@ -150,7 +150,7 @@ fun SearchScreen(
                     Icon(
                         painter = painterResource(id = R.drawable.searchtext),
                         contentDescription = "Search",
-                        modifier = Modifier.size(46.dp),
+                        modifier = Modifier.size(200.dp),
                         tint = Color.Unspecified
                     )
                 }
