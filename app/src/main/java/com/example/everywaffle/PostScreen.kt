@@ -220,7 +220,7 @@ fun PostScreen(postid:Int?, navController: NavHostController){
                                     CoroutineScope(Dispatchers.Main).launch {
                                         val result = mainViewModel.postscrap(postid = postid!!)
                                         if (result == null) {
-                                            // TODO:
+                                            Toast.makeText(context, "이미 스크랩한 글입니다.",Toast.LENGTH_SHORT).show()
                                         } else {
                                             post = post.copy(scraps = post.scraps + 1)
                                         }
@@ -260,7 +260,7 @@ fun PostScreen(postid:Int?, navController: NavHostController){
                                             val result =
                                                 mainViewModel.postmakevote(postid = postid!!)
                                             if (result == null) {
-                                                // TODO:
+                                                Toast.makeText(context, "이미 투표 글로 선택한 글입니다.",Toast.LENGTH_SHORT).show()
                                             } else {
                                                 post =
                                                     post.copy(makeVoteCnt = post.makeVoteCnt + 1) // TODO:
@@ -503,6 +503,7 @@ fun PostScreen(postid:Int?, navController: NavHostController){
                             {
                                 CoroutineScope(Dispatchers.Main).launch {
                                     val result = mainViewModel.postcommentlike(it.parentcommentid)
+                                    Log.d("aaaa",result.toString())
                                     if(result==null){
                                         Toast.makeText(context, "이미 공감한 댓글입니다.",Toast.LENGTH_SHORT).show()
                                     }
@@ -526,8 +527,7 @@ fun PostScreen(postid:Int?, navController: NavHostController){
                                 }
                             },
                             navController,
-                            post.userId,
-                            context
+                            post.userId
                         )
                     }
                     item{Divider()}
@@ -699,13 +699,12 @@ fun ParentCommentView(
     onclickdelete : () -> Unit = {},
     navController: NavHostController,
     posteduserid:Int,
-    contxt: Context
 ){
 
     var dropmenuexpanded by remember { mutableStateOf(false) }
     var dropmenuexpanded2 by remember { mutableStateOf(false) }
     val mainViewModel = hiltViewModel<MainViewModel>()
-    val context = contxt
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -856,7 +855,7 @@ fun ParentCommentView(
                         CoroutineScope(Dispatchers.Main).launch {
                             val result = mainViewModel.postcommentlike(it.childcommentid)
                             if(result==null){
-                                Toast.makeText(context, "이미 공감한 글입니다.",Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "이미 공감한 댓글입니다.",Toast.LENGTH_SHORT).show()
                             }
                             else{
                                 if(MainViewModel._postchanged.value) MainViewModel._postchanged.emit(false)

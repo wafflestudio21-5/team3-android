@@ -295,7 +295,8 @@ class MainViewModel @Inject constructor(
 
     suspend fun postcommentlike(commentid:Int):Int?{
         try{
-            api.postcommentlike(commentId = commentid, userid = UserId(MyApplication.prefs.getString("userid").toInt()))
+            val response = api.postcommentlike(commentId = commentid, userid = UserId(MyApplication.prefs.getString("userid").toInt()))
+            if(response.code()==500) return null
             return 1
         }
         catch (e:retrofit2.HttpException){
