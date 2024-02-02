@@ -1,6 +1,7 @@
 package com.example.everywaffle
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
@@ -8,6 +9,7 @@ import android.net.Uri
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -104,6 +106,7 @@ fun InitScreen(
     var signinfail by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
+    val activity = (LocalContext.current as? Activity)
 
     var isLoggingIn by remember { mutableStateOf(false) }
     var loginSuccess by remember { mutableStateOf(false) }
@@ -117,6 +120,10 @@ fun InitScreen(
         }
     }
 
+    BackHandler {
+        activity?.finish()
+    }
+
     Surface(
         modifier = Modifier
             .background(color = Color.White)
@@ -127,7 +134,9 @@ fun InitScreen(
 
             Text(
                 text = "함께하는 와플생활",
-                modifier = Modifier.height(18.dp).fillMaxWidth(),
+                modifier = Modifier
+                    .height(18.dp)
+                    .fillMaxWidth(),
                 fontSize = 15.sp,
                 textAlign = TextAlign.Center,
                 color = Color.Black,
@@ -274,7 +283,9 @@ fun InitScreen(
             }
 
             Row(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 18.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 18.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {

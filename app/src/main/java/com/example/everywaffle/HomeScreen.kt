@@ -96,7 +96,9 @@ fun HomeScreen(
             val result2 = mainViewModel.getUserInfo()
             Log.d("aaaa",result2.toString())
             if (result2 == null) { // 입력된 사용자 정보가 없는 경우
-                navController.navigate("Detail")
+                navController.navigate("Detail"){
+                    popUpTo("Init")
+                }
             }
         }
         CoroutineScope(Dispatchers.Main).launch {
@@ -155,7 +157,9 @@ fun HomeScreen(
                 IconButton(onClick = { navController.navigate("Search/whole") }) {
                     Icon(imageVector = Icons.Sharp.Search, contentDescription = "Search")
                 }
-                IconButton(onClick = { navController.navigate("User") } ) {
+                IconButton(onClick = { navController.navigate("User"){
+                    popUpTo("Home")
+                } } ) {
                     Icon(imageVector = Icons.Sharp.ManageAccounts, contentDescription = "")
                 }
             }

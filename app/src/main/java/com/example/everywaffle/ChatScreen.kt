@@ -1,6 +1,8 @@
 package com.example.everywaffle
 
+import android.app.Activity
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -51,6 +53,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.PointerIcon.Companion.Text
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.SemanticsProperties.Text
 import androidx.compose.ui.text.TextStyle
@@ -73,6 +76,7 @@ fun ChatScreen(navController: NavHostController) {
     val mainViewModel = hiltViewModel<MainViewModel>()
     var isBoatSelected by remember { mutableStateOf(true) }
     val sessions = remember { mutableStateListOf<SessionDetail>() }
+    val activity = (LocalContext.current as? Activity)
 
     LaunchedEffect(Unit){
         sessions.clear()
@@ -80,6 +84,10 @@ fun ChatScreen(navController: NavHostController) {
             val result = mainViewModel.getsessions()
             if(result!=null) sessions.addAll(result)
         }
+    }
+
+    BackHandler {
+        activity?.finish()
     }
 
     Surface(modifier = Modifier
@@ -157,7 +165,15 @@ fun ChatScreen(navController: NavHostController) {
                             modifier = Modifier
                                 .size(200.dp)
                                 .clickable {
-                                    navController.navigate("SendScreen/0/${MyApplication.prefs.getString("userid").toInt()}")
+                                    navController.navigate(
+                                        "SendScreen/0/${
+                                            MyApplication.prefs
+                                                .getString("userid")
+                                                .toInt()
+                                        }"
+                                    ) {
+                                        popUpTo("Chat")
+                                    }
                                 }
                         )
                     }
@@ -178,7 +194,9 @@ fun SessionPreview(
             .background(Color.White)
             .padding(horizontal = 18.dp)
             .clickable {
-                navController.navigate("Message/${session.sessionId}")
+                navController.navigate("Message/${session.sessionId}") {
+                    popUpTo("Chat")
+                }
             } // TODO:
     ){
         Spacer(modifier = Modifier.height(11.dp))
@@ -254,7 +272,15 @@ fun MessageView(
                             .width(18.dp)
                             .height(18.dp)
                             .clickable {
-                                navController.navigate("SendScreen/${sessionid}/${MyApplication.prefs.getString("userid").toInt()}")
+                                navController.navigate(
+                                    "SendScreen/${sessionid}/${
+                                        MyApplication.prefs
+                                            .getString("userid")
+                                            .toInt()
+                                    }"
+                                ) {
+                                    popUpTo("Message/${sessionid}")
+                                }
                             }
                     )
                     Spacer(modifier = Modifier.width(40.dp))

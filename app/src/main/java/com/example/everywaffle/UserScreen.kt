@@ -35,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -73,7 +74,10 @@ fun UserScreen(
     onNavigateToHome: () -> Unit = {},
     navController: NavHostController
 ) {
-    //test
+    LaunchedEffect(Unit){
+        accountOptions[0] = Pair("아이디",MyApplication.prefs.getString("id"))
+    }
+
     Surface(
         modifier = Modifier
             .background(color = Color.White)
@@ -220,7 +224,10 @@ fun UserOptionsSection(title: String, options: List<Pair<String, Any>>, onclickl
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp, horizontal = 16.dp) // Adjust padding as needed
-            .background(Color.White, shape = RoundedCornerShape(12.dp)) // Set the corner radius here
+            .background(
+                Color.White,
+                shape = RoundedCornerShape(12.dp)
+            ) // Set the corner radius here
             .shadow(1.dp, shape = RoundedCornerShape(12.dp)), // Optional shadow
         shape = RoundedCornerShape(12.dp)
     ) {

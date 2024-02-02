@@ -240,7 +240,9 @@ fun SearchPostPreview(
             modifier = Modifier
                 .background(Color.White)
                 .clickable {
-                    navController.navigate("Post/${post.postId}")
+                    navController.navigate("Post/${post.postId}"){
+                        popUpTo("Search/${post.postId}")
+                    }
                 }
                 .padding(horizontal = 16.dp)
         ) {

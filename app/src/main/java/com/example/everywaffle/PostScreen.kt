@@ -502,14 +502,23 @@ fun PostScreen(postid:Int?, navController: NavHostController){
                             },
                             {
                                 CoroutineScope(Dispatchers.Main).launch {
-                                    val result = mainViewModel.postcommentlike(it.parentcommentid)
-                                    Log.d("aaaa",result.toString())
-                                    if(result==null){
-                                        Toast.makeText(context, "이미 공감한 댓글입니다.",Toast.LENGTH_SHORT).show()
+                                    if(it.content=="삭제된 댓글입니다."){
+                                        Toast.makeText(context, "삭제된 댓글입니다.",Toast.LENGTH_SHORT).show()
                                     }
-                                    else{
-                                        if(MainViewModel._postchanged.value) MainViewModel._postchanged.emit(false)
-                                        else MainViewModel._postchanged.emit(true)
+                                    else {
+                                        val result = mainViewModel.postcommentlike(it.parentcommentid)
+                                        if (result == null) {
+                                            Toast.makeText(
+                                                context,
+                                                "이미 공감한 댓글입니다.",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else {
+                                            if (MainViewModel._postchanged.value) MainViewModel._postchanged.emit(
+                                                false
+                                            )
+                                            else MainViewModel._postchanged.emit(true)
+                                        }
                                     }
                                 }
                             },
@@ -561,7 +570,9 @@ fun PostScreen(postid:Int?, navController: NavHostController){
                     CoroutineScope(Dispatchers.Main).launch {
                         val result = mainViewModel.deletepost(post.postId)
                         if(result!=null){
-                            navController.navigate("Board/${post.category}")
+                            navController.navigate("Board/${post.category}"){
+                                popUpTo("Home")
+                            }
                         }
                     }
                 }
@@ -581,7 +592,9 @@ fun PostScreen(postid:Int?, navController: NavHostController){
                         val result = mainViewModel.makesession(post.userId)
                         if(result==null) {} // TODO:
                         else{
-                            navController.navigate("SendScreen/${result}/${MyApplication.prefs.getString("userid").toInt()}")
+                            navController.navigate("SendScreen/${result}/${MyApplication.prefs.getString("userid").toInt()}"){
+                                popUpTo("Post/${postid}")
+                            }
                         }
                     }
                 }
@@ -810,7 +823,9 @@ fun ParentCommentView(
                                 val result = mainViewModel.makesession(comment.userId)
                                 if(result==null) {} // TODO:
                                 else{
-                                    navController.navigate("SendScreen/${result}/${MyApplication.prefs.getString("userid").toInt()}")
+                                    navController.navigate("SendScreen/${result}/${MyApplication.prefs.getString("userid").toInt()}"){
+                                        popUpTo("Post/${comment.postId}")
+                                    }
                                 }
                             }
                         }
@@ -982,7 +997,9 @@ fun ChildCommentView(onclicklike: () -> Unit = {},
                                 val result = mainViewModel.makesession(comment.userId)
                                 if(result==null) {} // TODO:
                                 else{
-                                    navController.navigate("SendScreen/${result}/${MyApplication.prefs.getString("userid").toInt()}")
+                                    navController.navigate("SendScreen/${result}/${MyApplication.prefs.getString("userid").toInt()}"){
+                                        popUpTo("Post/${comment.postId}")
+                                    }
                                 }
                             }
                         }

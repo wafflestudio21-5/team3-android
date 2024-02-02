@@ -1,5 +1,7 @@
 package com.example.everywaffle
 
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -40,6 +42,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
@@ -56,6 +59,10 @@ fun DetailScreen(
     var nickname by remember { mutableStateOf("") }
     var department by remember { mutableStateOf("") }
     var studentId by remember { mutableStateOf("") }
+
+    BackHandler {
+        onNavigateToInit()
+    }
 
     Surface(
         modifier = Modifier
