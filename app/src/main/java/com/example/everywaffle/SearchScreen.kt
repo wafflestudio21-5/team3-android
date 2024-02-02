@@ -27,6 +27,7 @@ import androidx.compose.material.icons.sharp.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DividerDefaults.color
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -49,6 +50,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
@@ -117,7 +120,7 @@ fun SearchScreen(
                     cursorColor = MaterialTheme.colorScheme.primary,
                     errorCursorColor = MaterialTheme.colorScheme.error,
                     focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    containerColor = Color.Gray,
+                    containerColor = Color(0xFFF2F2F2),
                     unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
                     disabledBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
                 ),
@@ -134,21 +137,21 @@ fun SearchScreen(
 
             if (keyword!="") SearchBoardScreen(boardid = "Search_${boardid!!}", navController = navController, key = keyword)
         }
-        if (keyword=="") {
+        if (keyword.isEmpty()) {
             Box(contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(
-                        imageVector = Icons.Default.Search,
+                        painter = painterResource(id = R.drawable.searchicon),
                         contentDescription = "Search",
-                        modifier = Modifier.size(100.dp),
-                        tint = Color.Gray
+                        modifier = Modifier.size(46.dp),
+                        tint = Color.Unspecified
                     )
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Text(
-                        text = "전체 게시판의 글을 검색해보세요",
-                        fontSize = 20.sp,
-                        textAlign = TextAlign.Center,
-                        color = Color.Gray
+                    Spacer(modifier = Modifier.height(13.dp))
+                    Icon(
+                        painter = painterResource(id = R.drawable.searchtext),
+                        contentDescription = "Search",
+                        modifier = Modifier.size(46.dp),
+                        tint = Color.Unspecified
                     )
                 }
             }
