@@ -383,8 +383,10 @@ fun BoardScreen(
                 Text(text = boardnames.filterValues { it == boardid }.keys.firstOrDefault(), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 10.dp))
 
                 Row() {
-                    IconButton(onClick = { navController.navigate("Search/${boardid}") }) {
-                        Icon(imageVector = Icons.Sharp.Search, contentDescription = "Search")
+                    if(boardid != "VOTE_BOARD") {
+                        IconButton(onClick = { navController.navigate("Search/${boardid}") }) {
+                            Icon(imageVector = Icons.Sharp.Search, contentDescription = "Search")
+                        }
                     }
                     IconButton(onClick = { }) {
                         Icon(imageVector = Icons.Sharp.MoreVert, contentDescription = "")

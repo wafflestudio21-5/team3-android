@@ -29,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -69,9 +70,17 @@ fun SignupScreen(
     var signupfail by remember { mutableStateOf(false) }
     var signupid by remember { mutableStateOf("") }
     var signuppw by remember { mutableStateOf("") }
+    var signuppwcheck by remember { mutableStateOf("") }
     var signupemail by remember { mutableStateOf("") }
-    val context = LocalContext.current
+    var signupable by remember { mutableStateOf(1) } // 1이면 빈 입력 칸이 있음, 2면 비밀번호와 확인 불일치, 3이면 회원가입 가능
 
+    LaunchedEffect(signupid, signuppw, signuppwcheck, signupemail){
+        signupable = when{
+            (signupid.isEmpty() || signuppw.isEmpty() || signuppwcheck.isEmpty() || signupemail.isEmpty()) -> 1
+            (signuppwcheck != signuppw) -> 2
+            else -> 3
+        }
+    }
 
     Surface(
         modifier = Modifier
@@ -222,8 +231,8 @@ fun SignupScreen(
                 )
 
                 TextField(
-                    value = signuppw,
-                    onValueChange = { signuppw = it },
+                    value = signuppwcheck,
+                    onValueChange = { signuppwcheck = it },
                     placeholder = { Text(text = "비밀번호 확인", fontSize = 15.sp) },
                     modifier = Modifier
                         .padding(horizontal = 18.dp)
@@ -245,23 +254,37 @@ fun SignupScreen(
                     )
                 )
 
+                if(signupable==2){
+                    Spacer(Modifier.height(5.dp))
+                    Text(
+                        text = "비밀번호가 일치하지 않습니다.",
+                        color = Color(0xFFF91F15),
+                        fontSize = 10.sp,
+                        modifier = Modifier
+                            .padding(horizontal = 25.dp)
+                    )
+                }
+
                 Spacer(Modifier.height(40.dp))
                 Button(
                     onClick = {
-                        focusManager.clearFocus()
-                        keyboardController?.hide()
-                        CoroutineScope(Dispatchers.Main).launch {
-                            val result = mainViewModel.signup(signupid, signuppw, signupemail)
-                            if (result != null) {
-                                //mainViewModel.updateUserInfo(realname,nickname,department,studentId)
-                                signupdone = true
-                                //onNavigateToDetail()
-                            } else {
-                                signupfail = true
+                        if(signupable==3) {
+                            focusManager.clearFocus()
+                            keyboardController?.hide()
+                            CoroutineScope(Dispatchers.Main).launch {
+                                val result = mainViewModel.signup(signupid, signuppw, signupemail)
+                                if (result != null) {
+                                    //mainViewModel.updateUserInfo(realname,nickname,department,studentId)
+                                    signupdone = true
+                                    //onNavigateToDetail()
+                                } else {
+                                    signupfail = true
+                                }
                             }
                         }
                     },
-                    colors = ButtonDefaults.buttonColors(Color(0xFFF91F15)),
+                    colors = if(signupable==3) ButtonDefaults.buttonColors(Color(0xFFF91F15))
+                                else ButtonDefaults.buttonColors(Color(0xFFF2F2F2)),
                     shape = RoundedCornerShape(13.dp),
                     modifier = Modifier
                         .padding(horizontal = 18.dp)
@@ -270,7 +293,7 @@ fun SignupScreen(
                 ) {
                     Text(
                         text = "에브리와플 회원가입",
-                        color = Color.White,
+                        color = if(signupable==3) Color.White else Color(0xFFBBBBBB),
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -296,7 +319,7 @@ fun SignupScreen(
                         },
                         icon = Icons.Sharp.ErrorOutline,
                         title = "회원가입 실패",
-                        content = "이미 사용되고 있는 아이디입니다.",
+                        content = "이미 사용되고 있는 아이디/이메일 입니다.",
                         confirmtext = "다시하기"
                     )
                 }

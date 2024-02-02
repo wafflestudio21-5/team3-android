@@ -1,6 +1,8 @@
 package com.example.everywaffle
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
@@ -71,6 +73,7 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -112,6 +115,7 @@ fun PostScreen(postid:Int?, navController: NavHostController){
     var parentcommentid by remember { mutableStateOf(0) }
     val postchangedkey by MainViewModel.postchanged.collectAsState()
     val keyboardController = LocalSoftwareKeyboardController.current
+    val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
     val extraPadding by animateDpAsState(
         if (expanded) 15.dp else 0.dp,
@@ -178,7 +182,7 @@ fun PostScreen(postid:Int?, navController: NavHostController){
                                     CoroutineScope(Dispatchers.Main).launch {
                                         val result = mainViewModel.postlike(postid = postid!!)
                                         if (result == null) {
-                                            // TODO:
+                                            Toast.makeText(context, "이미 공감한 글입니다.",Toast.LENGTH_SHORT).show()
                                         } else {
                                             post = post.copy(likes = post.likes + 1)
                                         }
@@ -500,7 +504,7 @@ fun PostScreen(postid:Int?, navController: NavHostController){
                                 CoroutineScope(Dispatchers.Main).launch {
                                     val result = mainViewModel.postcommentlike(it.parentcommentid)
                                     if(result==null){
-                                        // TODO:
+                                        Toast.makeText(context, "이미 공감한 댓글입니다.",Toast.LENGTH_SHORT).show()
                                     }
                                     else{
                                         if(MainViewModel._postchanged.value) MainViewModel._postchanged.emit(false)
@@ -521,7 +525,9 @@ fun PostScreen(postid:Int?, navController: NavHostController){
                                     }
                                 }
                             },
-                            navController
+                            navController,
+                            post.userId,
+                            context
                         )
                     }
                     item{Divider()}
@@ -615,34 +621,6 @@ fun PostScreen(postid:Int?, navController: NavHostController){
 }
 
 @Composable
-@Preview
-fun Test(){
-    var expanded by remember { mutableStateOf(false) }
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "투표 결과 보기",
-            fontWeight = FontWeight.Bold,
-            fontSize = 12.sp,
-            color = Color(0xFF616161)
-        )
-        IconButton(onClick = { expanded = !expanded }, modifier = Modifier.width(15.dp).height(15.dp)) {
-            Icon(
-                painter = if (expanded) painterResource(id = R.drawable.showless) else painterResource(
-                    id = R.drawable.showmore
-                ),
-                contentDescription = if (expanded) "Show less" else "Show more",
-                modifier = Modifier.width(15.dp),
-                tint = Color.Unspecified
-            )
-        }
-    }
-}
-
-@Composable
 //@Preview
 fun PostView(
     post:PostDetail = PostDetail(postId=1, userId=35, title="waffle", content="waffle", category="FREE_BOARD", createdAt="2024-01-18T19:13:04.000+00:00", likes=1, 0,0,false,0,0,0)
@@ -719,12 +697,15 @@ fun ParentCommentView(
     onclicklike: () -> Unit = {},
     onclickupdate : () -> Unit = {},
     onclickdelete : () -> Unit = {},
-    navController: NavHostController
+    navController: NavHostController,
+    posteduserid:Int,
+    contxt: Context
 ){
 
     var dropmenuexpanded by remember { mutableStateOf(false) }
     var dropmenuexpanded2 by remember { mutableStateOf(false) }
     val mainViewModel = hiltViewModel<MainViewModel>()
+    val context = contxt
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -743,10 +724,11 @@ fun ParentCommentView(
                         .height(40.dp)
                 )
                 Text(
-                    text = "익명",
+                    text = if(comment.userId == posteduserid) "익명(글쓴이)" else "익명",
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = 5.dp, top = 8.dp)
+                    modifier = Modifier.padding(start = 5.dp, top = 8.dp),
+                    color = if(comment.userId == posteduserid) Color(0xFF05BCBC) else Color.Black
                 )
             }
 
@@ -874,7 +856,7 @@ fun ParentCommentView(
                         CoroutineScope(Dispatchers.Main).launch {
                             val result = mainViewModel.postcommentlike(it.childcommentid)
                             if(result==null){
-                                // TODO:
+                                Toast.makeText(context, "이미 공감한 글입니다.",Toast.LENGTH_SHORT).show()
                             }
                             else{
                                 if(MainViewModel._postchanged.value) MainViewModel._postchanged.emit(false)
@@ -894,7 +876,8 @@ fun ParentCommentView(
                             }
                         }
                     },
-                    navController = navController
+                    navController = navController,
+                    posteduserid = posteduserid
                 )
             }
         }
@@ -905,7 +888,8 @@ fun ParentCommentView(
 fun ChildCommentView(onclicklike: () -> Unit = {},
                      onclickdelete: () -> Unit = {},
                      comment: ChildComment = ChildComment(childcommentid=3, userId=8, postId=1, content="comment3", parentCommentId=2, createdAt="2024-01-19T15:04:15.000+00:00", likes=0),
-                     navController: NavHostController) {
+                     navController: NavHostController,
+                     posteduserid: Int) {
 
     var dropmenuexpanded by remember { mutableStateOf(false) }
     var dropmenuexpanded2 by remember { mutableStateOf(false) }
@@ -928,10 +912,11 @@ fun ChildCommentView(onclicklike: () -> Unit = {},
                         .height(40.dp)
                 )
                 Text(
-                    text = "익명",
+                    text = if(comment.userId == posteduserid) "익명(글쓴이)" else "익명",
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = 5.dp, top = 8.dp)
+                    modifier = Modifier.padding(start = 5.dp, top = 8.dp),
+                    color = if(comment.userId == posteduserid) Color(0xFF05BCBC) else Color.Black
                 )
             }
             Row(

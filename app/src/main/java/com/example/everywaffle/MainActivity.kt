@@ -389,6 +389,8 @@ val boardnames = mapOf(
     "졸업생게시판" to "GRADUATE_BOARD",
     "새내기게시판" to "FRESHMAN_BOARD",
     "정보게시판" to "INFO_BOARD",
+    "시사·이슈" to "ISSUE_BOARD",
+    "장터게시판" to "MARKET_BOARD",
     "투표게시판" to "VOTE_BOARD"
 )
 
