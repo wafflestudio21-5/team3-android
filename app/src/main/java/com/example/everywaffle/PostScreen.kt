@@ -583,7 +583,7 @@ fun PostScreen(postid:Int?, navController: NavHostController){
             modifier = Modifier.wrapContentSize(),
             expanded = dropmenuexpanded2,
             onDismissRequest = {dropmenuexpanded2 = false},
-            offset = DpOffset(260.dp, -820.dp) // 펼쳐지는 메뉴의 위치 조정
+            offset = DpOffset(260.dp, 820.dp) // 펼쳐지는 메뉴의 위치 조정
         ) {
             DropdownMenuItem(
                 text = {Text("쪽지 보내기")},

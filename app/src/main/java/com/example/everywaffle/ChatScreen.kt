@@ -165,7 +165,7 @@ fun ChatScreen(navController: NavHostController) {
         ){
             if (isBoatSelected) {
                 BottomAppBar( // TODO: 이 bottomappbar로 인해 Lowbar가 클릭이 되지 않는 현상 수정 필요
-                    modifier = Modifier.padding(16.dp),
+                    modifier = Modifier.padding(bottom = 100.dp),
                     contentPadding = PaddingValues(0.dp),
                     containerColor = Color.Transparent
                 ) {
@@ -176,6 +176,37 @@ fun ChatScreen(navController: NavHostController) {
                         Icon(
                             painter = painterResource(id = R.drawable.randommessage),
                             contentDescription = "랜덤쪽지 보내기",
+                            tint = Color.Unspecified,
+                            modifier = Modifier
+                                .size(200.dp)
+                                .clickable {
+                                    navController.navigate(
+                                        "SendScreen/0/${
+                                            MyApplication.prefs
+                                                .getString("userid")
+                                                .toInt()
+                                        }"
+                                    ) {
+                                        popUpTo("Chat")
+                                    }
+                                }
+                        )
+                    }
+                }
+            }
+            else{
+                BottomAppBar( // TODO: 이 bottomappbar로 인해 Lowbar가 클릭이 되지 않는 현상 수정 필요
+                    modifier = Modifier.padding(bottom = 100.dp),
+                    contentPadding = PaddingValues(0.dp),
+                    containerColor = Color.Transparent
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.normalmessage),
+                            contentDescription = "쪽지 보내기",
                             tint = Color.Unspecified,
                             modifier = Modifier
                                 .size(200.dp)
