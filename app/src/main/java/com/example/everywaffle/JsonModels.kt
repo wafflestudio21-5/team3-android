@@ -94,6 +94,12 @@ data class UserId(
 )
 
 @JsonClass(generateAdapter = true)
+data class UserId2(
+    @Json(name = "user1Id") val user1Id:Int,
+    @Json(name = "user2Id") val user2Id:Int
+)
+
+@JsonClass(generateAdapter = true)
 data class PostComment(
     @Json(name = "userId") val userid:Int,
     @Json(name = "postId") val postid:Int,
@@ -170,3 +176,26 @@ data class VoteResult(
     @Json(name = "currentDisagreeCnt") val currentDisagreeCnt:Int,
 )
 
+@JsonClass(generateAdapter = true)
+data class SessionDetail(
+    @Json(name = "sessionId") val sessionId:Int,
+    @Json(name = "user1Id") val user1Id:Int,
+    @Json(name = "user2Id") val user2Id:Int,
+    @Json(name = "lastMessage") val lastMessage:MessageDetail
+)
+
+@JsonClass(generateAdapter = true)
+data class MessageDetail(
+    @Json(name = "messageId") val messageId:Int,
+    @Json(name = "sessionId") val sessionId:Int,
+    @Json(name = "senderId") val senderId:Int,
+    @Json(name = "content") val content:String,
+    @Json(name = "createdAt") val createdAt:String
+)
+
+@JsonClass(generateAdapter = true)
+data class SendMessage(
+    @Json(name = "sessionId") val sessionId:Int,
+    @Json(name = "senderId") val senderId:Int,
+    @Json(name = "content") val content:String
+)

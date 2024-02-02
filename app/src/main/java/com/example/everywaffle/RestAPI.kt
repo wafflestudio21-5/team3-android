@@ -196,5 +196,33 @@ interface RestAPI {
         @Body() vote:Vote
     ):VoteResult
 
+    @GET("/api/messages/sessions/{userId}")
+    suspend fun getsessions(
+        @Header("Authorization") token:String="Bearer "+MyApplication.prefs.getString("token"),
+        @Path("userId") userId:Int
+    ):List<SessionDetail>
 
+    @GET("/api/messages/session/{sessionId}")
+    suspend fun getmessages(
+        @Header("Authorization") token:String="Bearer "+MyApplication.prefs.getString("token"),
+        @Path("sessionId") sessionId:Int
+    ):List<MessageDetail>
+
+    @POST("/api/messages/send")
+    suspend fun sendmessage(
+        @Header("Authorization") token:String="Bearer "+MyApplication.prefs.getString("token"),
+        @Body() messagebody:SendMessage
+    ):MessageDetail
+
+    @POST("/api/messages/random")
+    suspend fun sendmessagerandom(
+        @Header("Authorization") token:String="Bearer "+MyApplication.prefs.getString("token"),
+        @Body() messagebody:SendMessage
+    ):MessageDetail
+
+    @POST("/api/messages/session")
+    suspend fun makesession(
+        @Header("Authorization") token:String="Bearer "+MyApplication.prefs.getString("token"),
+        @Body() users:UserId2
+    ):Int
 }

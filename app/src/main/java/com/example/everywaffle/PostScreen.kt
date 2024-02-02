@@ -108,6 +108,7 @@ fun PostScreen(postid:Int?, navController: NavHostController){
     var post by remember { mutableStateOf(PostDetail(-1,0,"","","","",0, 0,0,false,0,0,0)) }
     val comments = remember { mutableStateListOf<ParentComment>() }
     var dropmenuexpanded by remember { mutableStateOf(false) }
+    var dropmenuexpanded2 by remember { mutableStateOf(false) }
     var parentcommentid by remember { mutableStateOf(0) }
     val postchangedkey by MainViewModel.postchanged.collectAsState()
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -149,6 +150,7 @@ fun PostScreen(postid:Int?, navController: NavHostController){
 
                 IconButton(onClick = {
                     if(post.userId == MyApplication.prefs.getString("userid").toInt()) dropmenuexpanded = true
+                    else dropmenuexpanded2 = true
                 }) {
                     Icon(imageVector = Icons.Sharp.MoreVert, contentDescription = "")
                 }
@@ -518,7 +520,8 @@ fun PostScreen(postid:Int?, navController: NavHostController){
                                         else MainViewModel._postchanged.emit(true)
                                     }
                                 }
-                            }
+                            },
+                            navController
                         )
                     }
                     item{Divider()}
@@ -558,6 +561,27 @@ fun PostScreen(postid:Int?, navController: NavHostController){
                 }
             )
         }
+
+        DropdownMenu(
+            modifier = Modifier.wrapContentSize(),
+            expanded = dropmenuexpanded2,
+            onDismissRequest = {dropmenuexpanded2 = false},
+            offset = DpOffset(260.dp, -820.dp) // 펼쳐지는 메뉴의 위치 조정
+        ) {
+            DropdownMenuItem(
+                text = {Text("쪽지 보내기")},
+                onClick = {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        val result = mainViewModel.makesession(post.userId)
+                        if(result==null) {} // TODO:
+                        else{
+                            navController.navigate("SendScreen/${result}/${MyApplication.prefs.getString("userid").toInt()}")
+                        }
+                    }
+                }
+            )
+        }
+
         if(voting){
             VoteDialog(
                 ondismiss = {voting = false},
@@ -689,16 +713,17 @@ fun PostView(
 }
 
 @Composable
-@Preview
 fun ParentCommentView(
     comment: ParentComment = ParentComment(parentcommentid=2, userId=8, postId=1, content="comment2", createdAt="2024-01-19T15:03:58.000+00:00", childComments=listOf(ChildComment(childcommentid=3, userId=8, postId=1, content="comment3", parentCommentId=2, createdAt="2024-01-19T15:04:15.000+00:00", likes=0), ChildComment(childcommentid=4, userId=8, postId=1, content="comment4", parentCommentId=2, createdAt="2024-01-19T15:04:21.000+00:00", likes=0)), likes=0),
     onclickcomment: () -> Unit = {},
     onclicklike: () -> Unit = {},
     onclickupdate : () -> Unit = {},
-    onclickdelete : () -> Unit = {}
+    onclickdelete : () -> Unit = {},
+    navController: NavHostController
 ){
 
     var dropmenuexpanded by remember { mutableStateOf(false) }
+    var dropmenuexpanded2 by remember { mutableStateOf(false) }
     val mainViewModel = hiltViewModel<MainViewModel>()
 
     Column(
@@ -768,6 +793,7 @@ fun ParentCommentView(
                                     .getString("userid")
                                     .toInt()
                             ) dropmenuexpanded = true
+                            else dropmenuexpanded2 = true
                         }
                         .padding(horizontal = 10.dp, vertical = 4.dp)
                         .size(14.dp),
@@ -789,6 +815,24 @@ fun ParentCommentView(
                     DropdownMenuItem(
                         text = {Text("삭제")},
                         onClick = onclickdelete
+                    )
+                }
+                DropdownMenu(
+                    modifier = Modifier.wrapContentSize(),
+                    expanded = dropmenuexpanded2,
+                    onDismissRequest = {dropmenuexpanded2 = false},
+                ) {
+                    DropdownMenuItem(
+                        text = {Text("쪽지 보내기")},
+                        onClick = {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                val result = mainViewModel.makesession(comment.userId)
+                                if(result==null) {} // TODO:
+                                else{
+                                    navController.navigate("SendScreen/${result}/${MyApplication.prefs.getString("userid").toInt()}")
+                                }
+                            }
+                        }
                     )
                 }
             }
@@ -849,7 +893,8 @@ fun ParentCommentView(
                                 else MainViewModel._postchanged.emit(true)
                             }
                         }
-                    }
+                    },
+                    navController = navController
                 )
             }
         }
@@ -859,9 +904,12 @@ fun ParentCommentView(
 @Composable
 fun ChildCommentView(onclicklike: () -> Unit = {},
                      onclickdelete: () -> Unit = {},
-                     comment: ChildComment = ChildComment(childcommentid=3, userId=8, postId=1, content="comment3", parentCommentId=2, createdAt="2024-01-19T15:04:15.000+00:00", likes=0)) {
+                     comment: ChildComment = ChildComment(childcommentid=3, userId=8, postId=1, content="comment3", parentCommentId=2, createdAt="2024-01-19T15:04:15.000+00:00", likes=0),
+                     navController: NavHostController) {
 
     var dropmenuexpanded by remember { mutableStateOf(false) }
+    var dropmenuexpanded2 by remember { mutableStateOf(false) }
+    val mainViewModel = hiltViewModel<MainViewModel>()
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -915,6 +963,7 @@ fun ChildCommentView(onclicklike: () -> Unit = {},
                                     .getString("userid")
                                     .toInt()
                             ) dropmenuexpanded = true
+                            else dropmenuexpanded2 = true
                         }
                         .padding(horizontal = 10.dp, vertical = 4.dp)
                         .size(14.dp),
@@ -935,6 +984,24 @@ fun ChildCommentView(onclicklike: () -> Unit = {},
                     DropdownMenuItem(
                         text = {Text("삭제")},
                         onClick = onclickdelete
+                    )
+                }
+                DropdownMenu(
+                    modifier = Modifier.wrapContentSize(),
+                    expanded = dropmenuexpanded2,
+                    onDismissRequest = {dropmenuexpanded2 = false},
+                ) {
+                    DropdownMenuItem(
+                        text = {Text("쪽지 보내기")},
+                        onClick = {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                val result = mainViewModel.makesession(comment.userId)
+                                if(result==null) {} // TODO:
+                                else{
+                                    navController.navigate("SendScreen/${result}/${MyApplication.prefs.getString("userid").toInt()}")
+                                }
+                            }
+                        }
                     )
                 }
             }
