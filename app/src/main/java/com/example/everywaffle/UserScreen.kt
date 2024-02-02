@@ -1,5 +1,6 @@
 package com.example.everywaffle
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -47,6 +48,8 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.modifier.modifierLocalConsumer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -73,9 +76,11 @@ fun UserScreen(
 ) {
     val mainViewModel = hiltViewModel<MainViewModel>()
     var towithdraw by remember { mutableStateOf(false) }
+
     var showAlert by remember{mutableStateOf(false)}
     val onFeaturedNotAvailable={showAlert=true}
 
+    val context = LocalContext.current
     LaunchedEffect(Unit){
         accountOptions[0] = Pair("아이디",MyApplication.prefs.getString("id"))
     }
@@ -120,7 +125,9 @@ fun UserScreen(
             onagree = {
                 CoroutineScope(Dispatchers.Main).launch {
                     val result = mainViewModel.withdraw()
-                    if(result==null) {} //TODO:
+                    if(result==null) {
+                        Toast.makeText(context,"탈퇴에 실패했습니다. 잠시 후 다시 시도해 주세요.", Toast.LENGTH_SHORT).show()
+                    }
                     else{
                         MyApplication.prefs.reset()
                         navController.navigate("Init")
@@ -313,7 +320,6 @@ fun AlertFeatureNotAvailableDialog(onDismissRequest: () -> Unit) {
 }
 
 @Composable
-
 fun OptionRow(Text1: String, Text2: String) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -339,6 +345,7 @@ fun OptionRow(Text1: String, Text2: String) {
         )
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
@@ -630,6 +637,7 @@ fun PasswordChangeScreen(
         }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable

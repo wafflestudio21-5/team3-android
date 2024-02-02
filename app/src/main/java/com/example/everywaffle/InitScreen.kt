@@ -76,19 +76,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-fun savetoken(context: Context, token: String) {
-    val sharedPref = context.getSharedPreferences("MyApp", Context.MODE_PRIVATE)
-    with (sharedPref.edit()) {
-        putString("Token", token)
-        apply()
-    }
-}
-
-fun checkloginstatus(context: Context): Boolean {
-    val sharedPref = context.getSharedPreferences("MyApp", Context.MODE_PRIVATE)
-    return sharedPref.getString("Token", null) != null
-}
-
 @SuppressLint("SuspiciousIndentation")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Preview

@@ -274,9 +274,7 @@ fun SignupScreen(
                             CoroutineScope(Dispatchers.Main).launch {
                                 val result = mainViewModel.signup(signupid, signuppw, signupemail)
                                 if (result != null) {
-                                    //mainViewModel.updateUserInfo(realname,nickname,department,studentId)
                                     signupdone = true
-                                    //onNavigateToDetail()
                                 } else {
                                     signupfail = true
                                 }
@@ -284,7 +282,7 @@ fun SignupScreen(
                         }
                     },
                     colors = if(signupable==3) ButtonDefaults.buttonColors(Color(0xFFF91F15))
-                                else ButtonDefaults.buttonColors(Color(0xFFF2F2F2)),
+                    else ButtonDefaults.buttonColors(Color(0xFFF2F2F2)),
                     shape = RoundedCornerShape(13.dp),
                     modifier = Modifier
                         .padding(horizontal = 18.dp)

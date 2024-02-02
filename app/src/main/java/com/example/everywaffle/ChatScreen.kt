@@ -127,7 +127,6 @@ fun ChatScreen(navController: NavHostController) {
                     modifier = Modifier
                         .clickable {
                             isBoatSelected = true
-
                         }
                 )
                 Text(
@@ -138,7 +137,6 @@ fun ChatScreen(navController: NavHostController) {
                     modifier = Modifier
                         .clickable {
                             isBoatSelected = false
-
                         }
                 )
             }
@@ -164,7 +162,7 @@ fun ChatScreen(navController: NavHostController) {
             modifier = Modifier.background(Color.Transparent)
         ){
             if (isBoatSelected) {
-                BottomAppBar( // TODO: 이 bottomappbar로 인해 Lowbar가 클릭이 되지 않는 현상 수정 필요
+                BottomAppBar(
                     modifier = Modifier.padding(bottom = 100.dp),
                     contentPadding = PaddingValues(0.dp),
                     containerColor = Color.Transparent
@@ -195,7 +193,7 @@ fun ChatScreen(navController: NavHostController) {
                 }
             }
             else{
-                BottomAppBar( // TODO: 이 bottomappbar로 인해 Lowbar가 클릭이 되지 않는 현상 수정 필요
+                BottomAppBar(
                     modifier = Modifier.padding(bottom = 100.dp),
                     contentPadding = PaddingValues(0.dp),
                     containerColor = Color.Transparent
@@ -243,7 +241,7 @@ fun SessionPreview(
                 navController.navigate("Message/${session.sessionId}") {
                     popUpTo("Chat")
                 }
-            } // TODO:
+            }
     ){
         Spacer(modifier = Modifier.height(11.dp))
         Row(
@@ -260,6 +258,7 @@ fun SessionPreview(
         Spacer(modifier = Modifier.height(13.dp))
     }
 }
+
 
 @Composable
 fun MessageView(
@@ -356,6 +355,7 @@ fun MessageView(
     }
 }
 
+
 @Composable
 fun MessageContent(
     message:MessageDetail
@@ -394,6 +394,7 @@ fun SendScreen(
 ) {
     val mainViewModel = hiltViewModel<MainViewModel>()
     var message by remember { mutableStateOf("") }
+    val context = LocalContext.current
 
     MaterialTheme {
         Scaffold(
@@ -426,8 +427,13 @@ fun SendScreen(
                             onClick = {
                                 CoroutineScope(Dispatchers.Main).launch {
                                     val result = mainViewModel.sendmessage(SendMessage(sessionId = sessionid!!, senderId = senderid!!, content = message))
-                                    if (result==null){} // TODO:
-                                    else{navController.popBackStack()}
+                                    if (result==null){
+                                        Toast.makeText(context,"쪽지 전송에 실패했습니다. 잠시 후 다시 시도해 주세요.",Toast.LENGTH_SHORT).show()
+                                    }
+                                    else{
+                                        Toast.makeText(context,"쪽지 전송에 성공했습니다.",Toast.LENGTH_SHORT).show()
+                                        navController.popBackStack()
+                                    }
                                 }
                             }
                         ) {

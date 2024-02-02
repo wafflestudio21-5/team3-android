@@ -182,7 +182,6 @@ fun HomeScreen(
 @Composable
 fun LowBar(navController: NavHostController, key:Int){
 
-    val iconSize = 64.dp
 
     Row(
         modifier = Modifier
@@ -191,18 +190,15 @@ fun LowBar(navController: NavHostController, key:Int){
         horizontalArrangement = Arrangement.SpaceAround
     ) {
 
-
         if (key==1) {
             IconButtonWithText(
                 imageVector = painterResource(id = R.drawable.home_selected),
-                size = iconSize,
                 onclick = { navController.navigate("Home") }
             )
         }
         else{
             IconButtonWithText(
                 imageVector = painterResource(id = R.drawable.home),
-                size = iconSize,
                 onclick = { navController.navigate("Home") }
             )
         }
