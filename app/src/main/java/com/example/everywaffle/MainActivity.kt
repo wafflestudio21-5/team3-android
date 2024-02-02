@@ -379,11 +379,12 @@ fun PopularPost(
             ) {
                 Row {
                     Icon(
-                        imageVector = Icons.Sharp.AccountBox,
+                        painter = painterResource(id = R.drawable.profile),
                         contentDescription = "User",
                         modifier = Modifier
-                            .width(30.dp)
-                            .height(30.dp)
+                            .width(40.dp)
+                            .height(40.dp),
+                        tint=Color.Unspecified
                     )
                     Text(
                         text = "익명",

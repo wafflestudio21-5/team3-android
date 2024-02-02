@@ -677,11 +677,11 @@ fun PostView(
     ){
         Row{
             Icon(
-                imageVector = Icons.Sharp.AccountBox,
+                painter= painterResource(id = R.drawable.profile),
                 contentDescription = "User",
                 modifier = Modifier
-                    .width(50.dp)
-                    .height(50.dp)
+                    .width(40.dp)
+                    .height(40.dp)
             )
             Column(
                 modifier = Modifier.padding(5.dp)
@@ -767,7 +767,8 @@ fun ParentCommentView(
                     contentDescription = "User",
                     modifier = Modifier
                         .width(40.dp)
-                        .height(40.dp)
+                        .height(40.dp),
+                    tint=Color.Unspecified
                 )
                 Text(
                     text = if(comment.userId == posteduserid) "익명(글쓴이)" else "익명",
@@ -893,11 +894,12 @@ fun ParentCommentView(
                 modifier = Modifier.padding(top = 7.dp, start = 10.dp)
             ){
                 Icon(
-                    imageVector = Icons.Sharp.SubdirectoryArrowRight,
+                    painter = painterResource(id = R.drawable.profile),
                     contentDescription = "User",
                     modifier = Modifier
                         .width(15.dp)
-                        .height(15.dp)
+                        .height(15.dp),
+                    tint=Color.Unspecified
                 )
 
                 ChildCommentView(
@@ -956,11 +958,12 @@ fun ChildCommentView(onclicklike: () -> Unit = {},
         ) {
             Row {
                 Icon(
-                    imageVector = Icons.Sharp.AccountBox,
+                    painter = painterResource(id = R.drawable.profile),
                     contentDescription = "User",
                     modifier = Modifier
                         .width(40.dp)
-                        .height(40.dp)
+                        .height(40.dp),
+                    tint=Color.Unspecified
                 )
                 Text(
                     text = if(comment.userId == posteduserid) "익명(글쓴이)" else "익명",

@@ -349,7 +349,7 @@ fun BoardList(navController: NavHostController, recent:Map<String,String>, trend
             Column(modifier = Modifier.padding(8.dp)) {
                 trend.forEach {
                     PopularPost(navController, it)
-                    Spacer(modifier = Modifier.height(8.dp)) 
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
             }
         }
