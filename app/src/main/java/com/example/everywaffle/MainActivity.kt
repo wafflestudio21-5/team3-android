@@ -266,32 +266,6 @@ fun MakeAlertDialog(
     )
 }
 
-// 임시
-/*
-@Composable
-fun IconButtonWithText(
-    imageVector: Painter,
-    text:String = "",
-    iconWidth:Dp=50.dp,
-    iconHeight:Dp=50.dp,
-    onclick : () -> Unit = {}
-){
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ){
-        IconButton(onClick = onclick) {
-            Icon(painter = imageVector, contentDescription = "",
-                modifier = Modifier
-                    .size(iconWidth, iconHeight),
-                tint = Color.Unspecified)
-        }
-        Text(
-            text = text
-        )
-    }
-}
- */
-
 // option에서 두번째 요소가 String이면 String 2개 배치 (실제 앱에서 아이디가 이 경우에 속함)
 // option에서 두번째 요소가 Int이면 그 숫자에 해당하는 함수 호출
 // 함수 목록은 UserScreen.kt의 UserScreen 함수에서 onclicklist에 있고, 이를 UserOptionsSection 함수에서 감지 및 실행

@@ -134,11 +134,11 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(color = Color.White)
-            .padding(15.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(color = Color.White)
                 .padding(15.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
