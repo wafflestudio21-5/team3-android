@@ -266,7 +266,7 @@ fun MakeAlertDialog(
 }
 
 // 임시
-
+/*
 @Composable
 fun IconButtonWithText(
     imageVector: Painter,
@@ -289,6 +289,7 @@ fun IconButtonWithText(
         )
     }
 }
+ */
 
 // option에서 두번째 요소가 String이면 String 2개 배치 (실제 앱에서 아이디가 이 경우에 속함)
 // option에서 두번째 요소가 Int이면 그 숫자에 해당하는 함수 호출

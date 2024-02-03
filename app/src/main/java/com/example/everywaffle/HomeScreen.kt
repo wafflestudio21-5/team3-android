@@ -61,6 +61,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -177,6 +178,25 @@ fun HomeScreen(
     }
 }
 
+@Composable
+fun IconButtonWithText(
+    imageVector: Painter,
+    text: String = "",
+    iconSize:Dp = 48.dp,
+    onclick: () -> Unit = {}
+) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable(onClick = onclick)) {
+        Icon(
+            painter = imageVector,
+            contentDescription = null,
+            modifier = Modifier
+                .size(iconSize),
+            tint = Color.Unspecified
+        )
+        Text(text = text)
+    }
+}
+
 
 
 @Composable
@@ -191,16 +211,14 @@ fun LowBar(navController: NavHostController, key:Int){
         if (key==1) {
             IconButtonWithText(
                 imageVector = painterResource(id = R.drawable.home_selected),
-                iconWidth = 50.dp,
-                iconHeight = 50.dp,
+                iconSize = 50.dp,
                 onclick = { navController.navigate("Home") }
             )
         }
         else{
             IconButtonWithText(
                 imageVector = painterResource(id = R.drawable.home),
-                iconWidth = 50.dp,
-                iconHeight = 500.dp,
+                iconSize = 50.dp,
                 onclick = { navController.navigate("Home") }
             )
         }
@@ -208,8 +226,7 @@ fun LowBar(navController: NavHostController, key:Int){
         if (key==3){
             IconButtonWithText(
                 imageVector = painterResource(id =R.drawable.vote_selected),
-                iconWidth = 50.dp,
-                iconHeight = 50.dp,
+                iconSize = 50.dp,
                 onclick = {navController.navigate("Board/VOTE_BOARD")}
             )
         }
@@ -217,8 +234,7 @@ fun LowBar(navController: NavHostController, key:Int){
         else{
             IconButtonWithText(
                 imageVector = painterResource(id =R.drawable.vote),
-                iconWidth = 50.dp,
-                iconHeight = 50.dp,
+                iconSize = 50.dp,
                 onclick = {navController.navigate("Board/VOTE_BOARD")}
             )
         }
@@ -226,16 +242,14 @@ fun LowBar(navController: NavHostController, key:Int){
         if (key==4){
             IconButtonWithText(
                 imageVector = painterResource(id =R.drawable.chat_selected),
-                iconWidth = 50.dp,
-                iconHeight = 50.dp,
+                iconSize = 50.dp,
                 onclick = {navController.navigate("Chat")}
             )
         }
         else{
             IconButtonWithText(
                 imageVector = painterResource(id =R.drawable.chat),
-                iconWidth = 50.dp,
-                iconHeight = 50.dp,
+                iconSize = 50.dp,
                 onclick = {navController.navigate("Chat")}
             )
         }
@@ -243,16 +257,14 @@ fun LowBar(navController: NavHostController, key:Int){
         if (key==5){
             IconButtonWithText(
                 imageVector = painterResource(id =R.drawable.user_selected),
-                iconWidth = 50.dp,
-                iconHeight = 50.dp,
+                iconSize = 50.dp,
                 onclick = {navController.navigate("User")}
             )
         }
         else{
             IconButtonWithText(
                 imageVector = painterResource(id =R.drawable.user),
-                iconWidth = 50.dp,
-                iconHeight = 50.dp,
+                iconSize = 50.dp,
                 onclick = {navController.navigate("User")}
             )
         }
