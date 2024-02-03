@@ -89,6 +89,7 @@ fun UserScreen(
         modifier = Modifier
             .background(color = Color.White)
             .fillMaxSize()
+
     ) {
         LazyColumn(modifier = Modifier.padding(16.dp)) {
             item {
