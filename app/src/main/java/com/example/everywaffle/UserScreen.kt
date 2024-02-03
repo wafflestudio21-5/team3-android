@@ -238,7 +238,10 @@ fun Header(onNavigateToHome: () -> Unit) {
         horizontalArrangement = Arrangement.Center
     ) {
         IconButton(onClick = onNavigateToHome) {
-            Icon(imageVector = Icons.Sharp.ArrowBack, contentDescription = "Back")
+            Icon(painter = painterResource(id = R.drawable.backarrow), contentDescription = "Search",
+                tint=Color.Unspecified, modifier = Modifier
+                    .height(18.dp)
+                    .width(18.dp))
         }
         Spacer(modifier = Modifier.weight(1f))
         Text(
@@ -346,7 +349,6 @@ fun OptionRow(Text1: String, Text2: String) {
     }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 //@Preview
@@ -383,10 +385,15 @@ fun PasswordChangeScreen(
 
                     )
 
+                Spacer(modifier = Modifier.weight(1f))
+
                 IconButton(
                     onClick = onNavigateToUser
                 ) {
-                    Icon(imageVector = Icons.Outlined.Cancel, contentDescription = "")
+                    Icon(painter = painterResource(id = R.drawable.ex), contentDescription = "Search",
+                        tint=Color.Unspecified, modifier = Modifier
+                            .height(18.dp)
+                            .width(18.dp))
                 }
             }
             Spacer(modifier = Modifier.height(20.dp))
@@ -669,13 +676,16 @@ fun EmailChangeScreen(
                     color = Color.Black,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-
                     )
+                Spacer(modifier = Modifier.weight(1f))
 
                 IconButton(
                     onClick = onNavigateToUser
                 ) {
-                    Icon(imageVector = Icons.Outlined.Cancel, contentDescription = "")
+                    Icon(painter = painterResource(id = R.drawable.ex), contentDescription = "Search",
+                        tint=Color.Unspecified, modifier = Modifier
+                            .height(18.dp)
+                            .width(18.dp))
                 }
             }
             Spacer(modifier = Modifier.height(20.dp))

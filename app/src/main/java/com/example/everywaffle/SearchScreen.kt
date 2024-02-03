@@ -230,7 +230,8 @@ fun SearchBoardScreen(
 @Composable
 fun SearchPostPreview(
     post: PostDetail,
-    navController: NavHostController
+    navController: NavHostController,
+    mainViewModel: MainViewModel = hiltViewModel()
 ) {
     Card(
         modifier = Modifier
@@ -263,7 +264,7 @@ fun SearchPostPreview(
                 Spacer(modifier = Modifier.width(8.dp))
                 ReactionNumberView("Comment", post.comments, "Normal")
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(timetoprint(post.createdAt), fontSize = 12.sp, color = Color.Gray)
+                Text(mainViewModel.timetoprint(post.createdAt), fontSize = 12.sp, color = Color.Gray)
             }
         }
         Divider()

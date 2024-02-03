@@ -230,7 +230,8 @@ fun ChatScreen(navController: NavHostController) {
 @Composable
 fun SessionPreview(
     session:SessionDetail,
-    navController: NavHostController
+    navController: NavHostController,
+    mainViewModel: MainViewModel = hiltViewModel()
 ){
     Column(
         modifier = Modifier
@@ -251,7 +252,7 @@ fun SessionPreview(
             horizontalArrangement = Arrangement.SpaceBetween
         ){
             Text(text = "익명", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-            Text(text = timetoprint(session.lastMessage.createdAt), fontSize = 12.sp, color = Color(0xFF979797))
+            Text(text = mainViewModel.timetoprint(session.lastMessage.createdAt), fontSize = 12.sp, color = Color(0xFF979797))
         }
         Spacer(modifier = Modifier.height(5.dp))
         Text(text = session.lastMessage.content, fontSize = 13.sp, color = Color.Black)
@@ -358,7 +359,8 @@ fun MessageView(
 
 @Composable
 fun MessageContent(
-    message:MessageDetail
+    message:MessageDetail,
+    mainViewModel: MainViewModel = hiltViewModel()
 ){
     Column(
         modifier = Modifier
@@ -376,7 +378,7 @@ fun MessageContent(
             Text(fontSize = 13.sp, fontWeight = FontWeight.Bold,
                 text = if(message.senderId == MyApplication.prefs.getString("userid").toInt()) "보낸 쪽지" else "받은 쪽지",
                 color = if(message.senderId == MyApplication.prefs.getString("userid").toInt()) Color(0xFF05BCBC) else Color(0xFFFFD330))
-            Text(text = timetoprint(message.createdAt), fontSize = 12.sp, color = Color(0xFF979797))
+            Text(text = mainViewModel.timetoprint(message.createdAt), fontSize = 12.sp, color = Color(0xFF979797))
         }
         Spacer(modifier = Modifier.height(5.dp))
         Text(text = message.content, fontSize = 13.sp, color = Color.Black)

@@ -156,12 +156,18 @@ fun HomeScreen(
                     )
                 }
                 IconButton(onClick = { navController.navigate("Search/whole") }) {
-                    Icon(imageVector = Icons.Sharp.Search, contentDescription = "Search")
+                    Icon(painter = painterResource(id = R.drawable.searchicon), contentDescription = "Search",
+                        tint=Color.Unspecified, modifier = Modifier
+                            .height(18.dp)
+                            .width(18.dp))
                 }
                 IconButton(onClick = { navController.navigate("User"){
                     popUpTo("Home")
                 } } ) {
-                    Icon(imageVector = Icons.Sharp.ManageAccounts, contentDescription = "")
+                    Icon(painter = painterResource(id = R.drawable.mypagename), contentDescription = "",
+                        tint=Color.Unspecified, modifier = Modifier
+                            .height(24.dp)
+                            .width(24.dp))
                 }
             }
             LazyColumn(
@@ -190,7 +196,7 @@ fun IconButtonWithText(
             painter = imageVector,
             contentDescription = null,
             modifier = Modifier
-                .size(iconSize),
+                .width(75.dp).height(58.dp),
             tint = Color.Unspecified
         )
         Text(text = text)
@@ -203,8 +209,7 @@ fun IconButtonWithText(
 fun LowBar(navController: NavHostController, key:Int){
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceAround,
     ) {
 
@@ -256,14 +261,14 @@ fun LowBar(navController: NavHostController, key:Int){
 
         if (key==5){
             IconButtonWithText(
-                imageVector = painterResource(id =R.drawable.user_selected),
+                imageVector = painterResource(id =R.drawable.touser_selected),
                 iconSize = 50.dp,
                 onclick = {navController.navigate("User")}
             )
         }
         else{
             IconButtonWithText(
-                imageVector = painterResource(id =R.drawable.user),
+                imageVector = painterResource(id =R.drawable.touser),
                 iconSize = 50.dp,
                 onclick = {navController.navigate("User")}
             )
@@ -416,7 +421,10 @@ fun BoardScreen(
                     IconButton(onClick = {
                         navController.navigate("Home")
                     }) {
-                        Icon(imageVector = Icons.Sharp.ArrowBack, contentDescription = "Back")
+                        Icon(painter = painterResource(id = R.drawable.backarrow), contentDescription = "Search",
+                            tint=Color.Unspecified, modifier = Modifier
+                                .height(18.dp)
+                                .width(18.dp))
                     }
                 }
 
@@ -425,11 +433,17 @@ fun BoardScreen(
                 Row() {
                     if(boardid != "VOTE_BOARD") {
                         IconButton(onClick = { navController.navigate("Search/${boardid}") }) {
-                            Icon(imageVector = Icons.Sharp.Search, contentDescription = "Search")
+                            Icon(painter = painterResource(id = R.drawable.searchicon), contentDescription = "Search",
+                                tint=Color.Unspecified, modifier = Modifier
+                                    .height(18.dp)
+                                    .width(18.dp))
                         }
                     }
                     IconButton(onClick = { }) {
-                        Icon(imageVector = Icons.Sharp.MoreVert, contentDescription = "")
+                        Icon(painter = painterResource(id = R.drawable.threedots), contentDescription = "Search",
+                            tint=Color.Unspecified, modifier = Modifier
+                                .height(18.dp)
+                                .width(18.dp))
                     }
                 }
             }
@@ -440,7 +454,7 @@ fun BoardScreen(
                 state = listState,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(.1f), // TODO:
+                    .weight(1f),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 itemList.forEach {
@@ -476,7 +490,8 @@ fun BoardScreen(
 @Composable
 fun PostPreview(
     post: PostDetail,
-    navController: NavHostController
+    navController: NavHostController,
+    mainViewModel: MainViewModel = hiltViewModel()
 ) {
     Card(
         modifier = Modifier
@@ -500,23 +515,35 @@ fun PostPreview(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(painter = painterResource(id = R.drawable.likeicon), contentDescription = "Like", Modifier.size(15.dp),tint=Color(0xFFF91F15))
+                Icon(painter = painterResource(id = R.drawable.likeicon), contentDescription = "Like", Modifier.size(13.dp),tint=Color(0xFFF91F15))
                 Text(text = "${post.likes}", modifier = Modifier.padding(start = 4.dp),color=Color(0xFFF91F15))
-                Spacer(modifier = Modifier.height(4.dp))
-                Icon(painter = painterResource(id = R.drawable.replyicon), contentDescription = "Comment", Modifier.size(15.dp),tint = Color(0xFF05BCBC))
+                Spacer(modifier = Modifier
+                    .height(6.dp)
+                    .width(8.dp))
+                Icon(painter = painterResource(id = R.drawable.replyicon), contentDescription = "Comment", Modifier.size(13.dp),tint = Color(0xFF05BCBC))
                 Text(text = "${post.comments}", modifier = Modifier.padding(start = 4.dp),color=Color(0xFF05BCBC))
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(timetoprint(post.createdAt), fontSize = 12.sp, color = Color.Gray)
+                Spacer(modifier = Modifier
+                    .height(6.dp)
+                    .width(8.dp))
+                Text(mainViewModel.timetoprint(post.createdAt), color = Color(0xFF979797))
+                Spacer(modifier = Modifier
+                    .height(6.dp)
+                    .width(8.dp))
+                Text(text="익명",color=Color(0xFF979797),modifier=Modifier.align(Alignment.CenterVertically))
             }
         }
-        Divider()
+        Divider(
+            color = Color.LightGray,
+            thickness = 1.dp
+        )
     }
 }
 
 @Composable
 fun CreatePost(navController: NavController, category: String) {
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .background(Color.Transparent),
         verticalArrangement = Arrangement.Bottom
     ) {

@@ -8,6 +8,9 @@ import com.kakao.sdk.user.UserApiClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 import javax.inject.Inject
 
 
@@ -389,4 +392,40 @@ class MainViewModel @Inject constructor(
             null
         }
     }
+
+    fun timetoprint(t:String):String{
+        try {
+            val time = Instant.parse(t).atZone(ZoneId.of("Asia/Seoul"))
+            val timec = LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul"))
+
+            return when {
+                timec.minusMinutes(1).isBefore(time) -> "방금 전"
+                timec.minusHours(1).isBefore(time) -> {
+                    var diff = 0L
+                    while (true) {
+                        diff += 1
+                        if (timec.minusMinutes(diff).isBefore(time)) break
+                    }
+                    "${diff - 1}분 전"
+                }
+
+                timec.dayOfMonth == time.dayOfMonth -> time.toString().slice(11..15)
+                timec.minusYears(1).isBefore(time) -> {
+                    time.toString().slice(5..9).replace("-", "/")
+                }
+
+                else -> {
+                    var diff = 0L
+                    while (true) {
+                        diff += 1
+                        if (timec.minusYears(diff).isBefore(time)) break
+                    }
+                    "${diff - 1}년 전"
+                }
+            }
+        }
+        catch(e:Exception) {return ""}
+    }
 }
+
+

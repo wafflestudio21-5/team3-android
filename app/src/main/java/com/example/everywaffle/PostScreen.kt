@@ -153,7 +153,10 @@ fun PostScreen(postid:Int?, navController: NavHostController){
                 IconButton(onClick = {
                     navController.popBackStack()
                 }) {
-                    Icon(imageVector = Icons.Sharp.ArrowBack, contentDescription = "Back")
+                    Icon(painter = painterResource(id = R.drawable.backarrow), contentDescription = "Back",
+                        tint=Color.Unspecified, modifier = Modifier
+                            .height(18.dp)
+                            .width(18.dp))
                 }
 
                 Text(text = boardnames.filterValues { it == post.category }.keys.firstOrDefault(), fontSize = 12.sp, fontWeight = FontWeight.Bold)
@@ -162,7 +165,10 @@ fun PostScreen(postid:Int?, navController: NavHostController){
                     if(post.userId == MyApplication.prefs.getString("userid").toInt()) dropmenuexpanded = true
                     else dropmenuexpanded2 = true
                 }) {
-                    Icon(imageVector = Icons.Sharp.MoreVert, contentDescription = "")
+                    Icon(painter = painterResource(id = R.drawable.threedots), contentDescription = "More",
+                        tint=Color.Unspecified, modifier = Modifier
+                            .height(18.dp)
+                            .width(18.dp))
                 }
             }
 
@@ -669,6 +675,7 @@ fun PostScreen(postid:Int?, navController: NavHostController){
 @Composable
 //@Preview
 fun PostView(
+    mainViewModel: MainViewModel = hiltViewModel(),
     post:PostDetail = PostDetail(postId=1, userId=35, title="waffle", content="waffle", category="FREE_BOARD", createdAt="2024-01-18T19:13:04.000+00:00", likes=1, 0,0,false,0,0,0)
 ){
     Column(
@@ -693,7 +700,7 @@ fun PostView(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = timetoprint(post.createdAt),
+                    text = mainViewModel.timetoprint(post.createdAt),
                     fontSize = 12.sp,
                 )
             }
@@ -746,7 +753,8 @@ fun ParentCommentView(
     onclickdelete : () -> Unit = {},
     navController: NavHostController,
     posteduserid:Int,
-    commentcolor:Color
+    commentcolor:Color,
+    mainViewModel: MainViewModel = hiltViewModel()
 ){
 
     var dropmenuexpanded by remember { mutableStateOf(false) }
@@ -883,7 +891,7 @@ fun ParentCommentView(
             modifier = Modifier.padding(top = 5.dp)
         ){
             Text(
-                text = timetoprint(comment.createdAt),
+                text = mainViewModel.timetoprint(comment.createdAt),
                 fontSize = 12.sp,
                 modifier = Modifier.padding(start = 5.dp)
             )
@@ -942,7 +950,8 @@ fun ChildCommentView(onclicklike: () -> Unit = {},
                      onclickdelete: () -> Unit = {},
                      comment: ChildComment = ChildComment(childcommentid=3, userId=8, postId=1, content="comment3", parentCommentId=2, createdAt="2024-01-19T15:04:15.000+00:00", likes=0),
                      navController: NavHostController,
-                     posteduserid: Int) {
+                     posteduserid: Int,
+                     mainViewModel: MainViewModel = hiltViewModel()) {
 
     var dropmenuexpanded by remember { mutableStateOf(false) }
     var dropmenuexpanded2 by remember { mutableStateOf(false) }
@@ -950,9 +959,12 @@ fun ChildCommentView(onclicklike: () -> Unit = {},
     val context = LocalContext.current
 
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth()
+            .padding(bottom=20.dp)
+            .clip(RoundedCornerShape(6.dp))
+            .background(Color(0xFFF9F9F9)),
         horizontalAlignment = Alignment.Start
-    ) {
+    ){
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
@@ -1062,7 +1074,7 @@ fun ChildCommentView(onclicklike: () -> Unit = {},
             modifier = Modifier.padding(top = 5.dp)
         ) {
             Text(
-                text = timetoprint(comment.createdAt),
+                text = mainViewModel.timetoprint(comment.createdAt),
                 fontSize = 12.sp,
                 modifier = Modifier.padding(start = 5.dp)
             )
@@ -1077,50 +1089,26 @@ fun ReactionNumberView(
     number:Int = 0,
     size:String = "Small"
 ){
-    val dpsize: Dp
-    val padding: Dp
     val fontsize: TextUnit
-    val icon: ImageVector
-    val color: Color
+    val iconid:Int
 
-    when(size){
-        "Big" -> {
-            dpsize=30.dp
-            padding=0.dp
-            fontsize=20.sp
-        }
-        "Normal" -> {
-            dpsize=15.dp
-            padding=0.dp
-            fontsize=12.sp
-        }
-        else -> {
-            dpsize=15.dp
-            padding=4.dp
-            fontsize=12.sp
-        }
+    fontsize=when(size){
+        "Big" -> 20.sp
+        "Normal" -> 12.sp
+        else -> 12.sp
     }
 
-    when(type){
-        "Like" -> {
-            icon = Icons.Default.Favorite
-            color = Color.Red
-        }
-        "Comment" -> {
-            icon = Icons.Default.Comment
-            color = Color(0xFF00BCD4)
-        }
-        else -> {
-            icon = Icons.Default.Star
-            color = Color(0xFFFFEB3B)
-        }
+    iconid=when(type){
+        "Like" -> R.drawable.likeicon
+        "Comment" -> R.drawable.commenticon
+        else -> R.drawable.likeicon
     }
 
-    Icon(painter = painterResource(id = R.drawable.likeicon),
+    Icon(painter = painterResource(id = iconid),
         contentDescription = "Like",
-        Modifier
+        modifier = Modifier
             .size(10.dp),
-        tint=Color(0xFFF91F15))
+        tint = Color.Unspecified)
     Text(
         number.toString(),
         modifier = Modifier.padding(start = 4.dp),
