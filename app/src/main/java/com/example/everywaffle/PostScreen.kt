@@ -681,7 +681,8 @@ fun PostView(
                 contentDescription = "User",
                 modifier = Modifier
                     .width(40.dp)
-                    .height(40.dp)
+                    .height(40.dp),
+                tint=Color.Unspecified
             )
             Column(
                 modifier = Modifier.padding(5.dp)
@@ -894,11 +895,11 @@ fun ParentCommentView(
                 modifier = Modifier.padding(top = 7.dp, start = 10.dp)
             ){
                 Icon(
-                    painter = painterResource(id = R.drawable.profile),
+                    painter = painterResource(id = R.drawable.arrow),
                     contentDescription = "User",
                     modifier = Modifier
-                        .width(15.dp)
-                        .height(15.dp),
+                        .width(12.dp)
+                        .height(12.dp),
                     tint=Color.Unspecified
                 )
 
