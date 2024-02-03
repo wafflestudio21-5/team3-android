@@ -1,4 +1,4 @@
-# team3-server
+# team3-android
 
 <br/>
 
